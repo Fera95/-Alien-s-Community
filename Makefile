@@ -29,7 +29,7 @@ test2: test_pthread2.c $(PTHREAD_DEPS) $(PTHREAD_HEADERS)
 		$(CC) test_pthread2.c $(PTHREAD_DEPS) -o test2 $(CFLAGS)
 
 test3: test_pthread3.c $(PTHREAD_DEPS) $(PTHREAD_HEADERS)
-		$(CC) test_pthread3.c $(PTHREAD_DEPS) -o test3 $(CFLAGS)
+		$(CC) test_pthread3.c $(PTHREAD_DEPS) -o test3 $(CFLAGS) -lpthread
 
 test4: test_pthread4.c $(PTHREAD_DEPS) $(PTHREAD_HEADERS)
 		$(CC) test_pthread4.c $(PTHREAD_DEPS) -o test4 $(CFLAGS)
