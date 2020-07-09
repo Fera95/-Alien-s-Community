@@ -52,6 +52,8 @@ typedef struct
 /**
  * Movement Bouncer
  */ 
+ enum alienType{alfa,beta};
+  
 typedef struct ALIEN
 {
     // IDENTIFER
@@ -60,11 +62,15 @@ typedef struct ALIEN
     float x, y;
     // SPEED
     float dx, dy;
+    // TYPE
+    enum alienType type;
+    // highway
+    PATH ** way;
     // IMAGE
     ALLEGRO_BITMAP * image;
     // CONTEXT
     GUI_CONTEXT *ctx;
-    // MAP pointers
+
     
 } ALIEN;
 
@@ -76,5 +82,4 @@ int add_character(GUI_CONTEXT *ctx, int id, int type, int dx, int dy);
 void *moveAlien(void *args);
 void drawmap(PATH **map);
 void create_map(GUI_CONTEXT *ctx);
-// void drawmap(GUI_CONTEXT *ctx);
 #endif

@@ -2,7 +2,9 @@ CC = gcc
 SRC = gui.c main.c 
 RUN = alienCommunity
 CFLAGS =  -I -Wall `pkg-config allegro-5 allegro_font-5 allegro_image-5 allegro_primitives-5 --libs --cflags` -lpthread
-main: build run
+
+all: build run
+
 build: $(src)
 	$(CC) $(SRC) -o $(RUN)  $(CFLAGS)
 
