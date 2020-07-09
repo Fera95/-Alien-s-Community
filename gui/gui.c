@@ -13,7 +13,7 @@ ALLEGRO_BITMAP *path = NULL;
 bool done = false;
 bool render = false;	
 #define EXIT_COUNT 11
-#define ENTER_COUNT 11
+#define ENTRY_COUNT 11
 #define AVENUE_COUNT 16
 #define MAPSIZE 8
 
@@ -90,25 +90,25 @@ int set_background(GUI_CONTEXT *ctx)
 void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 {
     PATH* alfaexit = malloc(EXIT_COUNT*sizeof(PATH));
-    PATH* alfaenter = malloc(ENTER_COUNT*sizeof(PATH));
+    PATH* alfaentry = malloc(ENTRY_COUNT*sizeof(PATH));
     PATH* northavenueA = malloc(AVENUE_COUNT*sizeof(PATH));
     PATH* northavenueB = malloc(AVENUE_COUNT*sizeof(PATH));
 
     PATH* betaexit = malloc(EXIT_COUNT*sizeof(PATH));
-    PATH* betaenter = malloc(ENTER_COUNT*sizeof(PATH));
+    PATH* betaentry = malloc(ENTRY_COUNT*sizeof(PATH));
     PATH* southavenueA = malloc(AVENUE_COUNT*sizeof(PATH));
     PATH* southavenueB = malloc(AVENUE_COUNT*sizeof(PATH));
     
     // Alfa Community enter
     int posxInit = 70;
     int posyInit = 500;
-    for(int i=0;i<ENTER_COUNT;i++){
-        alfaenter[i].x = posxInit;
-        alfaenter[i].y = posyInit-40*i;
-        alfaenter[i].height = 40;
-        alfaenter[i].width = 40;
-        alfaenter[i].image = ctx->path;
-        alfaenter[i].blocked = 0;
+    for(int i=0;i<ENTRY_COUNT;i++){
+        alfaentry[i].x = posxInit;
+        alfaentry[i].y = posyInit-40*i;
+        alfaentry[i].height = 40;
+        alfaentry[i].width = 40;
+        alfaentry[i].image = ctx->path;
+        alfaentry[i].blocked = 0;
     }
 
     // Alfa Community Exit
@@ -150,10 +150,10 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     // #########################################
     // Beta Community Exit
     posxInit = 810;
-    posyInit = 120+EXIT_COUNT*40;
+    posyInit = 120;
     for(int i=0;i<EXIT_COUNT;i++){
         betaexit[i].x = posxInit;
-        betaexit[i].y = posyInit-40*i;
+        betaexit[i].y = posyInit+40*i;
         betaexit[i].height = 40;
         betaexit[i].width = 40;
         betaexit[i].image = ctx->path;
@@ -162,14 +162,14 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 
     // Beta Community enter
     posxInit = 890;
-    posyInit = 120;
-    for(int i=0;i<ENTER_COUNT;i++){
-        betaenter[i].x = posxInit;
-        betaenter[i].y = posyInit+40*i;
-        betaenter[i].height = 40;
-        betaenter[i].width = 40;
-        betaenter[i].image = ctx->path;
-        betaenter[i].blocked = 0;
+    posyInit = 80 + EXIT_COUNT*40;
+    for(int i=0;i<ENTRY_COUNT;i++){
+        betaentry[i].x = posxInit;
+        betaentry[i].y = posyInit-40*i;
+        betaentry[i].height = 40;
+        betaentry[i].width = 40;
+        betaentry[i].image = ctx->path;
+        betaentry[i].blocked = 0;
     }
 
     posxInit = 890;
@@ -185,7 +185,7 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
         southavenueB[i].blocked = 0;
         k++;
     }
-    posxInit = 890-AVENUE_COUNT*40;
+    posxInit = 930-AVENUE_COUNT*40;
     posyInit += 40;
     k=0;
     for(int i=0;i<AVENUE_COUNT;i++){
@@ -201,13 +201,13 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     // map construccion
     ctx->map = (PATH**) malloc(MAPSIZE*sizeof(PATH*));
     ctx->map[0] = alfaexit;
-    ctx->map[1] = alfaenter;
+    ctx->map[1] = alfaentry;
     ctx->map[2] = northavenueA;
     ctx->map[3] = northavenueB;
     ctx->map[4] = southavenueA;
     ctx->map[5] = southavenueB;
     ctx->map[6] = betaexit;
-    ctx->map[7] = betaenter;
+    ctx->map[7] = betaentry;
 }
 
 int loop_gui(GUI_CONTEXT *ctx)
@@ -283,17 +283,17 @@ int loop_gui(GUI_CONTEXT *ctx)
 void drawmap(PATH **map)
 {
     PATH* alfaexit = map[0];
-    PATH* alfaenter = map[1];
+    PATH* alfaentry = map[1];
     PATH* northavenueA = map[2];
     PATH* northavenueB = map[3];
     PATH* southavenueA = map[4];
     PATH* southavenueB = map[5];
     PATH* betaexit = map[6];
-    PATH* betaenter = map[7];
+    PATH* betaentry = map[7];
     
-    for(int i=0;i<ENTER_COUNT;i++){
-        al_draw_bitmap(alfaenter[i].image, alfaenter[i].x, alfaenter[i].y, 0);
-        al_draw_bitmap(betaenter[i].image, betaenter[i].x, betaenter[i].y, 0);
+    for(int i=0;i<ENTRY_COUNT;i++){
+        al_draw_bitmap(alfaentry[i].image, alfaentry[i].x, alfaentry[i].y, 0);
+        al_draw_bitmap(betaentry[i].image, betaentry[i].x, betaentry[i].y, 0);
     }
 
     for(int i=0;i<EXIT_COUNT;i++){
@@ -314,13 +314,13 @@ void *moveAlien(void *args)
 
     /*
     ctx->map[0] = alfaexit;
-    ctx->map[1] = alfaenter;
+    ctx->map[1] = alfaentry;
     ctx->map[2] = northavenueA;
     ctx->map[3] = northavenueB;
     ctx->map[4] = southavenueA;
     ctx->map[5] = southavenueB;
     ctx->map[6] = betaexit;
-    ctx->map[7] = betaenter;
+    ctx->map[7] = betaentry;
     */
     ALIEN *myAlien = (ALIEN*) args;
     PATH **road = malloc(4*sizeof(PATH*));
@@ -329,16 +329,26 @@ void *moveAlien(void *args)
     road[2] = myAlien->ctx->map[4];
     road[3] = myAlien->ctx->map[7];
     
+    int init = 0;
+    int LIMIT = 0;  
     for (int i = 0; i < 4; i++)
     {
-        int sizeJ = sizeof(road[i])/sizeof(road[i][0]);
-        printf("Limit J = %d",sizeJ);
-        for (int j = 0; j < ENTER_COUNT; j++)
+        if(i == 0 || i == 3 || i==2){
+            init = 0;
+            LIMIT = EXIT_COUNT;
+        }
+        if(i == 1 ){
+            init = 2;
+            LIMIT = AVENUE_COUNT;
+        }
+        
+        for (init; init < LIMIT; init++)
         {
-            myAlien->x = road[i][j].x;
-            myAlien->y = road[i][j].y;
+            myAlien->x = road[i][init].x;
+            myAlien->y = road[i][init].y;
             sleep(1);
         }
     }
+    free(road);
 }
 
