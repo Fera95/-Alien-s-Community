@@ -46,6 +46,7 @@ typedef struct
     ALLEGRO_BITMAP *bridge;
     ALLEGRO_BITMAP *alfaCommunity;
     ALLEGRO_BITMAP *betaCommunity;
+    PATH ** map;
 
 } GUI_CONTEXT;
 /**
@@ -63,12 +64,9 @@ typedef struct ALIEN
     ALLEGRO_BITMAP * image;
     // CONTEXT
     GUI_CONTEXT *ctx;
+    // MAP pointers
     
 } ALIEN;
-
-
-#define mapsize 3
-PATH ** map;
 
 int init_gui(GUI_CONTEXT *ctx);
 int loop_gui(GUI_CONTEXT *ctx);
@@ -76,6 +74,7 @@ int finalize_gui(GUI_CONTEXT *ctx);
 int set_background(GUI_CONTEXT *ctx);
 int add_character(GUI_CONTEXT *ctx, int id, int type, int dx, int dy);
 void *moveAlien(void *args);
-void drawmap(GUI_CONTEXT *ctx);
+void drawmap(PATH **map);
+void create_map(GUI_CONTEXT *ctx);
 // void drawmap(GUI_CONTEXT *ctx);
 #endif
