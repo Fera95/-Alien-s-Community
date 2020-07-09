@@ -12,10 +12,13 @@ ALLEGRO_BITMAP *path = NULL;
 
 bool done = false;
 bool render = false;	
+#define ALFAEXIT_COUNT 11
+#define ALFAENTRANCE_COUNT 13
+#define NORTHAVENUE_COUNT 32
 
-struct PATH alfaexit[17];
-struct PATH alfaentrance[14];
-struct PATH northavenue[50];
+struct PATH alfaexit[ALFAEXIT_COUNT];
+struct PATH alfaentrance[ALFAENTRANCE_COUNT];
+struct PATH northavenue[NORTHAVENUE_COUNT];
 
 
 
@@ -188,10 +191,10 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     // Alfa Community Entrance
     int posxInit = 70;
     int posyInit = 500;
-    for(int i=0;i<17;i++){
+    for(int i=0;i<ALFAENTRANCE_COUNT;i++){
         alfaentrance[i].x = posxInit;
-        alfaentrance[i].y = posyInit-30*i;
-        alfaentrance[i].height = 30;
+        alfaentrance[i].y = posyInit-40*i;
+        alfaentrance[i].height = 40;
         alfaentrance[i].width = 40;
         alfaentrance[i].image = ctx->path;
         alfaentrance[i].blocked = 0;
@@ -200,30 +203,30 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 
     // Alfa Community Exit
     posxInit = 150;
-    posyInit = 490;
-    for(int i=0;i<14;i++){
+    posyInit = 500;
+    for(int i=0;i<ALFAEXIT_COUNT;i++){
         alfaexit[i].x = posxInit;
-        alfaexit[i].y = posyInit-30*i;
-        alfaexit[i].height = 30;
+        alfaexit[i].y = posyInit-40*i;
+        alfaexit[i].height = 40;
         alfaexit[i].width = 40;
         alfaexit[i].image = ctx->path;
         alfaexit[i].blocked = 0;
         al_draw_bitmap(alfaexit[i].image, alfaexit[i].x, alfaexit[i].y, 0);
     }
-    posxInit = 140;
+    posxInit = 150;
     posyInit = 20;
     int k = 0;
     // North Avenue
-    for(int i=0;i<50;i++){
-        if(i==26){
-            posxInit = 180;
+    for(int i=0;i<NORTHAVENUE_COUNT;i++){
+        if(i==16){
+            posxInit = 150;
             posyInit = 60;
             k=0;
         }
-        northavenue[i].x = posxInit+30*k;
+        northavenue[i].x = posxInit+40*k;
         northavenue[i].y = posyInit;
         northavenue[i].height = 40;
-        northavenue[i].width = 30;
+        northavenue[i].width = 40;
         northavenue[i].image = ctx->path;
         northavenue[i].blocked = 0;
         // al_draw_bitmap(northavenue[i].image, , northavenue[i].y, 0);
