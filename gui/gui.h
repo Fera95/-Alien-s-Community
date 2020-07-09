@@ -5,6 +5,9 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 #include <stdio.h>
+#include <time.h>
+#include <pthread.h>
+#include "path.h"
 /**
  * This is the basic structure to render a gui
  */
@@ -20,9 +23,7 @@ typedef struct
      * Pointer to the Alegro display
      */ 
     ALLEGRO_DISPLAY *disp;
-    /**
-     * Allegro font pointer
-     */ 
+    //  Allegro font pointer 
     ALLEGRO_FONT *font;
     /**
      * Controls when to finisthe game
@@ -41,32 +42,40 @@ typedef struct
      * Background representation
      */
     ALLEGRO_BITMAP *background;
+    ALLEGRO_BITMAP *path;
+    ALLEGRO_BITMAP *bridge;
+    ALLEGRO_BITMAP *alfaCommunity;
+    ALLEGRO_BITMAP *betaCommunity;
+
 } GUI_CONTEXT;
 /**
  * Movement Bouncer
  */ 
-typedef struct CHARACTER
+typedef struct ALIEN
 {
-    /**
-     * 
-     */
+    // IDENTIFER
     int id;
-    /**
-     * Coordinates
-     */
+    // COORDENADAS
     float x, y;
-    /**
-     * The way we set a velocity
-     */
+    // SPEED
     float dx, dy;
-    /**
-     * type 
-     */ 
-} CHARACTER;
+    // IMAGE
+    ALLEGRO_BITMAP * image;
+    // CONTEXT
+    GUI_CONTEXT *ctx;
+    
+} ALIEN;
+
+
+#define mapsize 3
+PATH ** map;
+
 int init_gui(GUI_CONTEXT *ctx);
 int loop_gui(GUI_CONTEXT *ctx);
 int finalize_gui(GUI_CONTEXT *ctx);
 int set_background(GUI_CONTEXT *ctx);
-
 int add_character(GUI_CONTEXT *ctx, int id, int type, int dx, int dy);
+void *moveAlien(void *args);
+void drawmap(GUI_CONTEXT *ctx);
+// void drawmap(GUI_CONTEXT *ctx);
 #endif
