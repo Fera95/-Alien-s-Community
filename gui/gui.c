@@ -14,7 +14,7 @@ bool done = false;
 bool render = false;	
 
 struct PATH alfaexit[17];
-struct PATH alfaentrance[15];
+struct PATH alfaentrance[14];
 struct PATH northavenue[50];
 
 
@@ -125,7 +125,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx);
-            al_draw_bitmap(ctx->alfaCommunity, 10, 470, 0);
+            al_draw_bitmap(ctx->alfaCommunity, 5, 470, 0);
             al_draw_bitmap(ctx->betaCommunity, 770, 100, 0);
             al_draw_bitmap(alien1.image, alien1.x, alien1.y, 0);
             al_flip_display();
@@ -186,7 +186,7 @@ int * create_map(int lenA){
 void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 {
     // Alfa Community Entrance
-    int posxInit = 50;
+    int posxInit = 70;
     int posyInit = 500;
     for(int i=0;i<17;i++){
         alfaentrance[i].x = posxInit;
@@ -200,7 +200,8 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 
     // Alfa Community Exit
     posxInit = 150;
-    for(int i=0;i<15;i++){
+    posyInit = 490;
+    for(int i=0;i<14;i++){
         alfaexit[i].x = posxInit;
         alfaexit[i].y = posyInit-30*i;
         alfaexit[i].height = 30;
@@ -209,13 +210,13 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
         alfaexit[i].blocked = 0;
         al_draw_bitmap(alfaexit[i].image, alfaexit[i].x, alfaexit[i].y, 0);
     }
-    posxInit = 120;
+    posxInit = 140;
     posyInit = 20;
     int k = 0;
     // North Avenue
     for(int i=0;i<50;i++){
         if(i==26){
-            posxInit = 160;
+            posxInit = 180;
             posyInit = 60;
             k=0;
         }
