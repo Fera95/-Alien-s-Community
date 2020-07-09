@@ -142,7 +142,9 @@ while(1){
 
 int main()
 {
-   
+   while(1){
+
+  
    int i, j;
 
    pthread_t thread_id[NTHREADS];
@@ -193,7 +195,7 @@ int main()
        
        sleep(5);
    }
-
+    }
 
 }
 
