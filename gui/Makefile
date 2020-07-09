@@ -1,2 +1,12 @@
-main:
-	gcc gui.c main.c  -o main.o `pkg-config allegro-5 allegro_font-5 allegro_image-5 allegro_primitives-5 --libs --cflags`
+CC = gcc
+SRC = gui.c main.c 
+RUN = alienCommunity
+CFLAGS =  -I -Wall `pkg-config allegro-5 allegro_font-5 allegro_image-5 allegro_primitives-5 --libs --cflags` -lpthread
+all: $(src)
+	$(CC) $(SRC) -o $(RUN)  $(CFLAGS)
+
+clean:
+	rm $(RUN)
+
+run:
+	./$(RUN)
