@@ -12,13 +12,17 @@ ALLEGRO_BITMAP *path = NULL;
 
 bool done = false;
 bool render = false;	
-#define ALFAEXIT_COUNT 11
-#define ALFAENTRANCE_COUNT 13
-#define NORTHAVENUE_COUNT 32
+#define EXIT_COUNT 11
+#define ENTRANCE_COUNT 13
+#define AVENUE_COUNT 30
 
-struct PATH alfaexit[ALFAEXIT_COUNT];
-struct PATH alfaentrance[ALFAENTRANCE_COUNT];
-struct PATH northavenue[NORTHAVENUE_COUNT];
+struct PATH alfaexit[EXIT_COUNT];
+struct PATH alfaentrance[ENTRANCE_COUNT];
+struct PATH northavenue[AVENUE_COUNT];
+
+struct PATH betaexit[EXIT_COUNT];
+struct PATH betaentrance[ENTRANCE_COUNT];
+struct PATH southavenue[AVENUE_COUNT];
 
 
 
@@ -129,7 +133,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx);
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, 0);
-            al_draw_bitmap(ctx->betaCommunity, 770, 100, 0);
+            al_draw_bitmap(ctx->betaCommunity, 775, 20, 0);
             al_draw_bitmap(alien1.image, alien1.x, alien1.y, 0);
             al_flip_display();
             ctx->redraw = false;
@@ -191,7 +195,7 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     // Alfa Community Entrance
     int posxInit = 70;
     int posyInit = 500;
-    for(int i=0;i<ALFAENTRANCE_COUNT;i++){
+    for(int i=0;i<ENTRANCE_COUNT;i++){
         alfaentrance[i].x = posxInit;
         alfaentrance[i].y = posyInit-40*i;
         alfaentrance[i].height = 40;
@@ -204,7 +208,7 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     // Alfa Community Exit
     posxInit = 150;
     posyInit = 500;
-    for(int i=0;i<ALFAEXIT_COUNT;i++){
+    for(int i=0;i<EXIT_COUNT;i++){
         alfaexit[i].x = posxInit;
         alfaexit[i].y = posyInit-40*i;
         alfaexit[i].height = 40;
@@ -217,8 +221,8 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     posyInit = 20;
     int k = 0;
     // North Avenue
-    for(int i=0;i<NORTHAVENUE_COUNT;i++){
-        if(i==16){
+    for(int i=0;i<AVENUE_COUNT;i++){
+        if(i==15){
             posxInit = 150;
             posyInit = 60;
             k=0;
@@ -233,14 +237,50 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
         al_draw_rotated_bitmap(northavenue[i].image,0,0,northavenue[i].x,northavenue[i].y, ALLEGRO_PI/2, 0);
         k++;
     }
+    // #########################################
+    // Beta Community Exit
+    posxInit = 810;
+    posyInit = 120;
+    for(int i=0;i<EXIT_COUNT;i++){
+        betaexit[i].x = posxInit;
+        betaexit[i].y = posyInit+40*i;
+        betaexit[i].height = 40;
+        betaexit[i].width = 40;
+        betaexit[i].image = ctx->path;
+        betaexit[i].blocked = 0;
+        al_draw_bitmap(betaexit[i].image, betaexit[i].x, betaexit[i].y, 0);
+    }
+
+    // Beta Community Entrance
+    posxInit = 890;
+    posyInit = 120;
+    for(int i=0;i<ENTRANCE_COUNT;i++){
+        betaentrance[i].x = posxInit;
+        betaentrance[i].y = posyInit+40*i;
+        betaentrance[i].height = 40;
+        betaentrance[i].width = 40;
+        betaentrance[i].image = ctx->path;
+        betaentrance[i].blocked = 0;
+        al_draw_bitmap(betaentrance[i].image, betaentrance[i].x, betaentrance[i].y, 0);
+    }
+
+    posxInit = 850;
+    posyInit = 560;
+    k = 0;
+    // South Avenue
+    for(int i=0;i<AVENUE_COUNT;i++){
+        if(i==15){
+            posxInit = 850;
+            posyInit = 600;
+            k=0;
+        }
+        southavenue[i].x = posxInit-40*k;
+        southavenue[i].y = posyInit;
+        southavenue[i].height = 40;
+        southavenue[i].width = 40;
+        southavenue[i].image = ctx->path;
+        southavenue[i].blocked = 0;
+        al_draw_bitmap(southavenue[i].image, southavenue[i].x, southavenue[i].y, 0);
+        k++;
+    }
 }
-
-
-    // for (int i=0; i<22; i++ ){
-    //     al_draw_bitmap(ctx->paths,120 ,i*30, 0);
-    //     al_draw_bitmap(ctx->paths,40 ,i*30, 0);
-    //     }
-    // for (int i=1; i<33; i++ ){
-    //     al_draw_rotated_bitmap(ctx->paths,0,0,i*30,0, ALLEGRO_PI/2, 0);
-    //     al_draw_rotated_bitmap(ctx->paths,0,0,i*30,30, ALLEGRO_PI/2, 0);
-        // }
