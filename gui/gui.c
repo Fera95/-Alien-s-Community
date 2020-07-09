@@ -15,7 +15,7 @@ bool render = false;
 #define EXIT_COUNT 11
 #define ENTER_COUNT 11
 #define AVENUE_COUNT 16
-#define MAPSIZE 6
+#define MAPSIZE 8
 
 
 void must_init(bool test, const char *description)
@@ -91,11 +91,13 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 {
     PATH* alfaexit = malloc(EXIT_COUNT*sizeof(PATH));
     PATH* alfaenter = malloc(ENTER_COUNT*sizeof(PATH));
-    PATH* northavenue = malloc(AVENUE_COUNT*sizeof(PATH)*2);
+    PATH* northavenueA = malloc(AVENUE_COUNT*sizeof(PATH)*2);
+    PATH* northavenueB = malloc(AVENUE_COUNT*sizeof(PATH)*2);
 
     PATH* betaexit = malloc(EXIT_COUNT*sizeof(PATH));
     PATH* betaenter = malloc(ENTER_COUNT*sizeof(PATH));
-    PATH* southavenue = malloc(AVENUE_COUNT*sizeof(PATH)*2);
+    PATH* southavenueA = malloc(AVENUE_COUNT*sizeof(PATH)*2);
+    PATH* southavenueB = malloc(AVENUE_COUNT*sizeof(PATH)*2);
     
     // Alfa Community enter
     int posxInit = 70;
@@ -124,18 +126,25 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     posyInit = 20;
     int k = 0;
     // North Avenue
-    for(int i=0;i<AVENUE_COUNT*2;i++){
-        if(i==AVENUE_COUNT){
-            posxInit = 70;
-            posyInit += 40;
-            k=0;
-        }
-        northavenue[i].x = posxInit+40*k;
-        northavenue[i].y = posyInit;
-        northavenue[i].height = 40;
-        northavenue[i].width = 40;
-        northavenue[i].image = ctx->path;
-        northavenue[i].blocked = 0;
+    for(int i=0;i<AVENUE_COUNT;i++){
+        northavenueA[i].x = posxInit+40*k;
+        northavenueA[i].y = posyInit;
+        northavenueA[i].height = 40;
+        northavenueA[i].width = 40;
+        northavenueA[i].image = ctx->path;
+        northavenueA[i].blocked = 0;
+        k++;
+    }
+    posxInit = 70;
+    posyInit += 40;
+    k=0;
+    for(int i=0;i<AVENUE_COUNT;i++){
+        northavenueB[i].x = posxInit+40*k;
+        northavenueB[i].y = posyInit;
+        northavenueB[i].height = 40;
+        northavenueB[i].width = 40;
+        northavenueB[i].image = ctx->path;
+        northavenueB[i].blocked = 0;
         k++;
     }
     // #########################################
@@ -168,17 +177,24 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     k = 0;
     // South Avenue
     for(int i=0;i<AVENUE_COUNT*2;i++){
-        if(i==AVENUE_COUNT){
-            posxInit = 890;
-            posyInit += 40;
-            k=0;
-        }
-        southavenue[i].x = posxInit-40*k;
-        southavenue[i].y = posyInit;
-        southavenue[i].height = 40;
-        southavenue[i].width = 40;
-        southavenue[i].image = ctx->path;
-        southavenue[i].blocked = 0;
+        southavenueA[i].x = posxInit-40*k;
+        southavenueA[i].y = posyInit;
+        southavenueA[i].height = 40;
+        southavenueA[i].width = 40;
+        southavenueA[i].image = ctx->path;
+        southavenueA[i].blocked = 0;
+        k++;
+    }
+    posxInit = 890;
+    posyInit += 40;
+    k=0;
+    for(int i=0;i<AVENUE_COUNT*2;i++){
+        southavenueB[i].x = posxInit-40*k;
+        southavenueB[i].y = posyInit;
+        southavenueB[i].height = 40;
+        southavenueB[i].width = 40;
+        southavenueB[i].image = ctx->path;
+        southavenueB[i].blocked = 0;
         k++;
     }
     // ##################################
@@ -186,10 +202,12 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     ctx->map = (PATH**) malloc(MAPSIZE*sizeof(PATH*));
     ctx->map[0] = alfaexit;
     ctx->map[1] = alfaenter;
-    ctx->map[2] = northavenue;
-    ctx->map[3] = southavenue;
-    ctx->map[4] = betaexit;
-    ctx->map[5] = betaenter;
+    ctx->map[2] = northavenueA;
+    ctx->map[3] = northavenueB;
+    ctx->map[4] = southavenueA;
+    ctx->map[5] = southavenueB;
+    ctx->map[6] = betaexit;
+    ctx->map[7] = betaenter;
 }
 
 int loop_gui(GUI_CONTEXT *ctx)
@@ -266,10 +284,12 @@ void drawmap(PATH **map)
 {
     PATH* alfaexit = map[0];
     PATH* alfaenter = map[1];
-    PATH* northavenue = map[2];
-    PATH* southavenue = map[3];
-    PATH* betaexit = map[4];
-    PATH* betaenter = map[5];
+    PATH* northavenueA = map[2];
+    PATH* northavenueB = map[3];
+    PATH* southavenueA = map[4];
+    PATH* southavenueB = map[5];
+    PATH* betaexit = map[6];
+    PATH* betaenter = map[7];
     
     for(int i=0;i<ENTER_COUNT;i++){
         al_draw_bitmap(alfaenter[i].image, alfaenter[i].x, alfaenter[i].y, 0);
@@ -281,9 +301,11 @@ void drawmap(PATH **map)
         al_draw_bitmap(betaexit[i].image, betaexit[i].x, betaexit[i].y, 0);
     }
 
-    for(int i=0;i<AVENUE_COUNT*2;i++){
-        al_draw_bitmap(northavenue[i].image, northavenue[i].x, northavenue[i].y, 0);
-        al_draw_bitmap(southavenue[i].image, southavenue[i].x, southavenue[i].y, 0);
+    for(int i=0;i<AVENUE_COUNT;i++){
+        al_draw_bitmap(northavenueA[i].image, northavenueA[i].x, northavenueA[i].y, 0);
+        al_draw_bitmap(southavenueA[i].image, southavenueA[i].x, southavenueA[i].y, 0);
+        al_draw_bitmap(northavenueB[i].image, northavenueB[i].x, northavenueB[i].y, 0);
+        al_draw_bitmap(southavenueB[i].image, southavenueB[i].x, southavenueB[i].y, 0);
     }    
 }
 
