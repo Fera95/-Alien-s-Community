@@ -2,7 +2,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-#include "lpthread/lpthread.h"
+#include "lpthread.h"
 #include <stdlib.h>
 #include <signal.h>
 #ifndef LPTHREAD
@@ -13,7 +13,7 @@ void *functionC();
 lpthread_mutex_t mutex1;
 int  counter = 0;
 
-main()
+int main()
 {
    int rc1, rc2;
    lpthread_t thread1, thread2;

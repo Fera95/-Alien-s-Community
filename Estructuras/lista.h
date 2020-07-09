@@ -19,6 +19,7 @@ typedef struct configpuente {
     int puenteTotalAliens_turno;
     int puentePesoPermitido;
     int puenteLargo;
+    int puenteTiempo_para_cruzar;
     int puenteAlgoritmo;
 } configpuente_t;
 

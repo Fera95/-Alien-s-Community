@@ -8,22 +8,18 @@ ifeq (${THREAD_LIB}, lPTHREAD)
 CFLAGS += -D lPTHREAD_LIB
 endif
 
-PTHREAD_DEPS=lpthread/lpthread.c lpthread/lpthread_mutex.c lpthread/lpthread_debug.c lpthread/list.c lpthread/lottery.c lpthread/selfishrr.c lpthread/edf.c lpthread/scheduling.c
-PTHREAD_HEADERS=lpthread/lpthread.h lpthread/tcb.h lpthread/list.h lpthread/lottery.h lpthread/selfishrr.h lpthread/edf.h
+PTHREAD_DEPS=lpthread.c 
+PTHREAD_HEADERS=lpthread.h 
 
 
 THREAD_LIB=PTHREAD
 SCHEDULER=LOTTERY
 
-default: test1 test2 test3 test4
-
-
+default:  test1 test2 test3 test4
 
 
 test1: test_pthread1.c $(PTHREAD_DEPS) $(PTHREAD_HEADERS)
 		$(CC) test_pthread1.c $(PTHREAD_DEPS) -o test1 $(CFLAGS)
-
-
 
 test2: test_pthread2.c $(PTHREAD_DEPS) $(PTHREAD_HEADERS)
 		$(CC) test_pthread2.c $(PTHREAD_DEPS) -o test2 $(CFLAGS)
@@ -38,4 +34,4 @@ test4: test_pthread4.c $(PTHREAD_DEPS) $(PTHREAD_HEADERS)
 
 .PHONY : clean
 clean:
-		rm  test1 test2 test3
+		rm  test1 test2 test3 test4
