@@ -13,12 +13,13 @@ ALLEGRO_BITMAP *path = NULL;
 bool done = false;
 bool render = false;	
 #define EXIT_COUNT 11
-#define ENTRANCE_COUNT 13
-#define AVENUE_COUNT 30
+#define ENTRANCE_COUNT 11
+#define AVENUE_COUNT 16
 
 struct PATH alfaexit[EXIT_COUNT];
 struct PATH alfaentrance[ENTRANCE_COUNT];
 struct PATH northavenue[AVENUE_COUNT];
+// struct PATH northavenueB[AVENUE_COUNT];
 
 struct PATH betaexit[EXIT_COUNT];
 struct PATH betaentrance[ENTRANCE_COUNT];
@@ -217,14 +218,14 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
         alfaexit[i].blocked = 0;
         al_draw_bitmap(alfaexit[i].image, alfaexit[i].x, alfaexit[i].y, 0);
     }
-    posxInit = 150;
+    posxInit = 110;
     posyInit = 20;
     int k = 0;
     // North Avenue
-    for(int i=0;i<AVENUE_COUNT;i++){
-        if(i==15){
-            posxInit = 150;
-            posyInit = 60;
+    for(int i=0;i<AVENUE_COUNT*2;i++){
+        if(i==AVENUE_COUNT){
+            posxInit = 110;
+            posyInit += 40;
             k=0;
         }
         northavenue[i].x = posxInit+40*k;
@@ -264,14 +265,14 @@ void drawmap(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
         al_draw_bitmap(betaentrance[i].image, betaentrance[i].x, betaentrance[i].y, 0);
     }
 
-    posxInit = 850;
+    posxInit = 890;
     posyInit = 560;
     k = 0;
     // South Avenue
-    for(int i=0;i<AVENUE_COUNT;i++){
-        if(i==15){
-            posxInit = 850;
-            posyInit = 600;
+    for(int i=0;i<AVENUE_COUNT*2;i++){
+        if(i==AVENUE_COUNT){
+            posxInit = 890;
+            posyInit += 40;
             k=0;
         }
         southavenue[i].x = posxInit-40*k;
