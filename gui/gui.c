@@ -91,13 +91,13 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
 {
     PATH* alfaexit = malloc(EXIT_COUNT*sizeof(PATH));
     PATH* alfaenter = malloc(ENTER_COUNT*sizeof(PATH));
-    PATH* northavenueA = malloc(AVENUE_COUNT*sizeof(PATH)*2);
-    PATH* northavenueB = malloc(AVENUE_COUNT*sizeof(PATH)*2);
+    PATH* northavenueA = malloc(AVENUE_COUNT*sizeof(PATH));
+    PATH* northavenueB = malloc(AVENUE_COUNT*sizeof(PATH));
 
     PATH* betaexit = malloc(EXIT_COUNT*sizeof(PATH));
     PATH* betaenter = malloc(ENTER_COUNT*sizeof(PATH));
-    PATH* southavenueA = malloc(AVENUE_COUNT*sizeof(PATH)*2);
-    PATH* southavenueB = malloc(AVENUE_COUNT*sizeof(PATH)*2);
+    PATH* southavenueA = malloc(AVENUE_COUNT*sizeof(PATH));
+    PATH* southavenueB = malloc(AVENUE_COUNT*sizeof(PATH));
     
     // Alfa Community enter
     int posxInit = 70;
@@ -127,18 +127,6 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     int k = 0;
     // North Avenue
     for(int i=0;i<AVENUE_COUNT;i++){
-        northavenueA[i].x = posxInit+40*k;
-        northavenueA[i].y = posyInit;
-        northavenueA[i].height = 40;
-        northavenueA[i].width = 40;
-        northavenueA[i].image = ctx->path;
-        northavenueA[i].blocked = 0;
-        k++;
-    }
-    posxInit = 70;
-    posyInit += 40;
-    k=0;
-    for(int i=0;i<AVENUE_COUNT;i++){
         northavenueB[i].x = posxInit+40*k;
         northavenueB[i].y = posyInit;
         northavenueB[i].height = 40;
@@ -147,13 +135,25 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
         northavenueB[i].blocked = 0;
         k++;
     }
+    posxInit = 70;
+    posyInit += 40;
+    k=0;
+    for(int i=0;i<AVENUE_COUNT;i++){
+        northavenueA[i].x = posxInit+40*k;
+        northavenueA[i].y = posyInit;
+        northavenueA[i].height = 40;
+        northavenueA[i].width = 40;
+        northavenueA[i].image = ctx->path;
+        northavenueA[i].blocked = 0;
+        k++;
+    }
     // #########################################
     // Beta Community Exit
     posxInit = 810;
-    posyInit = 120;
+    posyInit = 120+EXIT_COUNT*40;
     for(int i=0;i<EXIT_COUNT;i++){
         betaexit[i].x = posxInit;
-        betaexit[i].y = posyInit+40*i;
+        betaexit[i].y = posyInit-40*i;
         betaexit[i].height = 40;
         betaexit[i].width = 40;
         betaexit[i].image = ctx->path;
@@ -176,25 +176,25 @@ void create_map(GUI_CONTEXT *ctx)//, int lenA, int lenB, int lenC)
     posyInit = 560;
     k = 0;
     // South Avenue
-    for(int i=0;i<AVENUE_COUNT*2;i++){
-        southavenueA[i].x = posxInit-40*k;
-        southavenueA[i].y = posyInit;
-        southavenueA[i].height = 40;
-        southavenueA[i].width = 40;
-        southavenueA[i].image = ctx->path;
-        southavenueA[i].blocked = 0;
-        k++;
-    }
-    posxInit = 890;
-    posyInit += 40;
-    k=0;
-    for(int i=0;i<AVENUE_COUNT*2;i++){
+    for(int i=0;i<AVENUE_COUNT;i++){
         southavenueB[i].x = posxInit-40*k;
         southavenueB[i].y = posyInit;
         southavenueB[i].height = 40;
         southavenueB[i].width = 40;
         southavenueB[i].image = ctx->path;
         southavenueB[i].blocked = 0;
+        k++;
+    }
+    posxInit = 890-AVENUE_COUNT*40;
+    posyInit += 40;
+    k=0;
+    for(int i=0;i<AVENUE_COUNT;i++){
+        southavenueA[i].x = posxInit+40*k;
+        southavenueA[i].y = posyInit;
+        southavenueA[i].height = 40;
+        southavenueA[i].width = 40;
+        southavenueA[i].image = ctx->path;
+        southavenueA[i].blocked = 0;
         k++;
     }
     // ##################################
@@ -311,12 +311,23 @@ void drawmap(PATH **map)
 
 void *moveAlien(void *args)
 {
+
+    /*
+    ctx->map[0] = alfaexit;
+    ctx->map[1] = alfaenter;
+    ctx->map[2] = northavenueA;
+    ctx->map[3] = northavenueB;
+    ctx->map[4] = southavenueA;
+    ctx->map[5] = southavenueB;
+    ctx->map[6] = betaexit;
+    ctx->map[7] = betaenter;
+    */
     ALIEN *myAlien = (ALIEN*) args;
     PATH **road = malloc(4*sizeof(PATH*));
     road[0] = myAlien->ctx->map[0];
     road[1] = myAlien->ctx->map[2];
-    road[2] = myAlien->ctx->map[3];
-    road[3] = myAlien->ctx->map[4];
+    road[2] = myAlien->ctx->map[4];
+    road[3] = myAlien->ctx->map[7];
     
     for (int i = 0; i < 4; i++)
     {
