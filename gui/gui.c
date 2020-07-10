@@ -81,7 +81,7 @@ int set_background(GUI_CONTEXT *ctx)
     must_init(al_init_image_addon(), "image addon");
     ctx->background = al_load_bitmap("assets/background.png");
     ctx->pathImage = al_load_bitmap("assets/path.png");
-    ctx->passImage = al_load_bitmap("assets/bridge.png");
+    ctx->passImage = al_load_bitmap("assets/bridge2.png");
     ctx->queueImage = al_load_bitmap("assets/queue.png");
     ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
     ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
