@@ -2,15 +2,17 @@
 
 BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALLEGRO_BITMAP *queueImage, ALLEGRO_BITMAP *passImage, ALLEGRO_BITMAP *pathImage )
 {
+    if(length > 10)
+        length = 10;
     BRIDGE * newBridge = malloc(sizeof(BRIDGE));
     int queueSizeTemp = (int) (TOTAL_LENGTH - length)/2;
     newBridge->queueSize = queueSizeTemp;
-    newBridge->passSize = length;
+    newBridge->length = length;
     newBridge->queueNorth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->queueSouth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->exitNorth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->exitSouth = malloc(newBridge->queueSize*sizeof(PATH));
-    newBridge->pass = malloc(newBridge->passSize*sizeof(PATH));   
+    newBridge->pass = malloc(newBridge->length*sizeof(PATH));   
     
     newBridge->position = position;
     // CAMBIAR POR UN ENUMERATE
@@ -32,15 +34,16 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
          */
         // POSITION X AXIS
         newBridge->queueNorth[i].x = init_posx ;
-        newBridge->queueSouth[i].x = init_posx ;
-        newBridge->exitNorth[i].x = init_posx  + 40;
+        newBridge->queueSouth[i].x = init_posx + 40;
+        newBridge->exitNorth[i].x = init_posx;
         newBridge->exitSouth[i].x = init_posx  + 40;
 
         // POSITION Y AXIS
+
         newBridge->queueNorth[i].y = INIT_POSY + 40*i;
-        newBridge->queueSouth[i].y = END_POSY + 40*i- 40*queueSizeTemp;
-        newBridge->exitNorth[i].y = INIT_POSY + 40*i;
-        newBridge->exitSouth[i].y = END_POSY + 40*i- 40*queueSizeTemp;
+        newBridge->queueSouth[i].y = END_POSY - 40*i;
+        newBridge->exitNorth[i].y = (END_POSY-40*(queueSizeTemp-1))  + 40*i;
+        newBridge->exitSouth[i].y = (INIT_POSY+40*(queueSizeTemp-1)) - 40*i;
 
         // IMAGE
         newBridge->queueNorth[i].image = queueImage;
@@ -65,13 +68,13 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
         newBridge->exitSouth[i].width = 40;
     }
     
-    // SETTING THE 
+    // SETTING ONE WAY BRIDGE
     int posxOff = init_posx + 20;
-    int posyOff = INIT_POSY + 5 + 40 * newBridge->queueSize;
+    int posyOff = INIT_POSY + 40 * newBridge->queueSize;
     if (length%2!=0)
         posyOff+=20;
     
-    for (int i = 0; i < newBridge->passSize; i++)
+    for (int i = 0; i < newBridge->length; i++)
     {
         newBridge->pass[i].x = posxOff;
         newBridge->pass[i].y = posyOff + 40*i;

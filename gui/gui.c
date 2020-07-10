@@ -56,9 +56,9 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(3,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->midBridge = create_bridge(5,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->westBridge = create_bridge(6,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->eastBridge = create_bridge(1,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->midBridge = create_bridge(2,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->westBridge = create_bridge(7,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -82,7 +82,7 @@ int set_background(GUI_CONTEXT *ctx)
     ctx->background = al_load_bitmap("assets/background.png");
     ctx->pathImage = al_load_bitmap("assets/path.png");
     ctx->passImage = al_load_bitmap("assets/bridge.png");
-    ctx->queueImage = al_load_bitmap("assets/path.png");
+    ctx->queueImage = al_load_bitmap("assets/queue.png");
     ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
     ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
     must_init(ctx->background, "background");
@@ -350,10 +350,42 @@ void drawBridge(BRIDGE* mybridge){
         al_draw_bitmap(mybridge->exitSouth[i].image, mybridge->exitSouth[i].x, mybridge->exitSouth[i].y, 0);
     }
 
-    for (int i = 0; i < mybridge->passSize; i++)
+    for (int i = 0; i < mybridge->length; i++)
     {
         al_draw_bitmap(mybridge->pass[i].image, mybridge->pass[i].x, mybridge->pass[i].y, 0);
     }
+    int linesLeft[] = {
+        mybridge->queueNorth[mybridge->queueSize -1].x,
+        mybridge->queueNorth[mybridge->queueSize-1].y + 40,
+        mybridge->pass[0].x,
+        mybridge->pass[0].y,
+        mybridge->pass[mybridge->length-1].x,
+        mybridge->pass[mybridge->length-1].y + 40,
+        mybridge->exitNorth[0].x,
+        mybridge->exitNorth[0].y   
+
+        };
+    int linesRight[] = {
+        mybridge->exitSouth[0].x + 40,
+        mybridge->exitSouth[0].y + 40,
+        mybridge->pass[0].x+40,
+        mybridge->pass[0].y,
+        mybridge->pass[mybridge->length-1].x+40,
+        mybridge->pass[mybridge->length-1].y + 40,
+        mybridge->queueSouth[mybridge->queueSize-1].x + 40,
+        mybridge->queueSouth[mybridge->queueSize-1].y
+    };
+    ALLEGRO_COLOR purple = al_map_rgb(183,0,255);
+
+    // al_draw_line(linesLeft[0],linesLeft[1], linesLeft[2], linesLeft[3],purple,3);
+    // al_draw_line(linesLeft[2],linesLeft[3], linesLeft[4], linesLeft[5],purple,3);
+
+    for (int i = 0; i < 6; i+=2)
+        al_draw_line(linesLeft[i],linesLeft[i+1], linesLeft[i+2], linesLeft[i+3],purple,3);
+    
+    for (int i = 0; i < 6; i+=2)
+        al_draw_line(linesRight[i],linesRight[i+1], linesRight[i+2], linesRight[i+3],purple,3);
+        
 }
 
 void *moveAlien(void *args)

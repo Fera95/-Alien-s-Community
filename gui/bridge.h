@@ -14,7 +14,7 @@
 #define MID_POSX 430
 #define WEST_POSX 630
 #define INIT_POSY 100
-#define END_POSY 580  //INIT_POSY - 40*TOTAL_LENGTH
+#define END_POSY 540  //INIT_POSY - 40*TOTAL_LENGTH
 #define MAX_LENGTH 10
 
  enum bridgePosition{east, mid, west} ;
@@ -26,7 +26,6 @@ typedef struct BRIDGE
     int length;
     int weight;
     int queueSize;
-    int passSize;
     enum bridgePosition position;
     PATH *queueNorth;
     PATH *queueSouth;
