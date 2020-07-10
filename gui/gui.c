@@ -57,6 +57,8 @@ int init_gui(GUI_CONTEXT *ctx)
 
     create_map(ctx);
     ctx->eastBridge = create_bridge(3,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->midBridge = create_bridge(5,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->westBridge = create_bridge(6,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -155,8 +157,8 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     }
     // #########################################
     // Beta Community Exit
-    posxInit = 810;
-    posyInit = 120;
+    posxInit = 790;
+    posyInit = 140;
     for (int i = 0; i < EXIT_COUNT; i++)
     {
         betaexit[i].x = posxInit;
@@ -168,8 +170,8 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     }
 
     // Beta Community enter
-    posxInit = 890;
-    posyInit = 80 + EXIT_COUNT * 40;
+    posxInit = 870;
+    posyInit = 100 + EXIT_COUNT * 40;
     for (int i = 0; i < ENTRY_COUNT; i++)
     {
         betaentry[i].x = posxInit;
@@ -180,8 +182,8 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         betaentry[i].blocked = 0;
     }
 
-    posxInit = 890;
-    posyInit = 560;
+    posxInit = 870;
+    posyInit = 580;
     k = 0;
     // South Avenue
     for (int i = 0; i < AVENUE_COUNT; i++)
@@ -194,7 +196,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         southavenueB[i].blocked = 0;
         k++;
     }
-    posxInit = 930 - AVENUE_COUNT * 40;
+    posxInit = 910 - AVENUE_COUNT * 40;
     posyInit += 40;
     k = 0;
     for (int i = 0; i < AVENUE_COUNT; i++)
@@ -294,8 +296,10 @@ int loop_gui(GUI_CONTEXT *ctx)
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx->map);
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, 0);
-            al_draw_bitmap(ctx->betaCommunity, 775, 20, 0);
+            al_draw_bitmap(ctx->betaCommunity, 765, 20, 0);
             drawBridge(ctx->eastBridge);
+            drawBridge(ctx->midBridge);
+            drawBridge(ctx->westBridge);
             al_draw_bitmap(alien1.image, alien1.x, alien1.y, 0);
             al_draw_bitmap(alienBeta.image, alienBeta.x, alienBeta.y, 0);
             al_flip_display();
@@ -338,6 +342,14 @@ void drawmap(PATH **map)
 }
 
 void drawBridge(BRIDGE* mybridge){
+    for (int i = 0; i < mybridge->queueSize; i++)
+    {
+        al_draw_bitmap(mybridge->queueNorth[i].image, mybridge->queueNorth[i].x, mybridge->queueNorth[i].y, 0);
+        al_draw_bitmap(mybridge->queueSouth[i].image, mybridge->queueSouth[i].x, mybridge->queueSouth[i].y, 0);
+        al_draw_bitmap(mybridge->exitNorth[i].image, mybridge->exitNorth[i].x, mybridge->exitNorth[i].y, 0);
+        al_draw_bitmap(mybridge->exitSouth[i].image, mybridge->exitSouth[i].x, mybridge->exitSouth[i].y, 0);
+    }
+
     for (int i = 0; i < mybridge->passSize; i++)
     {
         al_draw_bitmap(mybridge->pass[i].image, mybridge->pass[i].x, mybridge->pass[i].y, 0);

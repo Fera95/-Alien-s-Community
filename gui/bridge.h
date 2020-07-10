@@ -10,9 +10,9 @@
 
 // CONSTANTS
 #define TOTAL_LENGTH 12
-#define WEST_POSX 600
-#define EAST_POSX 280
-#define MID_POSX 360
+#define EAST_POSX 270
+#define MID_POSX 430
+#define WEST_POSX 630
 #define INIT_POSY 100
 #define END_POSY 580  //INIT_POSY - 40*TOTAL_LENGTH
 #define MAX_LENGTH 10

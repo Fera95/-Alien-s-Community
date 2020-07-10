@@ -5,7 +5,7 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
     BRIDGE * newBridge = malloc(sizeof(BRIDGE));
     int queueSizeTemp = (int) (TOTAL_LENGTH - length)/2;
     newBridge->queueSize = queueSizeTemp;
-    newBridge->passSize = TOTAL_LENGTH - queueSizeTemp;
+    newBridge->passSize = length;
     newBridge->queueNorth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->queueSouth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->exitNorth = malloc(newBridge->queueSize*sizeof(PATH));
@@ -33,8 +33,8 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
         // POSITION X AXIS
         newBridge->queueNorth[i].x = init_posx ;
         newBridge->queueSouth[i].x = init_posx ;
-        newBridge->exitNorth[i].x = init_posx  + 80;
-        newBridge->exitSouth[i].x = init_posx  + 80;
+        newBridge->exitNorth[i].x = init_posx  + 40;
+        newBridge->exitSouth[i].x = init_posx  + 40;
 
         // POSITION Y AXIS
         newBridge->queueNorth[i].y = INIT_POSY + 40*i;
@@ -66,8 +66,8 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
     }
     
     // SETTING THE 
-    int posyOff = 40 * newBridge->queueSize;
-    int posxOff = init_posx + 40;
+    int posxOff = init_posx + 20;
+    int posyOff = INIT_POSY + 5 + 40 * newBridge->queueSize;
     if (length%2!=0)
         posyOff+=20;
     

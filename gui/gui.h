@@ -51,6 +51,8 @@ typedef struct
 
     PATH ** map;
     BRIDGE * eastBridge;
+    BRIDGE * midBridge;
+    BRIDGE * westBridge;
 
 } GUI_CONTEXT;
 /**
