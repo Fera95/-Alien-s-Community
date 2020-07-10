@@ -1,5 +1,5 @@
 CC = gcc
-SRC = gui.c main.c 
+SRC = gui.c main.c bridge.c
 RUN = alienCommunity
 CFLAGS =  -I -Wall `pkg-config allegro-5 allegro_font-5 allegro_image-5 allegro_primitives-5 --libs --cflags` -lpthread
 

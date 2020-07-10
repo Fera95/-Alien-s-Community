@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <pthread.h>
-#include "path.h"
+// #include "path.h"
+#include "bridge.h"
 /**
  * This is the basic structure to render a gui
  */
@@ -42,11 +43,14 @@ typedef struct
      * Background representation
      */
     ALLEGRO_BITMAP *background;
-    ALLEGRO_BITMAP *path;
-    ALLEGRO_BITMAP *bridge;
+    ALLEGRO_BITMAP *pathImage;
+    ALLEGRO_BITMAP *queueImage;
+    ALLEGRO_BITMAP *passImage;
     ALLEGRO_BITMAP *alfaCommunity;
     ALLEGRO_BITMAP *betaCommunity;
+
     PATH ** map;
+    BRIDGE * eastBridge;
 
 } GUI_CONTEXT;
 /**
@@ -81,5 +85,6 @@ int set_background(GUI_CONTEXT *ctx);
 int add_character(GUI_CONTEXT *ctx, int id, int type, int dx, int dy);
 void *moveAlien(void *args);
 void drawmap(PATH **map);
+void drawBridge(BRIDGE* bridge);
 void create_map(GUI_CONTEXT *ctx);
 #endif

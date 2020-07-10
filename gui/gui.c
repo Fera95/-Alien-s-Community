@@ -5,7 +5,9 @@ ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_TIMER *timer;
 ALLEGRO_BITMAP *background = NULL;
-ALLEGRO_BITMAP *path = NULL;
+ALLEGRO_BITMAP *pathImage = NULL;
+ALLEGRO_BITMAP *queueImage = NULL;
+ALLEGRO_BITMAP *passImage = NULL;
 //
 //
 
@@ -54,6 +56,7 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
+    ctx->eastBridge = create_bridge(3,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -68,19 +71,20 @@ int finalize_gui(GUI_CONTEXT *ctx)
     al_destroy_timer(ctx->timer);
     al_destroy_event_queue(ctx->queue);
     al_destroy_bitmap(ctx->background);
-    al_destroy_bitmap(ctx->path);
+    al_destroy_bitmap(ctx->pathImage);
 }
 
 int set_background(GUI_CONTEXT *ctx)
 {
     must_init(al_init_image_addon(), "image addon");
     ctx->background = al_load_bitmap("assets/background.png");
-    ctx->path = al_load_bitmap("assets/path.png");
-    ctx->bridge = al_load_bitmap("assets/bridge.png");
+    ctx->pathImage = al_load_bitmap("assets/path.png");
+    ctx->passImage = al_load_bitmap("assets/bridge.png");
+    ctx->queueImage = al_load_bitmap("assets/path.png");
     ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
     ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
     must_init(ctx->background, "background");
-    must_init(ctx->path, "path");
+    must_init(ctx->pathImage, "path");
     return 0;
 }
 //
@@ -106,7 +110,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         alfaentry[i].y = posyInit - 40 * i;
         alfaentry[i].height = 40;
         alfaentry[i].width = 40;
-        alfaentry[i].image = ctx->path;
+        alfaentry[i].image = ctx->pathImage;
         alfaentry[i].blocked = 0;
     }
 
@@ -119,7 +123,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         alfaexit[i].y = posyInit - 40 * i;
         alfaexit[i].height = 40;
         alfaexit[i].width = 40;
-        alfaexit[i].image = ctx->path;
+        alfaexit[i].image = ctx->pathImage;
         alfaexit[i].blocked = 0;
     }
     posxInit = 70;
@@ -132,7 +136,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         northavenueB[i].y = posyInit;
         northavenueB[i].height = 40;
         northavenueB[i].width = 40;
-        northavenueB[i].image = ctx->path;
+        northavenueB[i].image = ctx->pathImage;
         northavenueB[i].blocked = 0;
         k++;
     }
@@ -145,7 +149,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         northavenueA[i].y = posyInit;
         northavenueA[i].height = 40;
         northavenueA[i].width = 40;
-        northavenueA[i].image = ctx->path;
+        northavenueA[i].image = ctx->pathImage;
         northavenueA[i].blocked = 0;
         k++;
     }
@@ -159,7 +163,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         betaexit[i].y = posyInit + 40 * i;
         betaexit[i].height = 40;
         betaexit[i].width = 40;
-        betaexit[i].image = ctx->path;
+        betaexit[i].image = ctx->pathImage;
         betaexit[i].blocked = 0;
     }
 
@@ -172,7 +176,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         betaentry[i].y = posyInit - 40 * i;
         betaentry[i].height = 40;
         betaentry[i].width = 40;
-        betaentry[i].image = ctx->path;
+        betaentry[i].image = ctx->pathImage;
         betaentry[i].blocked = 0;
     }
 
@@ -186,7 +190,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         southavenueB[i].y = posyInit;
         southavenueB[i].height = 40;
         southavenueB[i].width = 40;
-        southavenueB[i].image = ctx->path;
+        southavenueB[i].image = ctx->pathImage;
         southavenueB[i].blocked = 0;
         k++;
     }
@@ -199,7 +203,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         southavenueA[i].y = posyInit;
         southavenueA[i].height = 40;
         southavenueA[i].width = 40;
-        southavenueA[i].image = ctx->path;
+        southavenueA[i].image = ctx->pathImage;
         southavenueA[i].blocked = 0;
         k++;
     }
@@ -291,6 +295,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             drawmap(ctx->map);
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, 0);
             al_draw_bitmap(ctx->betaCommunity, 775, 20, 0);
+            drawBridge(ctx->eastBridge);
             al_draw_bitmap(alien1.image, alien1.x, alien1.y, 0);
             al_draw_bitmap(alienBeta.image, alienBeta.x, alienBeta.y, 0);
             al_flip_display();
@@ -329,6 +334,13 @@ void drawmap(PATH **map)
         al_draw_bitmap(southavenueA[i].image, southavenueA[i].x, southavenueA[i].y, 0);
         al_draw_bitmap(northavenueB[i].image, northavenueB[i].x, northavenueB[i].y, 0);
         al_draw_bitmap(southavenueB[i].image, southavenueB[i].x, southavenueB[i].y, 0);
+    }
+}
+
+void drawBridge(BRIDGE* mybridge){
+    for (int i = 0; i < mybridge->passSize; i++)
+    {
+        al_draw_bitmap(mybridge->pass[i].image, mybridge->pass[i].x, mybridge->pass[i].y, 0);
     }
 }
 
