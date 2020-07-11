@@ -56,9 +56,9 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(1,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->midBridge = create_bridge(2,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->westBridge = create_bridge(7,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->eastBridge = create_bridge(8,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->midBridge = create_bridge(5,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->westBridge = create_bridge(20,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
