@@ -7,12 +7,19 @@
 #include <stdio.h>
 #include <time.h>
 #include <pthread.h>
-// #include "path.h"
+
+/**
+ * 
+ * */ 
+#include "path.h"
 #include "bridge.h"
+#include "route.h"
+
+
 /**
  * This is the basic structure to render a gui
  */
-typedef struct
+typedef struct GUI_CONTEXT
 {
     /**
      * We need a timer and an event queue to 
@@ -58,7 +65,6 @@ typedef struct
 /**
  * Movement Bouncer
  */ 
- enum alienType{alfa,beta};
   
 typedef struct ALIEN
 {
@@ -71,7 +77,7 @@ typedef struct ALIEN
     // TYPE
     enum alienType type;
     // highway
-    PATH ** way;
+    ROUTE * way;
     // IMAGE
     ALLEGRO_BITMAP * image;
     // CONTEXT

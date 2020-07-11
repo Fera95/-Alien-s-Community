@@ -13,9 +13,7 @@ ALLEGRO_BITMAP *passImage = NULL;
 
 bool done = false;
 bool render = false;
-#define EXIT_COUNT 11
-#define ENTRY_COUNT 11
-#define AVENUE_COUNT 16
+
 #define MAPSIZE 8
 
 void must_init(bool test, const char *description)
@@ -56,9 +54,9 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(8,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->midBridge = create_bridge(5,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->westBridge = create_bridge(20,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->eastBridge = create_bridge(9,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->midBridge = create_bridge(2,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->westBridge = create_bridge(8,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -89,7 +87,6 @@ int set_background(GUI_CONTEXT *ctx)
     must_init(ctx->pathImage, "path");
     return 0;
 }
-//
 
 void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
 {
@@ -105,11 +102,11 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
 
     // Alfa Community enter
     int posxInit = 70;
-    int posyInit = 500;
+    int posyInit = 100;
     for (int i = 0; i < ENTRY_COUNT; i++)
     {
         alfaentry[i].x = posxInit;
-        alfaentry[i].y = posyInit - 40 * i;
+        alfaentry[i].y = posyInit + 40 * i;
         alfaentry[i].height = 40;
         alfaentry[i].width = 40;
         alfaentry[i].image = ctx->pathImage;
@@ -128,13 +125,13 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         alfaexit[i].image = ctx->pathImage;
         alfaexit[i].blocked = 0;
     }
-    posxInit = 70;
+    posxInit = 670;
     posyInit = 20;
     int k = 0;
     // North Avenue
     for (int i = 0; i < AVENUE_COUNT; i++)
     {
-        northavenueB[i].x = posxInit + 40 * k;
+        northavenueB[i].x = posxInit - 40 * k;
         northavenueB[i].y = posyInit;
         northavenueB[i].height = 40;
         northavenueB[i].width = 40;
@@ -239,6 +236,9 @@ int loop_gui(GUI_CONTEXT *ctx)
     alien1.y = 400;
     alien1.type = alfa;
 
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, moveAlien, (void *)&alien1);
+
     struct ALIEN alienBeta;
     alienBeta.ctx = ctx;
     alienBeta.image = al_load_bitmap("assets/beta25.png");
@@ -246,12 +246,10 @@ int loop_gui(GUI_CONTEXT *ctx)
     alienBeta.y = 600;
     alienBeta.type = beta;
 
-    //Generate aliens arrays:  // TODO this will be removed soon
+    // Generate aliens arrays:  // TODO this will be removed soon
     pthread_t thread_id_beta;
     pthread_create(&thread_id_beta, NULL, moveAlien, (void *)&alienBeta);
 
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, moveAlien, (void *)&alien1);
 
     // pthread_join(&thread_id, NULL);
     // pthread_join(&thread_id_beta, NULL);
@@ -377,9 +375,6 @@ void drawBridge(BRIDGE* mybridge){
     };
     ALLEGRO_COLOR purple = al_map_rgb(183,0,255);
 
-    // al_draw_line(linesLeft[0],linesLeft[1], linesLeft[2], linesLeft[3],purple,3);
-    // al_draw_line(linesLeft[2],linesLeft[3], linesLeft[4], linesLeft[5],purple,3);
-
     for (int i = 0; i < 6; i+=2)
         al_draw_line(linesLeft[i],linesLeft[i+1], linesLeft[i+2], linesLeft[i+3],purple,3);
     
@@ -391,44 +386,20 @@ void drawBridge(BRIDGE* mybridge){
 void *moveAlien(void *args)
 {
 
-    /*
-    ctx->map[0] = alfaexit;
-    ctx->map[1] = alfaentry;
-    ctx->map[2] = northavenueA;
-    ctx->map[3] = northavenueB;
-    ctx->map[4] = southavenueA;
-    ctx->map[5] = southavenueB;
-    ctx->map[6] = betaexit;
-    ctx->map[7] = betaentry;
-    */
     ALIEN *myAlien = (ALIEN *)args;
-    PATH **road = malloc(4 * sizeof(PATH *));
-    road[0] = myAlien->ctx->map[0];
-    road[1] = myAlien->ctx->map[2];
-    road[2] = myAlien->ctx->map[4];
-    road[3] = myAlien->ctx->map[7];
-
-    int init = 0;
-    int LIMIT = 0;
-    for (int i = 0; i < 4; i++)
+    BRIDGE * temp = myAlien->ctx->midBridge;
+    if(myAlien->type == beta)
+        temp = myAlien->ctx->midBridge;
+    myAlien->way = create_route(temp, myAlien->ctx->map, myAlien->type);
+    int onRoad = 1;
+    while (onRoad == 1)
     {
-        if (i == 0 || i == 3 || i == 2)
-        {
-            init = 0;
-            LIMIT = EXIT_COUNT;
-        }
-        if (i == 1)
-        {
-            init = 2;
-            LIMIT = AVENUE_COUNT;
-        }
-
-        for (init; init < LIMIT; init++)
-        {
-            myAlien->x = road[i][init].x;
-            myAlien->y = road[i][init].y;
-            sleep(1);
-        }
+        next_move(&myAlien->x,&myAlien->y,myAlien->way);
+        onRoad = !myAlien->way->finished;
+        // if(myAlien->type == alfa)
+            usleep(250000);
+        usleep(250000);
     }
-    free(road);
+    printf("ROAD COMPLETED\n");
+    free(myAlien->way);
 }
