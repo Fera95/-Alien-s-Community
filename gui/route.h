@@ -30,6 +30,6 @@ typedef struct ROUTE
 }ROUTE;
 
 
-ROUTE * create_route(BRIDGE* bridge, PATH **map, enum alienType type );
-void next_move(float *next_x,float* next_y, ROUTE * alienRoute);
+ROUTE * create_route(BRIDGE* bridge, PATH **map, enum alienType type, float *dx, float *dy  );
+void next_move(float *next_x,float* next_y, ROUTE * alienRoute, float *dx,float *dy);
 #endif

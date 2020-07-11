@@ -54,9 +54,9 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(9,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->midBridge = create_bridge(2,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->westBridge = create_bridge(8,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->eastBridge = create_bridge(1,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->midBridge = create_bridge(3,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->westBridge = create_bridge(2,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -232,18 +232,23 @@ int loop_gui(GUI_CONTEXT *ctx)
     struct ALIEN alien1;
     alien1.ctx = ctx;
     alien1.image = al_load_bitmap("assets/alfa25.png");
-    alien1.x = 35;
-    alien1.y = 400;
+    alien1.x = COMMUNITY_ALFA_POSX;
+    alien1.y = COMMUNITY_ALFA_POSY;
+    alien1.dx = 1;
+    alien1.dy = 1;
     alien1.type = alfa;
 
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, moveAlien, (void *)&alien1);
 
+
     struct ALIEN alienBeta;
     alienBeta.ctx = ctx;
     alienBeta.image = al_load_bitmap("assets/beta25.png");
-    alienBeta.x = 600;
-    alienBeta.y = 600;
+    alienBeta.x = COMMUNITY_BETA_POSX;
+    alienBeta.y = COMMUNITY_BETA_POSY;
+    alienBeta.dx = 1;
+    alienBeta.dy = 1;
     alienBeta.type = beta;
 
     // Generate aliens arrays:  // TODO this will be removed soon
@@ -389,16 +394,16 @@ void *moveAlien(void *args)
     ALIEN *myAlien = (ALIEN *)args;
     BRIDGE * temp = myAlien->ctx->midBridge;
     if(myAlien->type == beta)
-        temp = myAlien->ctx->midBridge;
-    myAlien->way = create_route(temp, myAlien->ctx->map, myAlien->type);
+        temp = myAlien->ctx->westBridge;
+    myAlien->way = create_route(temp, myAlien->ctx->map, myAlien->type, &myAlien->dx, &myAlien->dy );
     int onRoad = 1;
     while (onRoad == 1)
     {
-        next_move(&myAlien->x,&myAlien->y,myAlien->way);
+        next_move(&myAlien->x,&myAlien->y,myAlien->way, &myAlien->dx, &myAlien->dy);
         onRoad = !myAlien->way->finished;
         // if(myAlien->type == alfa)
-            usleep(250000);
-        usleep(250000);
+            // usleep(250000);
+        usleep(25000);
     }
     printf("ROAD COMPLETED\n");
     free(myAlien->way);

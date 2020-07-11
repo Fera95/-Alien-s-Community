@@ -15,6 +15,11 @@
 #include "bridge.h"
 #include "route.h"
 
+#define COMMUNITY_ALFA_POSX 125
+#define COMMUNITY_ALFA_POSY 520
+
+#define COMMUNITY_BETA_POSX 820
+#define COMMUNITY_BETA_POSY 100
 
 /**
  * This is the basic structure to render a gui
