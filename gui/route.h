@@ -6,10 +6,8 @@
 
 
 
-
-
 enum alienType{alfa,beta};
-
+enum direction{left, right, up, down};
 typedef struct ROUTE 
 {
     // 
@@ -22,6 +20,8 @@ typedef struct ROUTE
     PATH * entry;
     PATH * current;
     enum alienType type;
+    enum direction dirx;
+    enum direction diry;
     int pos;
     int limit;
     int finished;
@@ -30,6 +30,6 @@ typedef struct ROUTE
 }ROUTE;
 
 
-ROUTE * create_route(BRIDGE* bridge, PATH **map, enum alienType type, float *dx, float *dy  );
-void next_move(float *next_x,float* next_y, ROUTE * alienRoute, float *dx,float *dy);
+ROUTE * create_route(BRIDGE* bridge, PATH **map, enum alienType type, float dx, float dy  );
+void next_move(float *next_x,float* next_y, ROUTE * alienRoute, float dx,float dy);
 #endif

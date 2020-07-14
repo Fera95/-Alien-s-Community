@@ -54,9 +54,9 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(1,2,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->midBridge = create_bridge(3,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->westBridge = create_bridge(2,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->eastBridge = create_bridge(2,8,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->midBridge = create_bridge(5,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->westBridge = create_bridge(90,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -219,6 +219,8 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     ctx->map[7] = betaentry;
 }
 
+// DIBUJAR Y MOVER
+
 int loop_gui(GUI_CONTEXT *ctx)
 {
     /**
@@ -234,8 +236,8 @@ int loop_gui(GUI_CONTEXT *ctx)
     alien1.image = al_load_bitmap("assets/alfa25.png");
     alien1.x = COMMUNITY_ALFA_POSX;
     alien1.y = COMMUNITY_ALFA_POSY;
-    alien1.dx = 1;
-    alien1.dy = 1;
+    alien1.dx = 1.5;
+    alien1.dy = 1.5;
     alien1.type = alfa;
 
     pthread_t thread_id;
@@ -247,8 +249,8 @@ int loop_gui(GUI_CONTEXT *ctx)
     alienBeta.image = al_load_bitmap("assets/beta25.png");
     alienBeta.x = COMMUNITY_BETA_POSX;
     alienBeta.y = COMMUNITY_BETA_POSY;
-    alienBeta.dx = 1;
-    alienBeta.dy = 1;
+    alienBeta.dx = 2.2;
+    alienBeta.dy = 2.2;
     alienBeta.type = beta;
 
     // Generate aliens arrays:  // TODO this will be removed soon
@@ -258,7 +260,8 @@ int loop_gui(GUI_CONTEXT *ctx)
 
     // pthread_join(&thread_id, NULL);
     // pthread_join(&thread_id_beta, NULL);
-
+    int count = 0, flag=0;
+    
     while (1)
     {
         /**
@@ -274,17 +277,12 @@ int loop_gui(GUI_CONTEXT *ctx)
              */
             ctx->redraw = true;
             break;
-        /**
-         */
+        
         case ALLEGRO_EVENT_KEY_DOWN:
-        /**
-         */
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
             ctx->done = true;
             break;
         }
-        /**
-         */
         if (ctx->done)
         {
             printf("Done\n");
@@ -298,8 +296,12 @@ int loop_gui(GUI_CONTEXT *ctx)
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx->map);
-            al_draw_bitmap(ctx->alfaCommunity, 5, 470, 0);
-            al_draw_bitmap(ctx->betaCommunity, 765, 20, 0);
+            if(count==30){
+                flag = !flag;
+                count = 0;
+            }
+            al_draw_bitmap(ctx->alfaCommunity, 5, 470, flag);
+            al_draw_bitmap(ctx->betaCommunity, 765, 20, flag);
             drawBridge(ctx->eastBridge);
             drawBridge(ctx->midBridge);
             drawBridge(ctx->westBridge);
@@ -307,6 +309,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             al_draw_bitmap(alienBeta.image, alienBeta.x, alienBeta.y, 0);
             al_flip_display();
             ctx->redraw = false;
+            count++;
         }
     }
     finalize_gui(ctx);
@@ -392,14 +395,14 @@ void *moveAlien(void *args)
 {
 
     ALIEN *myAlien = (ALIEN *)args;
-    BRIDGE * temp = myAlien->ctx->midBridge;
-    if(myAlien->type == beta)
-        temp = myAlien->ctx->westBridge;
-    myAlien->way = create_route(temp, myAlien->ctx->map, myAlien->type, &myAlien->dx, &myAlien->dy );
+    BRIDGE * temp = myAlien->ctx->eastBridge;
+    // if(myAlien->type == beta)
+    //     temp = myAlien->ctx->westBridge;
+    myAlien->way = create_route(temp, myAlien->ctx->map, myAlien->type, myAlien->dx, myAlien->dy );
     int onRoad = 1;
     while (onRoad == 1)
     {
-        next_move(&myAlien->x,&myAlien->y,myAlien->way, &myAlien->dx, &myAlien->dy);
+        next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
         onRoad = !myAlien->way->finished;
         // if(myAlien->type == alfa)
             // usleep(250000);

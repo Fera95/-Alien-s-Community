@@ -12,7 +12,7 @@
     ctx->map[7] = betaentry;
  * 
  */ 
-ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float *dx, float *dy  )
+ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float dx, float dy  )
 {
     ROUTE *newRoute = malloc(sizeof(ROUTE));
     if(type == alfa)
@@ -25,10 +25,8 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float *dx,
         newRoute->avenue2 = map[4];
         newRoute->cross2entry = map[5];
         newRoute->entry = map[7];
-        *dx = abs(*dx);
-        *dy = -abs(*dy);
-
-
+        newRoute->diry = up;
+        newRoute->dirx = right;
     }
     else if (type == beta)
     {
@@ -41,8 +39,8 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float *dx,
         newRoute->avenue2 = map[3];
         newRoute->cross2entry = map[2];
         newRoute->entry = map[1];
-        *dx = abs(*dx);
-        *dy = abs(*dy);
+        newRoute->diry = down;
+        newRoute->dirx = left;
         
     }
     newRoute->current = newRoute->exit;
@@ -56,29 +54,46 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float *dx,
 
 
 
-void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float *dx, float *dy)
+void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float dy)
 {
     
     int change_pos = 1;
     float tempx,tempy;
-    tempx = *next_x + *dx; 
-    tempy = *next_y + *dy; 
-    printf("Moving alien type: %d\n",alienRoute->type);
-    printf("Current: X = %f, Y = %f\n", *next_x, *next_y);
-    printf("NEXT: X = %f, Y = %f\n", tempx, tempy);
-    printf("Limit: X = %f, Y = %f\n", alienRoute->current[alienRoute->pos].x, alienRoute->current[alienRoute->pos].y);
-    printf("speed: dx = %f, dy = %f\n", *dx, *dy);
-    if ((*dx > 0 && tempx <= alienRoute->current[alienRoute->pos].x) || (*dx < 0 && tempx >= alienRoute->current[alienRoute->pos].x) )
-    {
-            *next_x = tempx; 
+
+    if (alienRoute->diry-5 == down){
+        tempy = *next_y + dy; 
+        if(tempy < alienRoute->current[alienRoute->pos].y){
+            *next_y = tempy;
             change_pos = 0;
+        }
+    }
+    if (alienRoute->diry+5 == up){
+        tempy = *next_y - dy; 
+        if(tempy > alienRoute->current[alienRoute->pos].y){
+            *next_y = tempy;
+            change_pos = 0;
+        }
     }
     
-    if ((*dy > 0 && tempy <= alienRoute->current[alienRoute->pos].y) || (*dy < 0 && tempy >= alienRoute->current[alienRoute->pos].y) )
-    {
-            *next_y = tempy; 
+    if (alienRoute->dirx-5 == left){
+        tempx = *next_x - dx; 
+        if(tempx > alienRoute->current[alienRoute->pos].x){
+            *next_x = tempx;
             change_pos = 0;
+        }
     }
+    if (alienRoute->dirx+5 == right){
+        tempx = *next_x + dx; 
+        if(tempx < alienRoute->current[alienRoute->pos].x){
+            *next_x = tempx;
+            change_pos = 0;
+        }
+    }
+
+    // printf("Moving alien type: %d\n",alienRoute->type);
+    // printf("Current: X = %f, Y = %f\n", *next_x, *next_y);
+    // printf("Limit: X = %f, Y = %f\n", alienRoute->current[alienRoute->pos].x, alienRoute->current[alienRoute->pos].y);
+    // printf("speed: dx = %f, dy = %f\n", dx, dy);
     
     if(change_pos){
         printf("POS: %d\n",alienRoute->pos);
@@ -217,6 +232,7 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float *dx, floa
         }
         int available = !nextPath[tempPos].blocked;
         // LLAMAR AL SEMAFORO DEL PUENTE
+        
 
         if(available){
             // Liberamos el actual
@@ -228,41 +244,38 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float *dx, floa
             printf("NEW POS: %d\n",alienRoute->pos);
             printf("NEW LIMIT: %d\n",alienRoute->limit);
           
-            // *next_x = alienRoute->current[alienRoute->pos].x;
-            // *next_y = alienRoute->current[alienRoute->pos].y;
             alienRoute->current[alienRoute->pos].blocked = 1;
             
             /**
              * Direction of speed
             */ 
             // OCUPO IR A LA DERECHA
-            if( *next_x > alienRoute->current[tempPos].x ){
+            if( *next_x < alienRoute->current[tempPos].x ){
                 printf("Derecha\n");
-                *dx = abs(*dx);
+                alienRoute->dirx=right;
+
             }
             // OCUPO IR A LA IZQUIERDA
             else if(*next_x > alienRoute->current[tempPos].x){
                 printf("Izquierda\n");
-                *dx = -abs(*dx);
+                alienRoute->dirx=left;
+
             }
 
             // OCUPO BAJAR
             if (*next_y < alienRoute->current[tempPos].y ){
-                *dy = abs(*dy);
+                alienRoute->diry=down;
                 printf("BAJANDO\n");
             }
                 
             // OCUPO SUBIR
-            else if (*next_y < alienRoute->current[tempPos].y ){
-                *dy = -abs(*dy);
+            else if (*next_y > alienRoute->current[tempPos].y ){
+                alienRoute->diry=up;
                 printf("Subiendo\n");
 
 
             }
-            
-            // *next_x += *dx;
-            // *next_y += *dy;
-            
+
         }
         // retornar al estado
         else{
