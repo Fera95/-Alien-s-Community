@@ -84,20 +84,26 @@ int lpthread_detach(lpthread_t thread){
 
 int lpmutex_init(lpthread_mutex_t* restrict mutex, const lpthread_mutexattr_t *restrict attr){
 	mutex->locked=0; // Set the mutex as unlocked
+	mutex->magic= 0;
 	mutex->pid=0;
 	return 0;
 }
 int lpmutex_destroy(lpthread_mutex_t *mutex){
-	mutex->locked = 0; // Set the mutex as unlocked
+	mutex->locked = 0; // Set the mutex as unlocked chequear cono se hace en real
+	mutex ->magic = 1;
 	mutex->pid = 0;
 	return 0;
 }
 int lpthread_mutex_unlock(lpthread_mutex_t *mutex){
+	//Chequear magic
+	
 	mutex->locked = 0; // Set the mutex as unlocked
 	mutex->pid = 0;
 	return 0;
 }
 int lpmutex_trylock(lpthread_mutex_t *mutex){
+	//Chequear magic
+	
 	if(mutex->locked==0){ // If mutex is not locked, lock it
 		mutex->locked=1;
 		mutex->pid = getpid();
@@ -106,6 +112,8 @@ int lpmutex_trylock(lpthread_mutex_t *mutex){
 	return 1;
 }
 int lpthread_mutex_lock(lpthread_mutex_t *mutex){
+	//Chequear magic
+	
 	LOOP: while(mutex->locked); // Race condition !!!!!!!!! Wait for mutex to unlock
 	pid_t id = getpid();
 	mutex->locked= 1;
@@ -212,8 +220,5 @@ char* convert(unsigned int num, int base) {
 }
 
 void lpthread_self() {
-
-
   printf("Mi gettid: %ld \n",gettid());
-  
 }

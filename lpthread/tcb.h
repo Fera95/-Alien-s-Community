@@ -42,6 +42,7 @@ typedef struct lpthread_mutex_t
 {
   int locked;
   int holder;
+  int exist;
   int initialized;
   head_t* queue;
 
