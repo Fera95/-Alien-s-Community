@@ -1,21 +1,22 @@
 #include "route.h"
 #include "gui.h"
 
-/**
- * ctx->map[0] = alfaexit;
-    ctx->map[1] = alfaentry;
-    ctx->map[2] = northavenueA;
-    ctx->map[3] = northavenueB;
-    ctx->map[4] = southavenueA;
-    ctx->map[5] = southavenueB;
-    ctx->map[6] = betaexit;
-    ctx->map[7] = betaentry;
- * 
- */ 
-ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float dx, float dy  )
+ROUTE * create_route(BRIDGE *bridge, PATH **map, enum origin start )
 {
+
+    /**
+     * ctx->map[0] = alfaexit;
+        ctx->map[1] = alfaentry;
+        ctx->map[2] = northavenueA;
+        ctx->map[3] = northavenueB;
+        ctx->map[4] = southavenueA;
+        ctx->map[5] = southavenueB;
+        ctx->map[6] = betaexit;
+        ctx->map[7] = betaentry;
+    * 
+    */ 
     ROUTE *newRoute = malloc(sizeof(ROUTE));
-    if(type == alfa)
+    if(start == alfaPlanet)
     {
         newRoute->exit = map[0];
         newRoute->avenue1 = map[2];
@@ -28,7 +29,7 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float dx, 
         newRoute->diry = up;
         newRoute->dirx = right;
     }
-    else if (type == beta)
+    else if (start == betaPlanet)
     {
         newRoute->exit = map[6];
         newRoute->avenue1 = map[5];
@@ -45,9 +46,9 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum alienType type, float dx, 
     }
     newRoute->current = newRoute->exit;
     newRoute->pos = 0;
-    printf("FIRST POSITION of CURRENT type %d: X = %f, Y = %f\n", newRoute->type, newRoute->current->x, newRoute->current->y);
+    // printf("FIRST POSITION of CURRENT type %d: X = %f, Y = %f\n", newRoute->start, newRoute->current->x, newRoute->current->y);
     newRoute->limit = EXIT_COUNT;
-    newRoute->type = type;
+    newRoute->start = start;
     newRoute->finished = 0;
     return newRoute;
 }
@@ -60,14 +61,14 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
     int change_pos = 1;
     float tempx,tempy;
 
-    if (alienRoute->diry-5 == down){
+    if (alienRoute->diry == down){
         tempy = *next_y + dy; 
         if(tempy < alienRoute->current[alienRoute->pos].y){
             *next_y = tempy;
             change_pos = 0;
         }
     }
-    if (alienRoute->diry+5 == up){
+    if (alienRoute->diry == up){
         tempy = *next_y - dy; 
         if(tempy > alienRoute->current[alienRoute->pos].y){
             *next_y = tempy;
@@ -75,14 +76,14 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
         }
     }
     
-    if (alienRoute->dirx-5 == left){
+    if (alienRoute->dirx == left){
         tempx = *next_x - dx; 
         if(tempx > alienRoute->current[alienRoute->pos].x){
             *next_x = tempx;
             change_pos = 0;
         }
     }
-    if (alienRoute->dirx+5 == right){
+    if (alienRoute->dirx == right){
         tempx = *next_x + dx; 
         if(tempx < alienRoute->current[alienRoute->pos].x){
             *next_x = tempx;
@@ -90,32 +91,30 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
         }
     }
 
-    // printf("Moving alien type: %d\n",alienRoute->type);
-    // printf("Current: X = %f, Y = %f\n", *next_x, *next_y);
-    // printf("Limit: X = %f, Y = %f\n", alienRoute->current[alienRoute->pos].x, alienRoute->current[alienRoute->pos].y);
-    // printf("speed: dx = %f, dy = %f\n", dx, dy);
     
     if(change_pos){
-        printf("POS: %d\n",alienRoute->pos);
-        printf("LIMIT: %d\n",alienRoute->limit);
+        // printf("x: %f\n",*next_x);
+        // printf("y: %f\n",*next_y);
+        // printf("POS: %d\n",alienRoute->pos);
+        // printf("LIMIT: %d\n",alienRoute->limit);
             
         int tempPos = alienRoute->pos;
         int tempLimit = alienRoute->limit;
         PATH *nextPath = alienRoute->current;
         // CASO PARTICULAR
-        if(alienRoute->current == alienRoute->bridge->pass && alienRoute->type==beta)
+        if(alienRoute->current == alienRoute->bridge->pass && alienRoute->start==betaPlanet)
             tempPos--;
         else
             tempPos++;
 
         if (tempPos == tempLimit)
         {
-            printf("CALCULA INTERSECCION\n");
+            // printf("CALCULA INTERSECCION\n");
             // Salida del a -> Avenida
             if(alienRoute->current == alienRoute->exit){
                 nextPath = alienRoute->avenue1;
                 tempPos = 2;
-                if(alienRoute->type == alfa)
+                if(alienRoute->start == alfaPlanet)
                 {
                     if(alienRoute->bridge->position == east)
                         tempLimit = 6;
@@ -125,7 +124,7 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
                         tempLimit = 14;
                 }
 
-                else if(alienRoute->type == beta)
+                else if(alienRoute->start == betaPlanet)
                 {
                     if(alienRoute->bridge->position == east)
                         tempLimit = 15;
@@ -140,10 +139,10 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
                 tempLimit = alienRoute->bridge->queueSize;
                 tempPos = 0;
 
-                if(alienRoute->type == alfa){
+                if(alienRoute->start == alfaPlanet){
                     nextPath = alienRoute->bridge->queueNorth;
                 }
-                else if(alienRoute->type == beta){
+                else if(alienRoute->start == betaPlanet){
                     nextPath = alienRoute->bridge->queueSouth;
 
                 }
@@ -166,10 +165,10 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
             else if(alienRoute->current == alienRoute->bridge->pass){
                 tempLimit = alienRoute->bridge->queueSize;
                 tempPos = 0;
-                if(alienRoute->type == alfa){
+                if(alienRoute->start == alfaPlanet){
                     nextPath = alienRoute->bridge->exitNorth;
                 }
-                else if(alienRoute->type == beta){
+                else if(alienRoute->start == betaPlanet){
                     nextPath = alienRoute->bridge->exitSouth;
                 }
 
@@ -228,6 +227,7 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
             // Final de trayecto, llegada a comunidad.
             else if(alienRoute->current == alienRoute->entry)
                 alienRoute->finished = 1;
+                alienRoute->current[alienRoute->pos].blocked = 0;
 
         }
         int available = !nextPath[tempPos].blocked;
@@ -241,8 +241,8 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
             alienRoute->pos = tempPos;
-            printf("NEW POS: %d\n",alienRoute->pos);
-            printf("NEW LIMIT: %d\n",alienRoute->limit);
+            // printf("NEW POS: %d\n",alienRoute->pos);
+            // printf("NEW LIMIT: %d\n",alienRoute->limit);
           
             alienRoute->current[alienRoute->pos].blocked = 1;
             
@@ -251,13 +251,13 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
             */ 
             // OCUPO IR A LA DERECHA
             if( *next_x < alienRoute->current[tempPos].x ){
-                printf("Derecha\n");
+                // printf("Derecha\n");
                 alienRoute->dirx=right;
 
             }
             // OCUPO IR A LA IZQUIERDA
             else if(*next_x > alienRoute->current[tempPos].x){
-                printf("Izquierda\n");
+                // printf("Izquierda\n");
                 alienRoute->dirx=left;
 
             }
@@ -265,22 +265,20 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
             // OCUPO BAJAR
             if (*next_y < alienRoute->current[tempPos].y ){
                 alienRoute->diry=down;
-                printf("BAJANDO\n");
+                // printf("Bajando\n");
             }
                 
             // OCUPO SUBIR
             else if (*next_y > alienRoute->current[tempPos].y ){
                 alienRoute->diry=up;
-                printf("Subiendo\n");
-
-
+                // printf("Subiendo\n");
             }
 
         }
-        // retornar al estado
-        else{
-            printf("CAMINO BLOQUEADO\n");
-        }
+        // retornar al estado`
+        // else{
+        //     printf("CAMINO BLOQUEADO\n");
+        // }
     }
 }
 

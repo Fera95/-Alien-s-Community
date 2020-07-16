@@ -8,21 +8,13 @@
 #include <time.h>
 #include <pthread.h>
 
-/**
- * 
- * */ 
-#include "path.h"
+#include "constants.h"
 #include "bridge.h"
 #include "route.h"
-
-#define COMMUNITY_ALFA_POSX 125
-#define COMMUNITY_ALFA_POSY 520
-
-#define COMMUNITY_BETA_POSX 820
-#define COMMUNITY_BETA_POSY 100
+#include "alien.h"
 
 /**
- * This is the basic structure to render a gui
+ * Basic Structure to render a gui
  */
 typedef struct GUI_CONTEXT
 {
@@ -38,58 +30,31 @@ typedef struct GUI_CONTEXT
     ALLEGRO_DISPLAY *disp;
     //  Allegro font pointer 
     ALLEGRO_FONT *font;
-    /**
-     * Controls when to finisthe game
-     */ 
-    bool done;
-    /**
-     *  Controls when to repaint the window
-     */
-    bool redraw;
-    /**
-     * Abstraction of General/GUI envent
-     */ 
+    //   Abstraction of General/GUI envent
     ALLEGRO_EVENT event;
 
-    /**
-     * Background representation
-     */
+    // Background representation
     ALLEGRO_BITMAP *background;
     ALLEGRO_BITMAP *pathImage;
     ALLEGRO_BITMAP *queueImage;
     ALLEGRO_BITMAP *passImage;
     ALLEGRO_BITMAP *alfaCommunity;
     ALLEGRO_BITMAP *betaCommunity;
+    ALLEGRO_BITMAP *betaImage;
+    ALLEGRO_BITMAP *alfaImage;
+    ALLEGRO_BITMAP *normalImage;
 
     PATH ** map;
     BRIDGE * eastBridge;
     BRIDGE * midBridge;
     BRIDGE * westBridge;
+    // Controls when to repaint the window
+    bool redraw;
+    // Controls when to finisthe game
+    bool done;
 
 } GUI_CONTEXT;
-/**
- * Movement Bouncer
- */ 
-  
-typedef struct ALIEN
-{
-    // IDENTIFER
-    int id;
-    // COORDENADAS
-    float x, y;
-    // SPEED
-    float dx, dy;
-    // TYPE
-    enum alienType type;
-    // highway
-    ROUTE * way;
-    // IMAGE
-    ALLEGRO_BITMAP * image;
-    // CONTEXT
-    GUI_CONTEXT *ctx;
 
-    
-} ALIEN;
 
 int init_gui(GUI_CONTEXT *ctx);
 int loop_gui(GUI_CONTEXT *ctx);
@@ -97,7 +62,8 @@ int finalize_gui(GUI_CONTEXT *ctx);
 int set_background(GUI_CONTEXT *ctx);
 int add_character(GUI_CONTEXT *ctx, int id, int type, int dx, int dy);
 void *moveAlien(void *args);
-void drawmap(PATH **map);
-void drawBridge(BRIDGE* bridge);
+void drawmap(PATH **map, GUI_CONTEXT *ctx);
+void drawBridge(BRIDGE* bridge, GUI_CONTEXT *ctx);
 void create_map(GUI_CONTEXT *ctx);
+ALIEN * generateAlien (GUI_CONTEXT *ctx);
 #endif

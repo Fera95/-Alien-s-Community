@@ -1,6 +1,6 @@
 #include "bridge.h"
 
-BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALLEGRO_BITMAP *queueImage, ALLEGRO_BITMAP *passImage, ALLEGRO_BITMAP *pathImage )
+BRIDGE* create_bridge (int length, int weight, enum bridgePosition position )
 {
     if(length > 10)
         length = 10;
@@ -45,11 +45,11 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
         newBridge->exitNorth[i].y = (END_POSY-40*(queueSizeTemp-1))  + 40*i;
         newBridge->exitSouth[i].y = (INIT_POSY+40*(queueSizeTemp-1)) - 40*i;
 
-        // IMAGE
-        newBridge->queueNorth[i].image = queueImage;
-        newBridge->queueSouth[i].image = queueImage;
-        newBridge->exitNorth[i].image = pathImage;
-        newBridge->exitSouth[i].image = pathImage;
+        // // IMAGE
+        // newBridge->queueNorth[i].image = queueImage;
+        // newBridge->queueSouth[i].image = queueImage;
+        // newBridge->exitNorth[i].image = pathImage;
+        // newBridge->exitSouth[i].image = pathImage;
 
         // BLOCKED 
         newBridge->queueNorth[i].blocked = 0;
@@ -78,7 +78,7 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position, ALL
     {
         newBridge->pass[i].x = posxOff;
         newBridge->pass[i].y = posyOff + 40*i;
-        newBridge->pass[i].image = passImage;
+        // newBridge->pass[i].image = passImage;
         newBridge->pass[i].blocked = 0;    
         newBridge->pass[i].height = 40;
         newBridge->pass[i].width = 40;    

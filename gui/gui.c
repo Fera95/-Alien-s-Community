@@ -9,12 +9,14 @@ ALLEGRO_BITMAP *pathImage = NULL;
 ALLEGRO_BITMAP *queueImage = NULL;
 ALLEGRO_BITMAP *passImage = NULL;
 //
-//
 
 bool done = false;
 bool render = false;
 
 #define MAPSIZE 8
+
+// CAMBIAR X ARCHIVO DE CONFIGURACION
+float SPEED_NORMAL = 1;
 
 void must_init(bool test, const char *description)
 {
@@ -54,9 +56,9 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(2,8,east,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->midBridge = create_bridge(5,5,mid,ctx->queueImage,ctx->passImage,ctx->pathImage);
-    ctx->westBridge = create_bridge(90,1,west,ctx->queueImage,ctx->passImage,ctx->pathImage);
+    ctx->eastBridge = create_bridge(2,8,east);
+    ctx->midBridge = create_bridge(5,5,mid);
+    ctx->westBridge = create_bridge(90,1,west);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -83,6 +85,10 @@ int set_background(GUI_CONTEXT *ctx)
     ctx->queueImage = al_load_bitmap("assets/queue.png");
     ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
     ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
+    ctx->betaImage = al_load_bitmap("assets/beta25.png");
+    ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
+    ctx->normalImage = al_load_bitmap("assets/normal25.png");
+
     must_init(ctx->background, "background");
     must_init(ctx->pathImage, "path");
     return 0;
@@ -109,7 +115,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         alfaentry[i].y = posyInit + 40 * i;
         alfaentry[i].height = 40;
         alfaentry[i].width = 40;
-        alfaentry[i].image = ctx->pathImage;
+        // alfaentry[i].image = ctx->pathImage;
         alfaentry[i].blocked = 0;
     }
 
@@ -122,7 +128,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         alfaexit[i].y = posyInit - 40 * i;
         alfaexit[i].height = 40;
         alfaexit[i].width = 40;
-        alfaexit[i].image = ctx->pathImage;
+        // alfaexit[i].image = ctx->pathImage;
         alfaexit[i].blocked = 0;
     }
     posxInit = 670;
@@ -135,7 +141,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         northavenueB[i].y = posyInit;
         northavenueB[i].height = 40;
         northavenueB[i].width = 40;
-        northavenueB[i].image = ctx->pathImage;
+        // northavenueB[i].image = ctx->pathImage;
         northavenueB[i].blocked = 0;
         k++;
     }
@@ -148,7 +154,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         northavenueA[i].y = posyInit;
         northavenueA[i].height = 40;
         northavenueA[i].width = 40;
-        northavenueA[i].image = ctx->pathImage;
+        // northavenueA[i].image = ctx->pathImage;
         northavenueA[i].blocked = 0;
         k++;
     }
@@ -162,7 +168,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         betaexit[i].y = posyInit + 40 * i;
         betaexit[i].height = 40;
         betaexit[i].width = 40;
-        betaexit[i].image = ctx->pathImage;
+        // betaexit[i].image = ctx->pathImage;
         betaexit[i].blocked = 0;
     }
 
@@ -175,7 +181,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         betaentry[i].y = posyInit - 40 * i;
         betaentry[i].height = 40;
         betaentry[i].width = 40;
-        betaentry[i].image = ctx->pathImage;
+        // betaentry[i].image = ctx->pathImage;
         betaentry[i].blocked = 0;
     }
 
@@ -189,7 +195,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         southavenueB[i].y = posyInit;
         southavenueB[i].height = 40;
         southavenueB[i].width = 40;
-        southavenueB[i].image = ctx->pathImage;
+        // southavenueB[i].image = ctx->pathImage;
         southavenueB[i].blocked = 0;
         k++;
     }
@@ -202,7 +208,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         southavenueA[i].y = posyInit;
         southavenueA[i].height = 40;
         southavenueA[i].width = 40;
-        southavenueA[i].image = ctx->pathImage;
+        // southavenueA[i].image = ctx->pathImage;
         southavenueA[i].blocked = 0;
         k++;
     }
@@ -219,6 +225,55 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     ctx->map[7] = betaentry;
 }
 
+/**
+ * CREATE A RANDOM ALIEN 
+ */ 
+ALIEN * generateAlien (GUI_CONTEXT *ctx)
+{
+    /**
+     *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
+     */     
+    enum alienType type = (enum alienType) (rand() % 3);
+   
+    // RANDOM COMMUNITY
+    enum  origin  start = (enum origin) (rand() % 2);
+   
+    //  RANDOM BRIDGE     
+    BRIDGE *tempBridge;
+    enum bridgePosition tempPos = (enum bridgePosition) (rand() % 3);
+
+    if(tempPos == east)
+        tempBridge = ctx->eastBridge;
+    else if(tempPos == west)
+        tempBridge = ctx->westBridge;
+    else
+        tempBridge = ctx->midBridge;
+    
+    float initPosX, initPosY;
+    ROUTE * tempRoute = create_route ( tempBridge, ctx->map, start );
+    if(start == alfaPlanet){
+        // printf("ORIGING ALFA PLANET\n");
+        initPosX = COMMUNITY_ALFA_POSX;
+        initPosY = COMMUNITY_ALFA_POSY;
+    }
+    else if (start == betaPlanet)
+    {
+        // printf("ORIGING BETA PLANET\n");
+        initPosX = COMMUNITY_BETA_POSX;
+        initPosY = COMMUNITY_BETA_POSY;
+    }
+    // printf("FIRST Y: %f\n",initPosY);
+    // printf("Type Alien: %d\
+    // \n\rBridge origin: %d\
+    // \n\rfirstX: %f\
+    // \n\rfirstY: %f\n",type, start, initPosX, initPosY);
+    ALIEN * newAlien = create_alien ( type, tempRoute, initPosX, initPosY, SPEED_NORMAL);
+    // printf("RETURNING\n");
+
+    return newAlien;
+}
+
+
 // DIBUJAR Y MOVER
 
 int loop_gui(GUI_CONTEXT *ctx)
@@ -230,38 +285,32 @@ int loop_gui(GUI_CONTEXT *ctx)
     timer = al_create_timer(1.0 / 60);
     al_start_timer(timer);
 
-    printf("Before Thread\n");
-    struct ALIEN alien1;
-    alien1.ctx = ctx;
-    alien1.image = al_load_bitmap("assets/alfa25.png");
-    alien1.x = COMMUNITY_ALFA_POSX;
-    alien1.y = COMMUNITY_ALFA_POSY;
-    alien1.dx = 1.5;
-    alien1.dy = 1.5;
-    alien1.type = alfa;
+    // printf("BEFORE CREATING THE LIST\n");
 
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, moveAlien, (void *)&alien1);
+    int count = 20, flag=0;
+    NODE_ALIEN *tempNode;
+    NODE_ALIEN *head = (NODE_ALIEN*) malloc(sizeof(NODE_ALIEN*));
+    head->data = generateAlien(ctx);
+    head->next = NULL;
+    head->data->id=-7;
+    // printf("ANTES DEL HILO\n");
+    pthread_t t;
+    pthread_create(&t, NULL, moveAlien, (void *)head->data);
+    // printf("PRIMER ALIEN GENERADO con ID: %d\n",head->data->id);
 
-
-    struct ALIEN alienBeta;
-    alienBeta.ctx = ctx;
-    alienBeta.image = al_load_bitmap("assets/beta25.png");
-    alienBeta.x = COMMUNITY_BETA_POSX;
-    alienBeta.y = COMMUNITY_BETA_POSY;
-    alienBeta.dx = 2.2;
-    alienBeta.dy = 2.2;
-    alienBeta.type = beta;
-
-    // Generate aliens arrays:  // TODO this will be removed soon
-    pthread_t thread_id_beta;
-    pthread_create(&thread_id_beta, NULL, moveAlien, (void *)&alienBeta);
-
-
-    // pthread_join(&thread_id, NULL);
-    // pthread_join(&thread_id_beta, NULL);
-    int count = 0, flag=0;
+    ALIEN *first = head->data;
     
+    // printf("DATOS DEL ALIEN GENERADO:\
+    // \n\r ID: %d\
+    // \n\r TYPE: %d\
+    // \n\r x: %f\
+    // \n\r y: %f\
+    // \n\r dx: %f\
+    // \n\r dy: %f\
+    // \n\r Start: %d\
+    // \n\r flag: %d\
+    // ",first->id, first->type, first->x, first->y,first->dx, first->dy, first->way->start, first->way->finished);
+ 
     while (1)
     {
         /**
@@ -295,27 +344,64 @@ int loop_gui(GUI_CONTEXT *ctx)
 
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_bitmap(ctx->background, 0, 0, 1);
-            drawmap(ctx->map);
-            if(count==30){
+            drawmap(ctx->map, ctx);
+           
+            if(count <= 0){
                 flag = !flag;
-                count = 0;
+                count = rand()%150;
+                ALIEN * myAlien = generateAlien(ctx);
+                myAlien->id = count;
+                pthread_t t2;
+                pthread_create(&t2, NULL, moveAlien, (void *)myAlien);
+                ADD_Alien(head, myAlien);
             }
+
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, flag);
             al_draw_bitmap(ctx->betaCommunity, 765, 20, flag);
-            drawBridge(ctx->eastBridge);
-            drawBridge(ctx->midBridge);
-            drawBridge(ctx->westBridge);
-            al_draw_bitmap(alien1.image, alien1.x, alien1.y, 0);
-            al_draw_bitmap(alienBeta.image, alienBeta.x, alienBeta.y, 0);
+            drawBridge(ctx->eastBridge, ctx);
+            drawBridge(ctx->midBridge, ctx);
+            drawBridge(ctx->westBridge, ctx);
+    
+           
+            tempNode = head;
+            while (tempNode != NULL)
+            {
+                if(!tempNode->data->way->finished )
+                {
+                    ALLEGRO_BITMAP *image;
+                    if(tempNode->data->type == alfa)
+                        image = ctx->alfaImage;
+                    
+                    else if(tempNode->data->type == beta)
+                        image = ctx->betaImage;
+                    
+                    else if(tempNode->data->type == normal)
+                        image = ctx->normalImage;
+
+
+                    al_draw_bitmap(image, tempNode->data->x, tempNode->data->y, 0);
+                    tempNode = tempNode->next;  
+                }
+                else {
+                    printf("DELETING:");
+                    printf("%d\n",tempNode->data->id );
+                    printf("HEAD ID:");
+                    printf("%d\n",head->data->id );
+                    NODE_ALIEN * temp2 = tempNode->next;
+                    REMOVE_Alien(&head,tempNode->data->id);
+                    tempNode = temp2;
+                }
+            }
+            
             al_flip_display();
             ctx->redraw = false;
-            count++;
+            count--;
         }
     }
     finalize_gui(ctx);
 }
 
-void drawmap(PATH **map)
+void drawmap(PATH **map, GUI_CONTEXT *ctx)
 {
     PATH *alfaexit = map[0];
     PATH *alfaentry = map[1];
@@ -328,37 +414,37 @@ void drawmap(PATH **map)
 
     for (int i = 0; i < ENTRY_COUNT; i++)
     {
-        al_draw_bitmap(alfaentry[i].image, alfaentry[i].x, alfaentry[i].y, 0);
-        al_draw_bitmap(betaentry[i].image, betaentry[i].x, betaentry[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, alfaentry[i].x, alfaentry[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, betaentry[i].x, betaentry[i].y, 0);
     }
 
     for (int i = 0; i < EXIT_COUNT; i++)
     {
-        al_draw_bitmap(alfaexit[i].image, alfaexit[i].x, alfaexit[i].y, 0);
-        al_draw_bitmap(betaexit[i].image, betaexit[i].x, betaexit[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, alfaexit[i].x, alfaexit[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, betaexit[i].x, betaexit[i].y, 0);
     }
 
     for (int i = 0; i < AVENUE_COUNT; i++)
     {
-        al_draw_bitmap(northavenueA[i].image, northavenueA[i].x, northavenueA[i].y, 0);
-        al_draw_bitmap(southavenueA[i].image, southavenueA[i].x, southavenueA[i].y, 0);
-        al_draw_bitmap(northavenueB[i].image, northavenueB[i].x, northavenueB[i].y, 0);
-        al_draw_bitmap(southavenueB[i].image, southavenueB[i].x, southavenueB[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, northavenueA[i].x, northavenueA[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, southavenueA[i].x, southavenueA[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, northavenueB[i].x, northavenueB[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, southavenueB[i].x, southavenueB[i].y, 0);
     }
 }
 
-void drawBridge(BRIDGE* mybridge){
+void drawBridge(BRIDGE* mybridge, GUI_CONTEXT *ctx){
     for (int i = 0; i < mybridge->queueSize; i++)
     {
-        al_draw_bitmap(mybridge->queueNorth[i].image, mybridge->queueNorth[i].x, mybridge->queueNorth[i].y, 0);
-        al_draw_bitmap(mybridge->queueSouth[i].image, mybridge->queueSouth[i].x, mybridge->queueSouth[i].y, 0);
-        al_draw_bitmap(mybridge->exitNorth[i].image, mybridge->exitNorth[i].x, mybridge->exitNorth[i].y, 0);
-        al_draw_bitmap(mybridge->exitSouth[i].image, mybridge->exitSouth[i].x, mybridge->exitSouth[i].y, 0);
+        al_draw_bitmap(ctx->queueImage, mybridge->queueNorth[i].x, mybridge->queueNorth[i].y, 0);
+        al_draw_bitmap(ctx->queueImage, mybridge->queueSouth[i].x, mybridge->queueSouth[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, mybridge->exitNorth[i].x, mybridge->exitNorth[i].y, 0);
+        al_draw_bitmap(ctx->pathImage, mybridge->exitSouth[i].x, mybridge->exitSouth[i].y, 0);
     }
 
     for (int i = 0; i < mybridge->length; i++)
     {
-        al_draw_bitmap(mybridge->pass[i].image, mybridge->pass[i].x, mybridge->pass[i].y, 0);
+        al_draw_bitmap(ctx->passImage, mybridge->pass[i].x, mybridge->pass[i].y, 0);
     }
     int linesLeft[] = {
         mybridge->queueNorth[mybridge->queueSize -1].x,
@@ -393,21 +479,18 @@ void drawBridge(BRIDGE* mybridge){
 
 void *moveAlien(void *args)
 {
-
-    ALIEN *myAlien = (ALIEN *)args;
-    BRIDGE * temp = myAlien->ctx->eastBridge;
-    // if(myAlien->type == beta)
-    //     temp = myAlien->ctx->westBridge;
-    myAlien->way = create_route(temp, myAlien->ctx->map, myAlien->type, myAlien->dx, myAlien->dy );
-    int onRoad = 1;
+    ALIEN *myAlien = (ALIEN*) args;
+    int onRoad = !myAlien->way->finished;
     while (onRoad == 1)
     {
-        next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
-        onRoad = !myAlien->way->finished;
-        // if(myAlien->type == alfa)
-            // usleep(250000);
-        usleep(25000);
+        if(myAlien!=NULL)
+        {
+            onRoad = !myAlien->way->finished;
+            next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
+            usleep(25000);
+        }
+        else
+            break;        
     }
     printf("ROAD COMPLETED\n");
-    free(myAlien->way);
 }
