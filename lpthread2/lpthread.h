@@ -47,6 +47,7 @@ typedef struct{
 
 typedef struct{
 	char locked;
+	char magic;
 	pid_t pid;
 } lpthread_mutex_t;
 typedef struct{

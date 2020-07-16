@@ -10,192 +10,44 @@
 
 
 
-#define NTHREADS 9
-void *thread_function(void *);
-//Banderas para eventos
-int  crear1 = 0;
-int  crear2 =0;
-int crear3 =0;
-
-//argumentos para 2do nivel(funciones creadoreas)
-struct args {
-   pthread_t idB;
-   int numero;
-};
-//argumentos para 3er nivel(funcion que printea)
-struct args2 {
-    char* creador;
-    int numero;
-};
-
-//funcion que printea
-void *thread_function(void *input)
-{  
-   int a = ((struct args2*)input)->numero;
-  
-   printf("Mis datos de alien son los siguientes: \n");
-   printf("Numero (indice): %d\n", a);
-   printf("Creador: %s\n", ((struct args2*)input)->creador);
-   free(input);
-}
-
-//funciones que crean hilos que tienen funciones que printean.
-void *crearhilo1(void *input){
-
-while(1){
- if(crear1){
- pthread_t x = ((struct args*)input)->idB ;
- int num = ((struct args*)input)->numero;
-
- int *arg = malloc(sizeof(*arg));
-        if ( arg == NULL ) {
-            fprintf(stderr, "Couldn't allocate memory for thread arg.\n");
-            exit(EXIT_FAILURE);
-        }
-
-        *arg = num;
-
- struct args2 *datos2_1 = (struct args2 *)malloc(sizeof(struct args2));
- datos2_1->creador =  "Creador1";
- datos2_1->numero = *arg;
-printf("Se dio evento1 creando alien tipo1 \n");
-  free(input);
- pthread_create( &x, NULL, thread_function, (void *)datos2_1);
- crear1 =0;
-
- }
- else{
-    printf(".\n");
- }
- 
- sleep(3);
-}
-}
-
-void *crearhilo2(void *input){
-
-while(1){
- if(crear2){
- pthread_t x = ((struct args*)input)->idB ;
- int num = ((struct args*)input)->numero;
-
- int *arg = malloc(sizeof(*arg));
-        if ( arg == NULL ) {
-            fprintf(stderr, "Couldn't allocate memory for thread arg.\n");
-            exit(EXIT_FAILURE);
-        }
-
-        *arg = num;
-
- struct args2 *datos2_2 = (struct args2 *)malloc(sizeof(struct args2));
- datos2_2->creador =  "Creador2";
- datos2_2->numero = num;
-printf("Se dio evento2 creando alien tipo2 \n");
-  free(input);
- pthread_create( &x, NULL, thread_function, (void *)datos2_2);
-  crear2 =0;
- 
- }
- else{
-    printf(".\n");
- }
-
-  sleep(3);
-}
-}
-
-void *crearhilo3(void *input){
-
-while(1){
- if(crear3){
- pthread_t x = ((struct args*)input)->idB ;
- int num = ((struct args*)input)->numero;
-
- int *arg = malloc(sizeof(*arg));
-        if ( arg == NULL ) {
-            fprintf(stderr, "Couldn't allocate memory for thread arg.\n");
-            exit(EXIT_FAILURE);
-        }
-
-        *arg = num;
-
- struct args2 *datos2_3 = (struct args2 *)malloc(sizeof(struct args2));
- datos2_3->creador =  "Creador3";
- datos2_3->numero = num;
- printf("Se dio evento3 creando alien tipo3 \n");
- free(input);
- pthread_create( &x, NULL, thread_function, (void *)datos2_3);
- crear3 =0;
-
- }
- else{
-    printf(".\n");
- }
- 
-  sleep(3);
-}
-}
-
-
-
-//main de la progra corriendop
+void *print_message_function( void *ptr );
 
 int main()
 {
-   while(1){
+     pthread_t thread1, thread2,thread3, thread4;
+     char *message1 = "Hilo 1";
+     char *message2 = "Hilo 2";
+     char *message3 = "Hilo 3";
+     char *message4 = "Hilo 4";
 
-  
-   int i, j;
+     int  iret1, iret2, iret3, iret4;
 
-   pthread_t thread_id[NTHREADS];
-   pthread_t thread_id2[NTHREADS];
+    /* Create independent threads each of which will execute function */
 
-   
-   for(i=0; i < NTHREADS; i++)
-   {
+     iret1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
+     iret2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
+     iret3 = pthread_create( &thread3, NULL, print_message_function, (void*) message3);
+     iret4 = pthread_create( &thread4, NULL, print_message_function, (void*) message4);
 
-       struct args *datos = (struct args *)malloc(sizeof(struct args));
-   
-   
-         
-      
-      //3 hilos de creacion 
-      
-     pthread_create( &thread_id[0], NULL, crearhilo1, (void *)datos);
-     pthread_create( &thread_id[1], NULL, crearhilo2, (void *)datos);   
-     pthread_create( &thread_id[2], NULL, crearhilo3, (void *)datos); 
+     /* Wait till threads are complete before main continues. Unless we  */
+     /* wait we run the risk of executing an exit which will terminate   */
+     /* the process and all threads before the threads have completed.   */
 
-     
-      //condiciones (ya sea al azar o teclas);
-         printf("Voy por la iteracion %d \n",i);
-         
-         if(i<=2){
-         datos->idB =  thread_id2[i];
-         int numeral = i;
-         datos->numero = numeral;
-         crear1 =1 ;
-         
-            
-         }
-         if(i>2 && i<=5){
-             datos->idB =  thread_id2[i];
-             int numeral = i;
-            datos->numero = numeral;
-             crear2 =1 ;
-             
-         }
+     pthread_join( thread1, NULL);
+     pthread_join( thread2, NULL); 
+     pthread_join( thread3, NULL);
+     pthread_join( thread4, NULL);
 
-         if(i>5){
-            datos->idB =  thread_id2[i];
-             int numeral = i;
-            datos->numero = numeral;
-            crear3 =1 ;
-              
-         }
-       
-       sleep(5);
-   }
-    }
-
+     printf("Thread 1 returns: %d\n",iret1);
+     printf("Thread 2 returns: %d\n",iret2);
+     printf("Thread 3 returns: %d\n",iret3);
+     printf("Thread 4 returns: %d\n",iret4);
+     exit(0);
 }
 
+void *print_message_function( void *ptr )
+{
+     char *message;
+     message = (char *) ptr;
+     printf("%s \n", message);
+}

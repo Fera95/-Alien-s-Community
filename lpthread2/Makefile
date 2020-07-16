@@ -13,7 +13,6 @@ PTHREAD_HEADERS=lpthread.h
 
 
 THREAD_LIB=PTHREAD
-SCHEDULER=LOTTERY
 
 default:  test1 test2 test3 test4
 

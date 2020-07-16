@@ -3,12 +3,13 @@
 /* initial the mutex lock */
 int lpthread_mutex_init(lpthread_mutex_t *mutex, const lpthread_mutexattr_t *mutexattr)
 {
-  
+  printf("Inicializando Mutex \n");
   operationInProgress = 1;
   lpthread_mutex_t m = *mutex;
   
   m.initialized = 1;
   m.locked = 0;
+  m.exist = 1;
   m.holder = -1; //holder represents the tid of the thread that is currently holding the mutex
   m.queue = malloc(sizeof(head_t*));;
   initQueue(m.queue);
@@ -22,6 +23,13 @@ int lpthread_mutex_init(lpthread_mutex_t *mutex, const lpthread_mutexattr_t *mut
 /* aquire the mutex lock */
 int lpthread_mutex_lock(lpthread_mutex_t *mutex)
 {
+    lpthread_mutex_t m = *mutex;
+    int alive = m.exist;
+   if(!alive){
+    printf("Mutex no existente");
+    return -2;  
+  }
+  
   //printf("Mutex lock !\n");
   if(!mainContextInitialized)
   {
@@ -67,12 +75,22 @@ int lpthread_mutex_lock(lpthread_mutex_t *mutex)
   
   operationInProgress = 0;
   //printf("Mutex locked !\n");
+
+  printf("Mutex Bloqueado con exito \n");
   return 0;
 };
 
 /* try aquire the mutex lock */
 int lpthread_mutex_trylock(lpthread_mutex_t *mutex)
 {
+
+  lpthread_mutex_t m = *mutex;
+    int alive = m.exist;
+  if(!alive){
+    printf("Mutex no existente");
+    return -1;  
+  }
+
   //printf("Mutex lock !\n");
   if(!mainContextInitialized)
   {
@@ -112,11 +130,19 @@ int lpthread_mutex_trylock(lpthread_mutex_t *mutex)
   operationInProgress = 0;
   //printf("Mutex locked !\n");
   return 0;
+   printf("Mutex tratado de bloquear con exito \n");
 };
 
 /* release the mutex lock */
 int lpthread_mutex_unlock(lpthread_mutex_t *mutex)
 {
+  lpthread_mutex_t m = *mutex;
+    int alive = m.exist;
+  if(!alive){
+    printf("Mutex no existente");
+    return -1;  
+  }
+
   //printf("Mutex unlock !\n");
   if(!mainContextInitialized)
   {
@@ -144,7 +170,9 @@ int lpthread_mutex_unlock(lpthread_mutex_t *mutex)
   operationInProgress = 0;
   
   //printf("Mutex unlocked !\n");
+ printf("Mutex desbloqueado con exito \n");
   return 0;
+  
 };
 
 /* destroy the mutex */
@@ -155,7 +183,7 @@ int lpthread_mutex_destroy(lpthread_mutex_t *mutex)
   //Prevent threads from accessing while mutex is in destruction process
   m.initialized = 0;
   operationInProgress = 0;
-
+  m.exist = 0;
   //If mutex still locked, wait for thread to release lock
   while(m.locked)
   {
@@ -172,6 +200,8 @@ int lpthread_mutex_destroy(lpthread_mutex_t *mutex)
       enqueue(&runningQueue, muThread);
   }
   *mutex = m;
+  printf("Mutex destruido \n");
   return 0;
+  
 };
 

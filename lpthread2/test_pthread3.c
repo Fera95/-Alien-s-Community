@@ -12,6 +12,8 @@
 
 #define NTHREADS 9
 void *thread_function(void *);
+
+
 //Banderas para eventos
 int  crear1 = 0;
 int  crear2 =0;
