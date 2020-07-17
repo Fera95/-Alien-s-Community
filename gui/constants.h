@@ -36,9 +36,11 @@ typedef struct BRIDGE
     // Bloqueado
     int blocked;
     // 
+    int countAliens;
     int length;
     int strength;
     int queueSize;
+    int full;
     int yield; // 1 SOUTH 0 NORTH
     int scheduler;
     double quatum;

@@ -4,4 +4,7 @@
 
 ROUTE * create_route ( BRIDGE* bridge, PATH **map, enum origin start );
 void next_move (ALIEN *alien );
+int can_move(BRIDGE * myBridge, ALIEN *alienMoving, PATH *nextPATH, int pos);
+
+
 #endif

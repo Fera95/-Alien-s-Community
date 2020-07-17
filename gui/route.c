@@ -148,8 +148,12 @@ void next_move(ALIEN *alien)//)
                 }
                 else if(alienRoute->start == betaPlanet){
                     nextPath = alienRoute->bridge->queueSouth;
-
                 }
+                else
+                {
+                    printf("NO SE ASIGNO LA COLA");
+                }
+                
                 // LLAMAR A CALENDARIZADOR AQUI ORDENE LA COLA
             }
 
@@ -235,10 +239,9 @@ void next_move(ALIEN *alien)//)
 
         }
 
-        int available = !nextPath[tempPos].blocked;
-        if(nextPath == alienRoute->bridge->pass )
-            if(alienRoute->bridge->yield && alienRoute->start == alfaPlanet)
-                available= 0;
+        int available = can_move(alienRoute->bridge, alien, nextPath, tempPos);
+
+        
         // LLAMAR AL SEMAFORO DEL PUENTE
         
 
@@ -267,7 +270,6 @@ void next_move(ALIEN *alien)//)
             else if(*next_x > alienRoute->current[tempPos].x){
                 // printf("Izquierda\n");
                 alienRoute->dirx=left;
-
             }
 
             // OCUPO BAJAR
@@ -275,7 +277,6 @@ void next_move(ALIEN *alien)//)
                 alienRoute->diry=down;
                 // printf("Bajando\n");
             }
-                
             // OCUPO SUBIR
             else if (*next_y > alienRoute->current[tempPos].y ){
                 alienRoute->diry=up;
@@ -289,4 +290,58 @@ void next_move(ALIEN *alien)//)
         // }
     }
 }
+
+int can_move(BRIDGE * myBridge, ALIEN *alienMoving, PATH *nextPATH, int pos)
+{
+    int result;
+    if( nextPATH[pos].blocked )
+        result = 0;
+    else
+        // result = 1;
+        if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
+        {
+            if( !myBridge->full){
+
+                if(myBridge->yield && alienMoving->way->start == alfaPlanet){
+                    myBridge->full = 1;
+                    result = 1;
+                    myBridge->countAliens++;
+                    printf("Puente: %d Coutner Alfa:%d\n", myBridge->position, myBridge->countAliens);
+                }
+                else if (!myBridge->yield && alienMoving->way->start == betaPlanet)
+                {
+                    myBridge->full = 1;
+                    result = 1;
+                    myBridge->countAliens++;
+                    printf("Puente: %d Coutner BetA: %d\n", myBridge->position, myBridge->countAliens);   
+                }
+                else
+                {
+                    result = 0;
+                }
+            }
+            else
+                result = 0;
+            
+        }
+        else if (nextPATH == myBridge->exitNorth || nextPATH == myBridge->exitSouth)
+        {
+            myBridge->full = 0;
+            if(myBridge->countAliens >= 10)
+            {
+                myBridge->countAliens = 0;
+                myBridge->yield = !myBridge->yield;
+                printf("CAMBIO DE Via a BETA en %d,  %d", myBridge->position, myBridge->yield);
+            }
+
+        }
+        else
+        {
+            result = 1;
+        }
+    
+    return result;
+
+}
+
 

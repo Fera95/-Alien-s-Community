@@ -13,7 +13,9 @@ BRIDGE* create_bridge (int length, int strength, enum bridgePosition position, i
     newBridge->exitNorth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->exitSouth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->pass = malloc(newBridge->length*sizeof(PATH));   
-    
+    newBridge->yield = 0;
+    newBridge->countAliens = 0;
+    newBridge->full = 0;
     newBridge->position = position;
     // CAMBIAR POR UN ENUMERATE
     int init_posx;
@@ -93,10 +95,3 @@ BRIDGE* create_bridge (int length, int strength, enum bridgePosition position, i
 // 		exit(EXIT_FAILURE);
 // 	}
 // }
-
-int can_cross(BRIDGE * myBridge, ALIEN alienMoving)
-{
-    return 1;
-
-}
-
