@@ -14,7 +14,7 @@ bool done = false;
 bool render = false;
 
 #define MAPSIZE 8
-
+int countIDs = 0;
 // CAMBIAR X ARCHIVO DE CONFIGURACION
 float SPEED_NORMAL = 1;
 
@@ -232,41 +232,89 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
     enum alienType type = beta;// (enum alienType) (rand() % 1) ;
    
     // RANDOM COMMUNITY
+    int emptyqueue = 1;
     enum  origin  start = (enum origin) (rand() % 2);
-   
+    printf("VALOR DE MAPA[0][0]: %d\n", (ctx->map[0][0]).blocked);
+    if(start == alfaPlanet && (ctx->map[0][0]).blocked)
+    {
+        emptyqueue = 0;
+        printf("SALIDA ALFA NO DISPONIBLE\n");
+
+
+    }
+    else if(start == betaPlanet && (ctx->map[6][0]).blocked)
+    {
+        emptyqueue = 0;
+        printf("SALIDA BETA NO DISPONIBLE\n");
+    }
+    
     //  RANDOM BRIDGE     
     BRIDGE *tempBridge;
     enum bridgePosition tempPos = (enum bridgePosition) (rand() % 3);
-
     if(tempPos == east)
-        tempBridge = ctx->eastBridge;
-    else if(tempPos == west)
-        tempBridge = ctx->westBridge;
-    else
-        tempBridge = ctx->midBridge;
-    
-    float initPosX, initPosY;
-    ROUTE * tempRoute = create_route ( tempBridge, ctx->map, start );
-    if(start == alfaPlanet){
-        // printf("ORIGING ALFA PLANET\n");
-        initPosX = COMMUNITY_ALFA_POSX;
-        initPosY = COMMUNITY_ALFA_POSY;
-    }
-    else if (start == betaPlanet)
     {
-        // printf("ORIGING BETA PLANET\n");
-        initPosX = COMMUNITY_BETA_POSX;
-        initPosY = COMMUNITY_BETA_POSY;
+        tempBridge = ctx->eastBridge;
+        // if(start == alfaPlanet){
+        //     if(ctx->eastBridge->queueNorth[0].blocked  && ctx->eastBridge->queueNorth[ctx->eastBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+        // else if(start == betaPlanet){
+        //     if(ctx->eastBridge->queueSouth[0].blocked  && ctx->eastBridge->queueSouth[ctx->eastBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
     }
-    // printf("FIRST Y: %f\n",initPosY);
-    // printf("Type Alien: %d\
-    // \n\rBridge origin: %d\
-    // \n\rfirstX: %f\
-    // \n\rfirstY: %f\n",type, start, initPosX, initPosY);
-    ALIEN * newAlien = create_alien ( type, tempRoute, initPosX, initPosY, SPEED_NORMAL);
-    // printf("RETURNING\n");
+    else if(tempPos == west){
+        tempBridge = ctx->westBridge;
+        // if(start == alfaPlanet){
+        //     if(ctx->westBridge->queueNorth[0].blocked  && ctx->westBridge->queueNorth[ctx->westBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+        // else if(start == betaPlanet){
+        //     if(ctx->westBridge->queueSouth[0].blocked  && ctx->westBridge->queueSouth[ctx->westBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+    }
+    else if(tempPos == mid){
+        tempBridge = ctx->midBridge;
+        // if(start == alfaPlanet){
+        //     if(ctx->midBridge->queueNorth[0].blocked  && ctx->midBridge->queueNorth[ctx->midBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+        // else if(start == betaPlanet){
+        //     if(ctx->midBridge->queueSouth[0].blocked  && ctx->midBridge->queueSouth[ctx->midBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+    }
+    ALIEN * newAlien;
+    if(emptyqueue){
+        float initPosX, initPosY;
+        ROUTE * tempRoute = create_route ( &tempBridge, ctx->map, start );
+        if(start == alfaPlanet){
+            // printf("ORIGING ALFA PLANET\n");
+            initPosX = COMMUNITY_ALFA_POSX;
+            initPosY = COMMUNITY_ALFA_POSY;
+        }
+        else if (start == betaPlanet)
+        {
+            // printf("ORIGING BETA PLANET\n");
+            initPosX = COMMUNITY_BETA_POSX;
+            initPosY = COMMUNITY_BETA_POSY;
+        }
+        newAlien = create_alien (countIDs, type, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
+        countIDs++;
+    }   
 
-    return newAlien;
+    else
+    {
+        newAlien = NULL;
+    }
+    return newAlien;    
 }
 
 
@@ -287,16 +335,18 @@ int loop_gui(GUI_CONTEXT *ctx)
 
 
     create_bridge(&ctx->eastBridge, 2,8, east, 0);
-    for (int i = 0; i < 5; i++)
-    {
-        printf("QUEUE[%d] bloqueado:%d\n",i, ctx->eastBridge->queueNorth[i].blocked);
-    }
+    // ctx->eastBridge->queueNorth[4].blocked = 1;
+    // for (int i = 0; i < 5; i++)
+    // {
+    //     printf("QUEUE[%d] bloqueado:%d\n",i, ctx->eastBridge->queueNorth[i].blocked);
+    // }
     create_bridge(&ctx->midBridge, 5, 5, mid, 0);
     create_bridge(&ctx->westBridge, 90, 1, west, 0);
        
 
 
     int count = 20, flag=0;
+    // CABEZA DE LA LISTA
     NODE_ALIEN *tempNode;
     NODE_ALIEN *head = (NODE_ALIEN*) malloc(sizeof(NODE_ALIEN*));
     head->data = generateAlien(ctx);
@@ -347,10 +397,16 @@ int loop_gui(GUI_CONTEXT *ctx)
                 flag = !flag;
                 count = rand()%300;
                 ALIEN * myAlien = generateAlien(ctx);
-                myAlien->id = count;
-                pthread_t t2;
-                pthread_create(&t2, NULL, moveAlien, (void *)myAlien);
-                ADD_Alien(head, myAlien);
+                if(myAlien != NULL  ){
+                    pthread_t t2;
+                    pthread_create(&t2, NULL, moveAlien, (void *)myAlien);
+                    ADD_Alien(head, myAlien);
+                }
+                else
+                {
+                    printf("QUEUE LLENA\n");
+                }
+                
             }
 
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, flag);
@@ -486,5 +542,5 @@ void *moveAlien(void *args)
         else
             break;        
     }
-    printf("ROAD COMPLETED\n");
+    // printf("ROAD COMPLETED\n");
 }

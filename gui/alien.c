@@ -1,12 +1,12 @@
 #include "alien.h"
 
-ALIEN * create_alien(enum alienType type, ROUTE * myWay, float firstX, float firstY, float baseSpeed)
+ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed)
 {
     // printf("Creating ALIEN\n");
     // printf("TIPO RECIBIDO: %d\n", type);
     ALIEN * newAlien = (ALIEN*) malloc(sizeof(ALIEN));
     newAlien->type = type;
-
+    newAlien->id = ID;
     if(type == normal){
         // printf("TIPO: Normal\n");
 
@@ -33,7 +33,7 @@ ALIEN * create_alien(enum alienType type, ROUTE * myWay, float firstX, float fir
         // newAlien->image = al_load_bitmap("assets/beta25.png");
     }
     // printf("Asigning route\n");
-    newAlien->way = myWay;
+    newAlien->way = *myWay;
     newAlien->x = firstX;
     newAlien->y = firstY;
 
@@ -62,19 +62,15 @@ void ADD_Alien (struct NODE_ALIEN * head, struct ALIEN *newData)
 
 void REMOVE_Alien ( struct NODE_ALIEN ** head, int idRemove)
 {
-    printf("HEAD REMOVING ID: %d: \n",(*head)->data->id);
-
     NODE_ALIEN * temp = (*head);
 
     if((*head)->data->id == idRemove)
     {
-        printf("IS THE HEAD\n");
         *head =  temp->next;
         free(temp);
     }
     else
     {
-        printf("NOT THE HEAD");
         while (temp->next != NULL && temp->next->data->id != idRemove)
             temp = temp->next;
         if(temp->next != NULL)
@@ -96,7 +92,7 @@ void printList(NODE_ALIEN *head)
     while (temp != NULL)
     {
         if(head->data != NULL){
-            printf("data ID:%d",temp->data->id);
+            // printf("data ID:%d",temp->data->id);
             countID++;
         }
         else {

@@ -1,7 +1,7 @@
 #include "route.h"
 #include "gui.h"
 
-ROUTE * create_route(BRIDGE *bridge, PATH **map, enum origin start )
+ROUTE * create_route(BRIDGE **bridge, PATH **map, enum origin start )
 {
 
     /**
@@ -20,8 +20,7 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum origin start )
     {
         newRoute->exit = map[0];
         newRoute->avenue1 = map[2];
-        newRoute->bridge = bridge;
-        
+        // 
         newRoute->cross2avenue = map[5];
         newRoute->avenue2 = map[4];
         newRoute->cross2entry = map[5];
@@ -34,7 +33,6 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum origin start )
         newRoute->exit = map[6];
         newRoute->avenue1 = map[5];
         
-        newRoute->bridge = bridge;
         
         newRoute->cross2avenue = map[2];
         newRoute->avenue2 = map[3];
@@ -44,6 +42,7 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum origin start )
         newRoute->dirx = left;
         
     }
+    newRoute->bridge = *bridge;
     newRoute->current = newRoute->exit;
     newRoute->pos = 0;
     // printf("FIRST POSITION of CURRENT type %d: X = %f, Y = %f\n", newRoute->start, newRoute->current->x, newRoute->current->y);
@@ -97,10 +96,6 @@ void next_move(ALIEN *alien)//)
 
     
     if(change_pos){
-        // printf("x: %f\n",*next_x);
-        // printf("y: %f\n",*next_y);
-        // printf("POS: %d\n",alienRoute->pos);
-        // printf("LIMIT: %d\n",alienRoute->limit);
 
         int tempPos = alienRoute->pos;
         int tempLimit = alienRoute->limit;
@@ -113,8 +108,7 @@ void next_move(ALIEN *alien)//)
 
         if (tempPos == tempLimit)
         {
-            // printf("CALCULA INTERSECCION\n");
-            // Salida del a -> Avenida
+            // Salida -> Avenida
             if(alienRoute->current == alienRoute->exit){
                 nextPath = alienRoute->avenue1;
                 tempPos = 2;
@@ -140,7 +134,6 @@ void next_move(ALIEN *alien)//)
             }
             // Avenida -> Cola
             else if(alienRoute->current == alienRoute->avenue1){
-                printf("PASANDO A LA COLA\n");
 
                 if(alienRoute->start == alfaPlanet){
                     nextPath = alienRoute->bridge->queueNorth;
@@ -159,7 +152,7 @@ void next_move(ALIEN *alien)//)
                 nextPath = alienRoute->bridge->pass;
                 tempLimit = alienRoute->bridge->length;
                 tempPos = 0;
-                
+
             }
             // Cola -> Puente
             else if(alienRoute->current == alienRoute->bridge->queueSouth){
@@ -200,8 +193,8 @@ void next_move(ALIEN *alien)//)
             else if(alienRoute->current == alienRoute->bridge->exitSouth){
                 nextPath = alienRoute->cross2avenue;
                 if(alienRoute->bridge->position == east){
-                    tempLimit = 6;
-                    tempPos = 5;
+                    tempLimit = 7;
+                    tempPos = 6;
                 }
                 else if(alienRoute->bridge->position == mid){
                     tempLimit = 11;
@@ -216,8 +209,8 @@ void next_move(ALIEN *alien)//)
             // Avenida -> Avenida (Cruzar avenida)
             else if(alienRoute->current==alienRoute->cross2avenue&& tempPos!=1){
                 nextPath = alienRoute->avenue2;
-                tempLimit = AVENUE_COUNT;
                 tempPos = AVENUE_COUNT - alienRoute->limit;
+                tempLimit = AVENUE_COUNT;
             }
             // Avenida -> Entrada
             else if(alienRoute->current == alienRoute->avenue2 ){
@@ -225,15 +218,17 @@ void next_move(ALIEN *alien)//)
                 tempLimit = 1;
                 tempPos= 0;
             }
+            // 
             else if(alienRoute->current == alienRoute->cross2entry){
                 nextPath = alienRoute->entry;
                 tempLimit = ENTRY_COUNT;
                 tempPos= 0;
             }
             // Final de trayecto, llegada a comunidad.
-            else if(alienRoute->current == alienRoute->entry)
+            else if(alienRoute->current == alienRoute->entry){
                 alienRoute->finished = 1;
                 alienRoute->current[alienRoute->pos].blocked = 0;
+            }
 
         }
 
@@ -244,6 +239,10 @@ void next_move(ALIEN *alien)//)
         
 
         if(available){
+            // if(alienRoute->current == alienRoute->bridge->queueNorth && alienRoute->bridge->position == east){
+            //     printf("ALTERANDO A QUEUE\n");
+            // }
+
             // Liberamos el actual
             alienRoute->current[alienRoute->pos].blocked = 0;
             alienRoute->current[alienRoute->pos].alienID = -1;
@@ -293,27 +292,36 @@ void next_move(ALIEN *alien)//)
 
 int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
 {
+
+    
     int result;
     BRIDGE * myBridge = alienMoving->way->bridge;
+    // if(myBridge->position == east){
+    //     if(alienMoving->way->current != nextPATH)
+    //     {
+    //         printf("TRATANDO DE CAMBIAR DE ARREGLO\n\n");
+
+    //     }
+    // }
     if( nextPATH[pos].blocked ){
         result = 0;
-    }
-    else
         if(nextPATH == myBridge->queueNorth && myBridge->position == east ){
+            // printf("NEXT_PATH[%d] BLOCKED:%d\n",pos, nextPATH[pos].blocked);
             for (int i = 0; i < 5; i++)
             {
-                printf("QUEUE[%d] bloqueado:%d\n",i, myBridge->queueNorth[i].blocked);
-                printf("NEXT_PATH[%d] bloqueada:%d\n",pos, nextPATH->blocked);
-            
+                // printf("QUEUE[%d] bloqueado:%d\n",i, myBridge->queueNorth[i].blocked);            
             }
-            
-
         }
-        // if(nextPATH == myBridge->queueSouth && myBridge->position == west){
-        //     printf("ESTOY EN LA COLA SUR CON LA POS %d bloqueada:%d\n",pos, nextPATH[pos].blocked);
-        //     printf("ACTUAL COLA NORTE[%d] BRIDGE:%d bloqueada:%d\n",alienMoving->way->pos, myBridge->position, alienMoving->way->current[alienMoving->way->pos].blocked);
+    }
+    else{
 
-        // }
+        if(nextPATH == myBridge->queueNorth && myBridge->position == east ){
+            // printf("NEXT_PATH[%d] NOT BLOCKED:%d\n",pos, nextPATH[pos].blocked);
+            for (int i = 0; i < 5; i++)
+            {
+                // printf("QUEUE[%d] bloqueado:%d\n",i, myBridge->queueNorth[i].blocked);            
+            }
+        }
         if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
         {
             if( !myBridge->full){
@@ -322,14 +330,14 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
                     myBridge->full = 1;
                     result = 1;
                     myBridge->countAliens++;
-                    printf("Puente: %d Coutner Alfa:%d\n", myBridge->position, myBridge->countAliens);
+                    // printf("Puente: %d Coutner Alfa:%d\n", myBridge->position, myBridge->countAliens);
                 }
                 else if (!myBridge->yield && alienMoving->way->start == betaPlanet)
                 {
                     myBridge->full = 1;
                     result = 1;
                     myBridge->countAliens++;
-                    printf("Puente: %d Coutner BetA: %d\n", myBridge->position, myBridge->countAliens);   
+                    // printf("Puente: %d Coutner BetA: %d\n", myBridge->position, myBridge->countAliens);   
                 }
                 else
                 {
@@ -347,7 +355,7 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
             {
                 myBridge->countAliens = 0;
                 myBridge->yield = !myBridge->yield;
-                printf("CAMBIO DE Via a BETA en %d,  %d", myBridge->position, myBridge->yield);
+                // printf("CAMBIO DE Via a BETA en %d,  %d", myBridge->position, myBridge->yield);
             }
 
         }
@@ -355,7 +363,12 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
         {
             result = 1;
         }
-    
+    }
+    // if( myBridge->position == east ){
+    //     if(alienMoving->way->current != nextPATH || nextPATH == myBridge->queueNorth){
+    //         printf("RETURN VALUE NORTH: %d\n",result);
+    //     }
+    // }
     return result;
 
 }
