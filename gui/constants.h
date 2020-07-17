@@ -17,6 +17,7 @@ typedef struct PATH
     // COORDENADAS
     float x, y;
     int width, height;
+
     
 } PATH;
 
@@ -36,8 +37,12 @@ typedef struct BRIDGE
     int blocked;
     // 
     int length;
-    int weight;
+    int strength;
     int queueSize;
+    int yield; // 1 SOUTH 0 NORTH
+    int scheduler;
+    double quatum;
+    double crossTime;
     enum bridgePosition position;
     PATH *queueNorth;
     PATH *queueSouth;
@@ -45,14 +50,9 @@ typedef struct BRIDGE
     PATH *exitSouth;
     PATH *pass;
     
-    // CONTEXT
-    // GUI_CONTEXT *ctx;
-    
 }
 BRIDGE;
 
-
-// ROUTE
 
 enum origin { alfaPlanet, betaPlanet };
 enum direction{left, right, up, down};
@@ -74,14 +74,15 @@ typedef struct ROUTE
     int limit;
     int finished;
 
-
 }ROUTE;
 
 
 
 
 
-// ALIEN
+/**
+ * ALIEN
+ */ 
 enum alienType { alfa, beta, normal };
 enum priority { high, medium, low };
 
@@ -129,7 +130,9 @@ typedef struct INVADER
 } INVADER;
 
 
-// GUI
+/**
+ * GUI
+ */ 
 
 #define COMMUNITY_ALFA_POSX 125
 #define COMMUNITY_ALFA_POSY 520
@@ -137,6 +140,23 @@ typedef struct INVADER
 #define COMMUNITY_BETA_POSX 820
 #define COMMUNITY_BETA_POSY 100
 
+/**
+ * CONFIGURATION
+ */ 
+#define WEST_BRIDGE_CONF_PATH  "../config/top_band.conf"
+#define MID_BRIDGE_CONF_PATH  "../config/mid_band.conf"
+#define EAST_BRIDGE_CONF_PATH  "../config/bottom_band.conf"
+#define AUX_FILE_PATH  "../config/config.aux"
+
+
+struct configBridge
+{
+    enum bridgePosition pos;
+    int length;
+    int strength;
+    // scheduler option
+    int scheduler;
+};
 
 
 #endif

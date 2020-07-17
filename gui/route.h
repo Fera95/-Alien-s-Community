@@ -3,5 +3,5 @@
 #include "constants.h"
 
 ROUTE * create_route ( BRIDGE* bridge, PATH **map, enum origin start );
-void next_move ( float *next_x,float* next_y, ROUTE * alienRoute, float dx,float dy );
+void next_move (ALIEN *alien );
 #endif

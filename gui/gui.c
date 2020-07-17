@@ -56,9 +56,11 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
     create_map(ctx);
-    ctx->eastBridge = create_bridge(2,8,east);
-    ctx->midBridge = create_bridge(5,5,mid);
-    ctx->westBridge = create_bridge(90,1,west);
+
+
+    ctx->eastBridge = create_bridge(2,8, east, 0);
+    ctx->midBridge = create_bridge(5, 5, mid, 0);
+    ctx->westBridge = create_bridge(90, 1, west, 0);
 
     ctx->done = false;
     ctx->redraw = true;
@@ -293,24 +295,12 @@ int loop_gui(GUI_CONTEXT *ctx)
     head->data = generateAlien(ctx);
     head->next = NULL;
     head->data->id=-7;
-    // printf("ANTES DEL HILO\n");
+    
     pthread_t t;
     pthread_create(&t, NULL, moveAlien, (void *)head->data);
-    // printf("PRIMER ALIEN GENERADO con ID: %d\n",head->data->id);
-
+    
     ALIEN *first = head->data;
     
-    // printf("DATOS DEL ALIEN GENERADO:\
-    // \n\r ID: %d\
-    // \n\r TYPE: %d\
-    // \n\r x: %f\
-    // \n\r y: %f\
-    // \n\r dx: %f\
-    // \n\r dy: %f\
-    // \n\r Start: %d\
-    // \n\r flag: %d\
-    // ",first->id, first->type, first->x, first->y,first->dx, first->dy, first->way->start, first->way->finished);
- 
     while (1)
     {
         /**
@@ -383,10 +373,6 @@ int loop_gui(GUI_CONTEXT *ctx)
                     tempNode = tempNode->next;  
                 }
                 else {
-                    printf("DELETING:");
-                    printf("%d\n",tempNode->data->id );
-                    printf("HEAD ID:");
-                    printf("%d\n",head->data->id );
                     NODE_ALIEN * temp2 = tempNode->next;
                     REMOVE_Alien(&head,tempNode->data->id);
                     tempNode = temp2;
@@ -486,7 +472,8 @@ void *moveAlien(void *args)
         if(myAlien!=NULL)
         {
             onRoad = !myAlien->way->finished;
-            next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
+            // next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
+            next_move(myAlien);
             usleep(25000);
         }
         else

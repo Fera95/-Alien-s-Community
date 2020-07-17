@@ -55,9 +55,13 @@ ROUTE * create_route(BRIDGE *bridge, PATH **map, enum origin start )
 
 
 
-void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float dy)
+void next_move(ALIEN *alien)//)
 {
-    
+    float *next_x = &alien->x;
+    float *next_y = &alien->y;
+    ROUTE *alienRoute = alien->way;
+    float dx = alien->dx;
+    float dy = alien->dy;
     int change_pos = 1;
     float tempx,tempy;
 
@@ -230,7 +234,11 @@ void next_move(float *next_x, float* next_y, ROUTE * alienRoute, float dx, float
                 alienRoute->current[alienRoute->pos].blocked = 0;
 
         }
+
         int available = !nextPath[tempPos].blocked;
+        if(nextPath == alienRoute->bridge->pass )
+            if(alienRoute->bridge->yield && alienRoute->start == alfaPlanet)
+                available= 0;
         // LLAMAR AL SEMAFORO DEL PUENTE
         
 

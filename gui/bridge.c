@@ -1,8 +1,8 @@
 #include "bridge.h"
 
-BRIDGE* create_bridge (int length, int weight, enum bridgePosition position )
+BRIDGE* create_bridge (int length, int strength, enum bridgePosition position, int scheduler )
 {
-    if(length > 10)
+    if(length > 10 || length < 0)
         length = 10;
     BRIDGE * newBridge = malloc(sizeof(BRIDGE));
     int queueSizeTemp = (int) (TOTAL_LENGTH - length)/2;
@@ -45,12 +45,6 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position )
         newBridge->exitNorth[i].y = (END_POSY-40*(queueSizeTemp-1))  + 40*i;
         newBridge->exitSouth[i].y = (INIT_POSY+40*(queueSizeTemp-1)) - 40*i;
 
-        // // IMAGE
-        // newBridge->queueNorth[i].image = queueImage;
-        // newBridge->queueSouth[i].image = queueImage;
-        // newBridge->exitNorth[i].image = pathImage;
-        // newBridge->exitSouth[i].image = pathImage;
-
         // BLOCKED 
         newBridge->queueNorth[i].blocked = 0;
         newBridge->queueSouth[i].blocked = 0;
@@ -86,3 +80,23 @@ BRIDGE* create_bridge (int length, int weight, enum bridgePosition position )
     
     return  newBridge;
 }
+
+// BRIDGE* load_bridge(enum bridgePosition pos)
+// {
+//     if (pos == west){
+// 		return get_config_aux(WEST_BRIDGE_CONF_PATH);
+// 	} else if (pos == mid){
+// 		return get_config_aux(MID_BRIDGE_CONF_PATH);
+// 	} else if (pos == east){
+// 		return get_config_aux(EAST_BRIDGE_CONF_PATH);
+// 	} else {
+// 		exit(EXIT_FAILURE);
+// 	}
+// }
+
+int can_cross(BRIDGE * myBridge, ALIEN alienMoving)
+{
+    return 1;
+
+}
+
