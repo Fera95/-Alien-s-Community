@@ -16,7 +16,7 @@ bool render = false;
 #define MAPSIZE 8
 int countIDs = 0;
 // CAMBIAR X ARCHIVO DE CONFIGURACION
-float SPEED_NORMAL = 1;
+float SPEED_NORMAL = 2;
 
 void must_init(bool test, const char *description)
 {
@@ -229,20 +229,19 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
     /**
      *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
      */     
-    enum alienType type = beta;// (enum alienType) (rand() % 1) ;
+    enum alienType type = (enum alienType) (rand() % 3) ;  // beta;//
    
     // RANDOM COMMUNITY
     int emptyqueue = 1;
-    enum  origin  start = (enum origin) (rand() % 2);
-    printf("VALOR DE MAPA[0][0]: %d\n", (ctx->map[0][0]).blocked);
-    if(start == alfaPlanet && (ctx->map[0][0]).blocked)
+    enum  origin  start = (enum origin) (rand() % 2); //betaPlanet;//
+    if(start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
         emptyqueue = 0;
         printf("SALIDA ALFA NO DISPONIBLE\n");
 
 
     }
-    else if(start == betaPlanet && (ctx->map[6][0]).blocked)
+    else if(start == betaPlanet && (ctx->map[6][2]).blocked)
     {
         emptyqueue = 0;
         printf("SALIDA BETA NO DISPONIBLE\n");
@@ -334,14 +333,14 @@ int loop_gui(GUI_CONTEXT *ctx)
     create_map(ctx);
 
 
-    create_bridge(&ctx->eastBridge, 2,8, east, 0);
+    create_bridge(&ctx->eastBridge, 3,8, east, 0);
     // ctx->eastBridge->queueNorth[4].blocked = 1;
     // for (int i = 0; i < 5; i++)
     // {
     //     printf("QUEUE[%d] bloqueado:%d\n",i, ctx->eastBridge->queueNorth[i].blocked);
     // }
     create_bridge(&ctx->midBridge, 5, 5, mid, 0);
-    create_bridge(&ctx->westBridge, 90, 1, west, 0);
+    create_bridge(&ctx->westBridge, 9, 1, west, 0);
        
 
 
@@ -407,7 +406,9 @@ int loop_gui(GUI_CONTEXT *ctx)
                     printf("QUEUE LLENA\n");
                 }
                 
-            }
+            }  
+            PATH * primer = ctx->map[0];
+            
 
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, flag);
             al_draw_bitmap(ctx->betaCommunity, 765, 20, flag);

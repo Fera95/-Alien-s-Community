@@ -246,6 +246,8 @@ void next_move(ALIEN *alien)//)
             // Liberamos el actual
             alienRoute->current[alienRoute->pos].blocked = 0;
             alienRoute->current[alienRoute->pos].alienID = -1;
+            *next_x = alienRoute->current[alienRoute->pos].x;
+            *next_y = alienRoute->current[alienRoute->pos].y;
 
             // Asignar el nuevo espacio.
             alienRoute->current = nextPath;
@@ -296,36 +298,14 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
     
     int result;
     BRIDGE * myBridge = alienMoving->way->bridge;
-    // if(myBridge->position == east){
-    //     if(alienMoving->way->current != nextPATH)
-    //     {
-    //         printf("TRATANDO DE CAMBIAR DE ARREGLO\n\n");
-
-    //     }
-    // }
     if( nextPATH[pos].blocked ){
         result = 0;
-        if(nextPATH == myBridge->queueNorth && myBridge->position == east ){
-            // printf("NEXT_PATH[%d] BLOCKED:%d\n",pos, nextPATH[pos].blocked);
-            for (int i = 0; i < 5; i++)
-            {
-                // printf("QUEUE[%d] bloqueado:%d\n",i, myBridge->queueNorth[i].blocked);            
-            }
-        }
     }
-    else{
-
-        if(nextPATH == myBridge->queueNorth && myBridge->position == east ){
-            // printf("NEXT_PATH[%d] NOT BLOCKED:%d\n",pos, nextPATH[pos].blocked);
-            for (int i = 0; i < 5; i++)
-            {
-                // printf("QUEUE[%d] bloqueado:%d\n",i, myBridge->queueNorth[i].blocked);            
-            }
-        }
+    else
+    {    
         if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
         {
             if( !myBridge->full){
-
                 if(myBridge->yield && alienMoving->way->start == alfaPlanet){
                     myBridge->full = 1;
                     result = 1;
@@ -344,19 +324,22 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
                     result = 0;
                 }
             }
-            else
+            else{
+
                 result = 0;
+            }
             
         }
         else if (nextPATH == myBridge->exitNorth || nextPATH == myBridge->exitSouth)
         {
             myBridge->full = 0;
-            if(myBridge->countAliens >= 10)
+            if(myBridge->countAliens >= 3)
             {
                 myBridge->countAliens = 0;
                 myBridge->yield = !myBridge->yield;
                 // printf("CAMBIO DE Via a BETA en %d,  %d", myBridge->position, myBridge->yield);
             }
+            result = 1;
 
         }
         else
@@ -364,11 +347,7 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
             result = 1;
         }
     }
-    // if( myBridge->position == east ){
-    //     if(alienMoving->way->current != nextPATH || nextPATH == myBridge->queueNorth){
-    //         printf("RETURN VALUE NORTH: %d\n",result);
-    //     }
-    // }
+    
     return result;
 
 }
