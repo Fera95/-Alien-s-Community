@@ -55,13 +55,7 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_display_event_source(ctx->disp));
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
 
-    create_map(ctx);
-
-
-    ctx->eastBridge = create_bridge(2,8, east, 0);
-    ctx->midBridge = create_bridge(5, 5, mid, 0);
-    ctx->westBridge = create_bridge(90, 1, west, 0);
-
+        
     ctx->done = false;
     ctx->redraw = true;
     printf("Init success\n");
@@ -235,7 +229,7 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
     /**
      *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
      */     
-    enum alienType type = (enum alienType) (rand() % 3);
+    enum alienType type = beta;// (enum alienType) (rand() % 1) ;
    
     // RANDOM COMMUNITY
     enum  origin  start = (enum origin) (rand() % 2);
@@ -289,6 +283,19 @@ int loop_gui(GUI_CONTEXT *ctx)
 
     // printf("BEFORE CREATING THE LIST\n");
 
+    create_map(ctx);
+
+
+    create_bridge(&ctx->eastBridge, 2,8, east, 0);
+    for (int i = 0; i < 5; i++)
+    {
+        printf("QUEUE[%d] bloqueado:%d\n",i, ctx->eastBridge->queueNorth[i].blocked);
+    }
+    create_bridge(&ctx->midBridge, 5, 5, mid, 0);
+    create_bridge(&ctx->westBridge, 90, 1, west, 0);
+       
+
+
     int count = 20, flag=0;
     NODE_ALIEN *tempNode;
     NODE_ALIEN *head = (NODE_ALIEN*) malloc(sizeof(NODE_ALIEN*));
@@ -338,7 +345,7 @@ int loop_gui(GUI_CONTEXT *ctx)
            
             if(count <= 0){
                 flag = !flag;
-                count = rand()%150;
+                count = rand()%300;
                 ALIEN * myAlien = generateAlien(ctx);
                 myAlien->id = count;
                 pthread_t t2;

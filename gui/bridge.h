@@ -3,7 +3,7 @@
 
 #include "constants.h"
 
-BRIDGE * create_bridge( int length, int weight, enum bridgePosition position, int scheduler);
+void create_bridge( BRIDGE **ctxBridge, int length, int weight, enum bridgePosition position, int scheduler);
 BRIDGE * load_bridge(enum bridgePosition pos);
 
 #endif

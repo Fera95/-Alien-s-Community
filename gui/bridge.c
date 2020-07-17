@@ -1,6 +1,6 @@
 #include "bridge.h"
 
-BRIDGE* create_bridge (int length, int strength, enum bridgePosition position, int scheduler )
+void create_bridge (BRIDGE **ctxBridge, int length, int strength, enum bridgePosition position, int scheduler )
 {
     if(length > 10 || length < 0)
         length = 10;
@@ -80,7 +80,7 @@ BRIDGE* create_bridge (int length, int strength, enum bridgePosition position, i
         newBridge->pass[i].width = 40;    
     } 
     
-    return  newBridge;
+    *ctxBridge = newBridge;
 }
 
 // BRIDGE* load_bridge(enum bridgePosition pos)

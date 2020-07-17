@@ -101,7 +101,7 @@ void next_move(ALIEN *alien)//)
         // printf("y: %f\n",*next_y);
         // printf("POS: %d\n",alienRoute->pos);
         // printf("LIMIT: %d\n",alienRoute->limit);
-            
+
         int tempPos = alienRoute->pos;
         int tempLimit = alienRoute->limit;
         PATH *nextPath = alienRoute->current;
@@ -125,7 +125,7 @@ void next_move(ALIEN *alien)//)
                     else if(alienRoute->bridge->position == mid)
                         tempLimit = 10;
                     else if(alienRoute->bridge->position == west)
-                        tempLimit = 14;
+                        tempLimit = 15;
                 }
 
                 else if(alienRoute->start == betaPlanet)
@@ -140,8 +140,7 @@ void next_move(ALIEN *alien)//)
             }
             // Avenida -> Cola
             else if(alienRoute->current == alienRoute->avenue1){
-                tempLimit = alienRoute->bridge->queueSize;
-                tempPos = 0;
+                printf("PASANDO A LA COLA\n");
 
                 if(alienRoute->start == alfaPlanet){
                     nextPath = alienRoute->bridge->queueNorth;
@@ -149,10 +148,8 @@ void next_move(ALIEN *alien)//)
                 else if(alienRoute->start == betaPlanet){
                     nextPath = alienRoute->bridge->queueSouth;
                 }
-                else
-                {
-                    printf("NO SE ASIGNO LA COLA");
-                }
+                tempLimit = alienRoute->bridge->queueSize;
+                tempPos = 0;
                 
                 // LLAMAR A CALENDARIZADOR AQUI ORDENE LA COLA
             }
@@ -162,6 +159,7 @@ void next_move(ALIEN *alien)//)
                 nextPath = alienRoute->bridge->pass;
                 tempLimit = alienRoute->bridge->length;
                 tempPos = 0;
+                
             }
             // Cola -> Puente
             else if(alienRoute->current == alienRoute->bridge->queueSouth){
@@ -239,7 +237,7 @@ void next_move(ALIEN *alien)//)
 
         }
 
-        int available = can_move(alienRoute->bridge, alien, nextPath, tempPos);
+        int available = can_move(alien, nextPath, tempPos);
 
         
         // LLAMAR AL SEMAFORO DEL PUENTE
@@ -248,13 +246,15 @@ void next_move(ALIEN *alien)//)
         if(available){
             // Liberamos el actual
             alienRoute->current[alienRoute->pos].blocked = 0;
+            alienRoute->current[alienRoute->pos].alienID = -1;
+
             // Asignar el nuevo espacio.
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
             alienRoute->pos = tempPos;
+            alienRoute->current[alienRoute->pos].alienID = alien->id;
             // printf("NEW POS: %d\n",alienRoute->pos);
             // printf("NEW LIMIT: %d\n",alienRoute->limit);
-          
             alienRoute->current[alienRoute->pos].blocked = 1;
             
             /**
@@ -291,13 +291,29 @@ void next_move(ALIEN *alien)//)
     }
 }
 
-int can_move(BRIDGE * myBridge, ALIEN *alienMoving, PATH *nextPATH, int pos)
+int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
 {
     int result;
-    if( nextPATH[pos].blocked )
+    BRIDGE * myBridge = alienMoving->way->bridge;
+    if( nextPATH[pos].blocked ){
         result = 0;
+    }
     else
-        // result = 1;
+        if(nextPATH == myBridge->queueNorth && myBridge->position == east ){
+            for (int i = 0; i < 5; i++)
+            {
+                printf("QUEUE[%d] bloqueado:%d\n",i, myBridge->queueNorth[i].blocked);
+                printf("NEXT_PATH[%d] bloqueada:%d\n",pos, nextPATH->blocked);
+            
+            }
+            
+
+        }
+        // if(nextPATH == myBridge->queueSouth && myBridge->position == west){
+        //     printf("ESTOY EN LA COLA SUR CON LA POS %d bloqueada:%d\n",pos, nextPATH[pos].blocked);
+        //     printf("ACTUAL COLA NORTE[%d] BRIDGE:%d bloqueada:%d\n",alienMoving->way->pos, myBridge->position, alienMoving->way->current[alienMoving->way->pos].blocked);
+
+        // }
         if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
         {
             if( !myBridge->full){

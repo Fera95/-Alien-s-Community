@@ -17,7 +17,7 @@ typedef struct PATH
     // COORDENADAS
     float x, y;
     int width, height;
-
+    int alienID;
     
 } PATH;
 
