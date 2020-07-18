@@ -43,6 +43,19 @@ typedef struct GUI_CONTEXT
     ALLEGRO_BITMAP *betaImage;
     ALLEGRO_BITMAP *alfaImage;
     ALLEGRO_BITMAP *normalImage;
+    // Menu Images
+    ALLEGRO_BITMAP *alfaSelected;
+    ALLEGRO_BITMAP *betaSelected;
+    ALLEGRO_BITMAP *normalSelected;
+    ALLEGRO_BITMAP *a;
+    ALLEGRO_BITMAP *ap;
+    ALLEGRO_BITMAP *b;
+    ALLEGRO_BITMAP *bp;
+    ALLEGRO_BITMAP *c;
+    ALLEGRO_BITMAP *cp;
+    ALLEGRO_BITMAP *sideAlfa;
+    ALLEGRO_BITMAP *sideBeta;
+
 
     PATH ** map;
     BRIDGE * eastBridge;

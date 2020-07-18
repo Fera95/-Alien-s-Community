@@ -85,6 +85,20 @@ int set_background(GUI_CONTEXT *ctx)
     ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
     ctx->normalImage = al_load_bitmap("assets/normal25.png");
 
+    ctx->alfaSelected = al_load_bitmap("assets/alfaSelected.png");
+    ctx->betaSelected = al_load_bitmap("assets/betaSelected.png");
+    ctx->normalSelected = al_load_bitmap("assets/normalSelected.png");
+
+    ctx->a = al_load_bitmap("assets/a.png");
+    ctx->ap = al_load_bitmap("assets/ap.png");
+    ctx->b = al_load_bitmap("assets/b.png");
+    ctx->bp = al_load_bitmap("assets/bp.png");
+    ctx->c = al_load_bitmap("assets/c.png");
+    ctx->cp = al_load_bitmap("assets/cp.png");
+
+    ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
+    ctx->sideBeta = al_load_bitmap("assets/sideBeta.png");
+
     must_init(ctx->background, "background");
     must_init(ctx->pathImage, "path");
     return 0;
