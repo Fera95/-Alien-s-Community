@@ -14,7 +14,7 @@ void create_bridge (BRIDGE **ctxBridge, int length, int strength, enum bridgePos
     newBridge->exitNorth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->exitSouth = malloc(newBridge->queueSize*sizeof(PATH));
     newBridge->pass = malloc(newBridge->length*sizeof(PATH));   
-    newBridge->yield = 1;
+    newBridge->yield = 0;
     newBridge->countAliens = 0;
     newBridge->full = 0;
     newBridge->position = position;

@@ -17,7 +17,7 @@ void push_back(NODE_ALIEN ** head, ALIEN *value);
 void push_front(NODE_ALIEN ** head, ALIEN *value);
 
 //returns the id of the popped element
-ALIEN * pop_front(NODE_ALIEN **head);
+ALIEN * pop_front(NODE_ALIEN **head, int delete);
 ALIEN * pop_back(NODE_ALIEN * head);
 ALIEN * remove_at(NODE_ALIEN **head, int index);
 

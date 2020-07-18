@@ -204,7 +204,6 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
         southavenueA[i].y = posyInit;
         southavenueA[i].height = 40;
         southavenueA[i].width = 40;
-        // southavenueA[i].image = ctx->pathImage;
         southavenueA[i].blocked = 0;
         k++;
     }
@@ -233,7 +232,7 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
    
     // RANDOM COMMUNITY
     int emptyqueue = 1;
-    enum  origin  start = (enum origin) (rand() % 2); //betaPlanet;//
+    enum  origin  start = (enum origin) (rand() % 2); //alfaPlanet;//betaPlanet;//
     if(start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
         emptyqueue = 0;
@@ -394,7 +393,7 @@ int loop_gui(GUI_CONTEXT *ctx)
            
             if(count <= 0){
                 flag = !flag;
-                count = rand()%300;
+                count = rand()%100;
                 ALIEN * myAlien = generateAlien(ctx);
                 if(myAlien != NULL  ){
                     pthread_t t2;

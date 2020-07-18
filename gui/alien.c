@@ -156,7 +156,7 @@ void push_front(NODE_ALIEN **head, ALIEN * data) {
 }
 
 // quitar de la cabeza 
-ALIEN * pop_front(NODE_ALIEN **head) {
+ALIEN * pop_front(NODE_ALIEN **head, int delete) {
   ALIEN * retval = NULL;
   NODE_ALIEN * new_head = NULL;
 
@@ -167,7 +167,9 @@ ALIEN * pop_front(NODE_ALIEN **head) {
 
   new_head = (*head)->next;
   retval = (*head)->data;
-  free(*head);
+  if(delete){
+    free(*head);
+  }
   *head = new_head;
 
   return retval;
@@ -216,7 +218,7 @@ ALIEN *remove_at(NODE_ALIEN **head, int index) {
 
   //primer elemento
   if(index == 0){
-    return pop_front(head);
+    return pop_front(head,1);
   }
 
   for(i = 0; i < index - 1; ++i){
