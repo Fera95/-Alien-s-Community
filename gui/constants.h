@@ -33,7 +33,7 @@ typedef struct PATH
 
 typedef struct BRIDGE
 {
-    // Bloqueado
+    // 
     int blocked;
     // 
     int countAliens;
@@ -46,6 +46,10 @@ typedef struct BRIDGE
     double quatum;
     double crossTime;
     enum bridgePosition position;
+    
+    void *northList;
+    void *southList;
+
     PATH *queueNorth;
     PATH *queueSouth;
     PATH *exitNorth;
@@ -77,9 +81,6 @@ typedef struct ROUTE
     int finished;
 
 }ROUTE;
-
-
-
 
 
 /**

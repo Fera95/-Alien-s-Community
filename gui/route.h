@@ -5,6 +5,7 @@
 ROUTE * create_route ( BRIDGE** bridge, PATH **map, enum origin start );
 void next_move (ALIEN *alien );
 int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos);
+void draw_sorted_queue(NODE_ALIEN *list, PATH *queuePATH, int sizequeue);
 
 
 #endif
