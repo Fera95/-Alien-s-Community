@@ -42,7 +42,7 @@ int init_gui(GUI_CONTEXT *ctx)
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
-    ctx->disp = al_create_display(975, 678);
+    ctx->disp = al_create_display(1366, 678);
     must_init(ctx->disp, "display");
 
     ctx->font = al_create_builtin_font();
@@ -51,11 +51,11 @@ int init_gui(GUI_CONTEXT *ctx)
     set_background(ctx);
 
     must_init(al_init_primitives_addon(), "primitives");
+    must_init(al_install_mouse(), "mouse");
     al_register_event_source(ctx->queue, al_get_keyboard_event_source());
     al_register_event_source(ctx->queue, al_get_display_event_source(ctx->disp));
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
-
-        
+    al_register_event_source(ctx->queue, al_get_mouse_event_source());
     ctx->done = false;
     ctx->redraw = true;
     printf("Init success\n");
@@ -84,6 +84,20 @@ int set_background(GUI_CONTEXT *ctx)
     ctx->betaImage = al_load_bitmap("assets/beta25.png");
     ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
     ctx->normalImage = al_load_bitmap("assets/normal25.png");
+
+    ctx->alfaSelected = al_load_bitmap("assets/alfaSelected.png");
+    ctx->betaSelected = al_load_bitmap("assets/betaSelected.png");
+    ctx->normalSelected = al_load_bitmap("assets/normalSelected.png");
+
+    ctx->a = al_load_bitmap("assets/a.png");
+    ctx->ap = al_load_bitmap("assets/ap.png");
+    ctx->b = al_load_bitmap("assets/b.png");
+    ctx->bp = al_load_bitmap("assets/bp.png");
+    ctx->c = al_load_bitmap("assets/c.png");
+    ctx->cp = al_load_bitmap("assets/cp.png");
+
+    ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
+    ctx->sideBeta = al_load_bitmap("assets/sideBeta.png");
 
     must_init(ctx->background, "background");
     must_init(ctx->pathImage, "path");
@@ -222,34 +236,32 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
 
 /**
  * CREATE A RANDOM ALIEN 
- */ 
-ALIEN * generateAlien (GUI_CONTEXT *ctx)
+ */
+ALIEN *generateAlien(GUI_CONTEXT *ctx)
 {
     /**
      *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
-     */     
-    enum alienType type = (enum alienType) (rand() % 3) ;  // beta;//
-   
+     */
+    enum alienType type = (enum alienType)(rand() % 3); // beta;//
+
     // RANDOM COMMUNITY
     int emptyqueue = 1;
-    enum  origin  start = (enum origin) (rand() % 2); //alfaPlanet;//betaPlanet;//
-    if(start == alfaPlanet && (ctx->map[0][2]).blocked)
+    enum origin start = (enum origin)(rand() % 2); //alfaPlanet;//betaPlanet;//
+    if (start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
         emptyqueue = 0;
         printf("SALIDA ALFA NO DISPONIBLE\n");
-
-
     }
-    else if(start == betaPlanet && (ctx->map[6][2]).blocked)
+    else if (start == betaPlanet && (ctx->map[6][2]).blocked)
     {
         emptyqueue = 0;
         printf("SALIDA BETA NO DISPONIBLE\n");
     }
-    
-    //  RANDOM BRIDGE     
+
+    //  RANDOM BRIDGE
     BRIDGE *tempBridge;
-    enum bridgePosition tempPos = (enum bridgePosition) (rand() % 3);
-    if(tempPos == east)
+    enum bridgePosition tempPos = (enum bridgePosition)(rand() % 3);
+    if (tempPos == east)
     {
         tempBridge = ctx->eastBridge;
         // if(start == alfaPlanet){
@@ -263,7 +275,8 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
         //     }
         // }
     }
-    else if(tempPos == west){
+    else if (tempPos == west)
+    {
         tempBridge = ctx->westBridge;
         // if(start == alfaPlanet){
         //     if(ctx->westBridge->queueNorth[0].blocked  && ctx->westBridge->queueNorth[ctx->westBridge->queueSize-1].blocked ){
@@ -276,7 +289,8 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
         //     }
         // }
     }
-    else if(tempPos == mid){
+    else if (tempPos == mid)
+    {
         tempBridge = ctx->midBridge;
         // if(start == alfaPlanet){
         //     if(ctx->midBridge->queueNorth[0].blocked  && ctx->midBridge->queueNorth[ctx->midBridge->queueSize-1].blocked ){
@@ -289,11 +303,13 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
         //     }
         // }
     }
-    ALIEN * newAlien;
-    if(emptyqueue){
+    ALIEN *newAlien;
+    if (emptyqueue)
+    {
         float initPosX, initPosY;
-        ROUTE * tempRoute = create_route ( &tempBridge, ctx->map, start );
-        if(start == alfaPlanet){
+        ROUTE *tempRoute = create_route(&tempBridge, ctx->map, start);
+        if (start == alfaPlanet)
+        {
             // printf("ORIGING ALFA PLANET\n");
             initPosX = COMMUNITY_ALFA_POSX;
             initPosY = COMMUNITY_ALFA_POSY;
@@ -304,17 +320,16 @@ ALIEN * generateAlien (GUI_CONTEXT *ctx)
             initPosX = COMMUNITY_BETA_POSX;
             initPosY = COMMUNITY_BETA_POSY;
         }
-        newAlien = create_alien (countIDs, type, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
+        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
         countIDs++;
-    }   
+    }
 
     else
     {
         newAlien = NULL;
     }
-    return newAlien;    
+    return newAlien;
 }
-
 
 // DIBUJAR Y MOVER
 
@@ -331,8 +346,7 @@ int loop_gui(GUI_CONTEXT *ctx)
 
     create_map(ctx);
 
-
-    create_bridge(&ctx->eastBridge, 3,8, east, 0);
+    create_bridge(&ctx->eastBridge, 3, 8, east, 0);
     // ctx->eastBridge->queueNorth[4].blocked = 1;
     // for (int i = 0; i < 5; i++)
     // {
@@ -340,38 +354,49 @@ int loop_gui(GUI_CONTEXT *ctx)
     // }
     create_bridge(&ctx->midBridge, 5, 5, mid, 0);
     create_bridge(&ctx->westBridge, 9, 1, west, 0);
-       
 
-
-    int count = 20, flag=0;
+    int count = 20, flag = 0;
     // CABEZA DE LA LISTA
     NODE_ALIEN *tempNode;
-    NODE_ALIEN *head = (NODE_ALIEN*) malloc(sizeof(NODE_ALIEN*));
+    NODE_ALIEN *head = (NODE_ALIEN *)malloc(sizeof(NODE_ALIEN *));
     head->data = generateAlien(ctx);
     head->next = NULL;
-    head->data->id=-7;
-    
+    head->data->id = -7;
+
     pthread_t t;
     pthread_create(&t, NULL, moveAlien, (void *)head->data);
-    
+
     ALIEN *first = head->data;
-    
+
     while (1)
     {
         /**
          */
+        clickedAlien(ctx, head);
         al_wait_for_event(ctx->queue, &(ctx->event));
         /**
          */
         switch (ctx->event.type)
         {
+        case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+            ctx->mouse_pressed = 1;
+            ctx->mouse_released = 0;
+            break;
+        case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+            ctx->mouse_pressed = 0;
+            ctx->mouse_released = 1;
+            break;
+        case ALLEGRO_EVENT_MOUSE_AXES:
+            ctx->x = ctx->event.mouse.x;
+            ctx->y = ctx->event.mouse.y;
+            break;
         case ALLEGRO_EVENT_TIMER:
             /**
              * Logic here 
              */
             ctx->redraw = true;
             break;
-        
+
         case ALLEGRO_EVENT_KEY_DOWN:
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
             ctx->done = true;
@@ -384,18 +409,21 @@ int loop_gui(GUI_CONTEXT *ctx)
         }
         /**
          */
+        handleMenu(ctx);
         if (ctx->redraw && al_is_event_queue_empty(ctx->queue))
         {
 
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx->map, ctx);
-           
-            if(count <= 0){
+
+            if (count <= 0)
+            {
                 flag = !flag;
-                count = rand()%100;
-                ALIEN * myAlien = generateAlien(ctx);
-                if(myAlien != NULL  ){
+                count = rand() % 100;
+                ALIEN *myAlien = generateAlien(ctx);
+                if (myAlien != NULL)
+                {
                     pthread_t t2;
                     pthread_create(&t2, NULL, moveAlien, (void *)myAlien);
                     ADD_Alien(head, myAlien);
@@ -404,44 +432,84 @@ int loop_gui(GUI_CONTEXT *ctx)
                 {
                     printf("QUEUE LLENA\n");
                 }
-                
-            }  
-            PATH * primer = ctx->map[0];
-            
+            }
+            PATH *primer = ctx->map[0];
 
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, flag);
             al_draw_bitmap(ctx->betaCommunity, 765, 20, flag);
+            char str[30];
+            sprintf(str, " x: %d, y: %d", ctx->x, ctx->y);
+            al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1100, 20, 0, str);
+            if (ctx->alienSelected != NULL)
+            {
+
+                char strAlienStatus[40];
+                sprintf(strAlienStatus, " x: %.2f, y: %.2f, type: %d,  id: %d ", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->type, ctx->alienSelected->id);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 658, 0, strAlienStatus);
+            }
+            else
+            {
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 658, 0, "No hay alien seleccionado");
+            }
+
+            drawMenu(ctx);
             drawBridge(ctx->eastBridge, ctx);
             drawBridge(ctx->midBridge, ctx);
             drawBridge(ctx->westBridge, ctx);
-    
-           
+
             tempNode = head;
             while (tempNode != NULL)
             {
-                if(!tempNode->data->way->finished )
+                if (!tempNode->data->way->finished)
                 {
                     ALLEGRO_BITMAP *image;
-                    if(tempNode->data->type == alfa)
-                        image = ctx->alfaImage;
-                    
-                    else if(tempNode->data->type == beta)
-                        image = ctx->betaImage;
-                    
-                    else if(tempNode->data->type == normal)
-                        image = ctx->normalImage;
+                    if (tempNode->data->type == alfa)
+                    {
+                        if (tempNode->data->selected == 1)
+                        {
+                            image = ctx->alfaSelected;
+                        }
+                        else
+                        {
+                            image = ctx->alfaImage;
+                        }
+                    }
 
+                    else if (tempNode->data->type == beta)
+                    {
+                        if (tempNode->data->selected == 1)
+                        {
+                            image = ctx->betaSelected;
+                        }
+                        else
+                        {
+                            image = ctx->betaImage;
+                        }
+                    }
+
+                    else if (tempNode->data->type == normal)
+                    {
+                        if (tempNode->data->selected == 1)
+                        {
+                            image = ctx->normalSelected;
+                        }
+                        else
+                        {
+                            image = ctx->normalImage;
+                        }
+                    }
 
                     al_draw_bitmap(image, tempNode->data->x, tempNode->data->y, 0);
-                    tempNode = tempNode->next;  
+                    tempNode = tempNode->next;
                 }
-                else {
-                    NODE_ALIEN * temp2 = tempNode->next;
-                    REMOVE_Alien(&head,tempNode->data->id);
+                else
+                {
+                    NODE_ALIEN *temp2 = tempNode->next;
+                    REMOVE_Alien(&head, tempNode->data->id);
                     tempNode = temp2;
                 }
             }
-            
+
             al_flip_display();
             ctx->redraw = false;
             count--;
@@ -482,7 +550,8 @@ void drawmap(PATH **map, GUI_CONTEXT *ctx)
     }
 }
 
-void drawBridge(BRIDGE* mybridge, GUI_CONTEXT *ctx){
+void drawBridge(BRIDGE *mybridge, GUI_CONTEXT *ctx)
+{
     for (int i = 0; i < mybridge->queueSize; i++)
     {
         al_draw_bitmap(ctx->queueImage, mybridge->queueNorth[i].x, mybridge->queueNorth[i].y, 0);
@@ -496,43 +565,41 @@ void drawBridge(BRIDGE* mybridge, GUI_CONTEXT *ctx){
         al_draw_bitmap(ctx->passImage, mybridge->pass[i].x, mybridge->pass[i].y, 0);
     }
     int linesLeft[] = {
-        mybridge->queueNorth[mybridge->queueSize -1].x,
-        mybridge->queueNorth[mybridge->queueSize-1].y + 40,
+        mybridge->queueNorth[mybridge->queueSize - 1].x,
+        mybridge->queueNorth[mybridge->queueSize - 1].y + 40,
         mybridge->pass[0].x,
         mybridge->pass[0].y,
-        mybridge->pass[mybridge->length-1].x,
-        mybridge->pass[mybridge->length-1].y + 40,
+        mybridge->pass[mybridge->length - 1].x,
+        mybridge->pass[mybridge->length - 1].y + 40,
         mybridge->exitNorth[0].x,
-        mybridge->exitNorth[0].y   
+        mybridge->exitNorth[0].y
 
-        };
+    };
     int linesRight[] = {
         mybridge->exitSouth[0].x + 40,
         mybridge->exitSouth[0].y + 40,
-        mybridge->pass[0].x+40,
+        mybridge->pass[0].x + 40,
         mybridge->pass[0].y,
-        mybridge->pass[mybridge->length-1].x+40,
-        mybridge->pass[mybridge->length-1].y + 40,
-        mybridge->queueSouth[mybridge->queueSize-1].x + 40,
-        mybridge->queueSouth[mybridge->queueSize-1].y
-    };
-    ALLEGRO_COLOR purple = al_map_rgb(183,0,255);
+        mybridge->pass[mybridge->length - 1].x + 40,
+        mybridge->pass[mybridge->length - 1].y + 40,
+        mybridge->queueSouth[mybridge->queueSize - 1].x + 40,
+        mybridge->queueSouth[mybridge->queueSize - 1].y};
+    ALLEGRO_COLOR purple = al_map_rgb(183, 0, 255);
 
-    for (int i = 0; i < 6; i+=2)
-        al_draw_line(linesLeft[i],linesLeft[i+1], linesLeft[i+2], linesLeft[i+3],purple,3);
-    
-    for (int i = 0; i < 6; i+=2)
-        al_draw_line(linesRight[i],linesRight[i+1], linesRight[i+2], linesRight[i+3],purple,3);
-        
+    for (int i = 0; i < 6; i += 2)
+        al_draw_line(linesLeft[i], linesLeft[i + 1], linesLeft[i + 2], linesLeft[i + 3], purple, 3);
+
+    for (int i = 0; i < 6; i += 2)
+        al_draw_line(linesRight[i], linesRight[i + 1], linesRight[i + 2], linesRight[i + 3], purple, 3);
 }
 
 void *moveAlien(void *args)
 {
-    ALIEN *myAlien = (ALIEN*) args;
+    ALIEN *myAlien = (ALIEN *)args;
     int onRoad = !myAlien->way->finished;
     while (onRoad == 1)
     {
-        if(myAlien!=NULL)
+        if (myAlien != NULL)
         {
             onRoad = !myAlien->way->finished;
             // next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
@@ -540,7 +607,120 @@ void *moveAlien(void *args)
             usleep(25000);
         }
         else
-            break;        
+            break;
     }
     // printf("ROAD COMPLETED\n");
+}
+
+void handleMenu(GUI_CONTEXT *ctx)
+{
+    char str[30];
+    char *planet = ctx->sideSelected == 0 ? "Alfa" : "Beta";
+    if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        printf("Creando normal en planeta: %s \n", planet);
+        ctx->mouse_released = 0;
+    }
+    /*** Second**/
+    if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        printf("Creando alfa en planeta: %s \n", planet);
+        ctx->mouse_released = 0;
+    }
+    /*** Third**/
+    if (ctx->mouse_released && ctx->x >= (1190) && ctx->x <= (1190 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        printf("Creando beta en planeta: %s\n", planet);
+        ctx->mouse_released = 0;
+    }
+    // else{
+    //     printf("no action\n");
+    // }
+}
+
+void drawMenu(GUI_CONTEXT *ctx)
+{
+    if (ctx->mouse_pressed && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        al_draw_bitmap(ctx->ap, 1100, 70, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->a, 1100, 70, 0);
+    }
+    /*** Second**/
+    if (ctx->mouse_pressed && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        al_draw_bitmap(ctx->bp, 1100, 160, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->b, 1100, 160, 0);
+    }
+    /*** Third**/
+    if (ctx->mouse_pressed && ctx->x >= (1190) && ctx->x <= (1190 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        al_draw_bitmap(ctx->cp, 1190, 160, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->c, 1190, 160, 0);
+    }
+    /*** Switch**/
+    if (ctx->mouse_pressed && ctx->x >= (1190) && ctx->x <= (1190 + 157 / 2) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        ctx->sideSelected = 0;
+    }
+    if (ctx->mouse_pressed && ctx->x >= (1190 + 157 / 2) && ctx->x <= (1190 + 157) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        ctx->sideSelected = 1;
+    }
+
+    if (ctx->sideSelected == 0)
+    {
+        al_draw_bitmap(ctx->sideAlfa, 1190, 70, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->sideBeta, 1190, 70, 0);
+    }
+}
+
+void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
+{
+
+    NODE_ALIEN *temp = NULL;
+    if (ctx->mouse_pressed == 1)
+    {
+        temp = head;
+
+        int count = 0;
+        while (temp != NULL)
+        {
+            if (temp->data != NULL)
+            {
+                count = count + 1;
+                float dx = abs(temp->data->x - ctx->x);
+                float dy = abs(temp->data->y - ctx->y);
+                if (dx <= 20 && dy <= 20)
+                {
+                    printf("Index of alien selected %d\n", count);
+                    // printf("dx: %f dy : %f\n", dx, dy);
+                    if (ctx->alienSelected != NULL)
+                    {
+                        ctx->alienSelected->selected = 0;
+                    }
+                    ctx->alienSelected = temp->data;
+                    ctx->alienSelected->selected = 1;
+                    // printf("x: %f y : %f\n", alien->x, alien->y);
+                    printf("x: %f y : %f %d\n", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->id);
+                    break;
+                }
+            }
+            temp = temp->next;
+        }
+    }
+    else
+    {
+    }
 }
