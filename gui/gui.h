@@ -53,6 +53,14 @@ typedef struct GUI_CONTEXT
     // Controls when to finisthe game
     bool done;
 
+    // This var is used to handle pressed click
+    int mouse_pressed;// 1 true 0 false
+    // This var uis used to handle released click
+    int mouse_released;// 1 true 0 false
+    // handle x mouse coordinate
+    int x;
+    // handle y mouse coordinate
+    int y;
 } GUI_CONTEXT;
 
 
