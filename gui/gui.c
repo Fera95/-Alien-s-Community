@@ -372,6 +372,7 @@ int loop_gui(GUI_CONTEXT *ctx)
     {
         /**
          */
+        clickedAlien(ctx, head);
         al_wait_for_event(ctx->queue, &(ctx->event));
         /**
          */
@@ -408,6 +409,7 @@ int loop_gui(GUI_CONTEXT *ctx)
         }
         /**
          */
+        handleMenu(ctx);
         if (ctx->redraw && al_is_event_queue_empty(ctx->queue))
         {
 
@@ -438,7 +440,19 @@ int loop_gui(GUI_CONTEXT *ctx)
             char str[30];
             sprintf(str, " x: %d, y: %d", ctx->x, ctx->y);
             al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1100, 20, 0, str);
+            if (ctx->alienSelected != NULL)
+            {
 
+                char strAlienStatus[40];
+                sprintf(strAlienStatus, " x: %.2f, y: %.2f, type: %d,  id: %d ", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->type, ctx->alienSelected->id);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 658, 0, strAlienStatus);
+            }
+            else
+            {
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 658, 0, "No hay alien seleccionado");
+            }
+
+            drawMenu(ctx);
             drawBridge(ctx->eastBridge, ctx);
             drawBridge(ctx->midBridge, ctx);
             drawBridge(ctx->westBridge, ctx);
@@ -450,13 +464,40 @@ int loop_gui(GUI_CONTEXT *ctx)
                 {
                     ALLEGRO_BITMAP *image;
                     if (tempNode->data->type == alfa)
-                        image = ctx->alfaImage;
+                    {
+                        if (tempNode->data->selected == 1)
+                        {
+                            image = ctx->alfaSelected;
+                        }
+                        else
+                        {
+                            image = ctx->alfaImage;
+                        }
+                    }
 
                     else if (tempNode->data->type == beta)
-                        image = ctx->betaImage;
+                    {
+                        if (tempNode->data->selected == 1)
+                        {
+                            image = ctx->betaSelected;
+                        }
+                        else
+                        {
+                            image = ctx->betaImage;
+                        }
+                    }
 
                     else if (tempNode->data->type == normal)
-                        image = ctx->normalImage;
+                    {
+                        if (tempNode->data->selected == 1)
+                        {
+                            image = ctx->normalSelected;
+                        }
+                        else
+                        {
+                            image = ctx->normalImage;
+                        }
+                    }
 
                     al_draw_bitmap(image, tempNode->data->x, tempNode->data->y, 0);
                     tempNode = tempNode->next;
@@ -569,4 +610,117 @@ void *moveAlien(void *args)
             break;
     }
     // printf("ROAD COMPLETED\n");
+}
+
+void handleMenu(GUI_CONTEXT *ctx)
+{
+    char str[30];
+    char *planet = ctx->sideSelected == 0 ? "Alfa" : "Beta";
+    if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        printf("Creando normal en planeta: %s \n", planet);
+        ctx->mouse_released = 0;
+    }
+    /*** Second**/
+    if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        printf("Creando alfa en planeta: %s \n", planet);
+        ctx->mouse_released = 0;
+    }
+    /*** Third**/
+    if (ctx->mouse_released && ctx->x >= (1190) && ctx->x <= (1190 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        printf("Creando beta en planeta: %s\n", planet);
+        ctx->mouse_released = 0;
+    }
+    // else{
+    //     printf("no action\n");
+    // }
+}
+
+void drawMenu(GUI_CONTEXT *ctx)
+{
+    if (ctx->mouse_pressed && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        al_draw_bitmap(ctx->ap, 1100, 70, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->a, 1100, 70, 0);
+    }
+    /*** Second**/
+    if (ctx->mouse_pressed && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        al_draw_bitmap(ctx->bp, 1100, 160, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->b, 1100, 160, 0);
+    }
+    /*** Third**/
+    if (ctx->mouse_pressed && ctx->x >= (1190) && ctx->x <= (1190 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
+    {
+        al_draw_bitmap(ctx->cp, 1190, 160, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->c, 1190, 160, 0);
+    }
+    /*** Switch**/
+    if (ctx->mouse_pressed && ctx->x >= (1190) && ctx->x <= (1190 + 157 / 2) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        ctx->sideSelected = 0;
+    }
+    if (ctx->mouse_pressed && ctx->x >= (1190 + 157 / 2) && ctx->x <= (1190 + 157) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        ctx->sideSelected = 1;
+    }
+
+    if (ctx->sideSelected == 0)
+    {
+        al_draw_bitmap(ctx->sideAlfa, 1190, 70, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->sideBeta, 1190, 70, 0);
+    }
+}
+
+void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
+{
+
+    NODE_ALIEN *temp = NULL;
+    if (ctx->mouse_pressed == 1)
+    {
+        temp = head;
+
+        int count = 0;
+        while (temp != NULL)
+        {
+            if (temp->data != NULL)
+            {
+                count = count + 1;
+                float dx = abs(temp->data->x - ctx->x);
+                float dy = abs(temp->data->y - ctx->y);
+                if (dx <= 20 && dy <= 20)
+                {
+                    printf("Index of alien selected %d\n", count);
+                    // printf("dx: %f dy : %f\n", dx, dy);
+                    if (ctx->alienSelected != NULL)
+                    {
+                        ctx->alienSelected->selected = 0;
+                    }
+                    ctx->alienSelected = temp->data;
+                    ctx->alienSelected->selected = 1;
+                    // printf("x: %f y : %f\n", alien->x, alien->y);
+                    printf("x: %f y : %f %d\n", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->id);
+                    break;
+                }
+            }
+            temp = temp->next;
+        }
+    }
+    else
+    {
+    }
 }

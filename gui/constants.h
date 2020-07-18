@@ -106,6 +106,8 @@ typedef struct ALIEN
     enum priority alienPriority;
     // highway
     ROUTE * way;
+    //Selected boolean
+    int selected;
     
 } ALIEN;
 
