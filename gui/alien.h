@@ -3,7 +3,7 @@
 
 #include "constants.h"
 #include <stdio.h>
-
+#include "time.h"
 
 ALIEN * create_alien (int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed);
 
@@ -36,6 +36,21 @@ void swap(NODE_ALIEN *head, int index1, int index2);
 
 //returns the length of the list
 int get_length(NODE_ALIEN * head);
+
+
+//removes alien by id
+ALIEN *remove_by_id(NODE_ALIEN *head, int id);
+
+
+//swaps the content of two nodes one by one
+void swap_one_by_one(struct NODE_ALIEN *a, struct NODE_ALIEN *b);
+
+//orders list by priority 
+void order_list_by_priority(NODE_ALIEN *head);
+
+//gets a loterry winner
+NODE_ALIEN * order_list_by_lotery(NODE_ALIEN *head);
+
 
 
 #endif

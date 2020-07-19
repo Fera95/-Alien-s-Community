@@ -1,4 +1,5 @@
 #include "bridge.h"
+#include "alien.h"
 
 void create_bridge (BRIDGE **ctxBridge, int length, int strength, enum bridgePosition position, int scheduler )
 {
@@ -100,3 +101,33 @@ void create_bridge (BRIDGE **ctxBridge, int length, int strength, enum bridgePos
 // 		exit(EXIT_FAILURE);
 // 	}
 // }
+
+void print_bridge(BRIDGE * bridge2print)
+{
+    
+    int lenPass = bridge2print->length;
+    int lenQueue = bridge2print->queueSize;
+    printf("POS: %d\nYIELD: %d\nFULL: %d\nBRIDGE SIZE: %d\nQUEUE LEN: %d\nSTRENGH: %d",bridge2print->position,bridge2print->yield,bridge2print->full, lenPass, lenQueue, bridge2print->strength);
+    // POSICIon, largo
+    printf("NORTH PATH:\n");
+    for (int i = 0; i < lenQueue; i++)
+    {
+        printf("QUEUENORTH[%d] BLOCKED: %d IDALIEN: %d\n",i, bridge2print->queueNorth[i].blocked, bridge2print->queueNorth[i].alienID);        
+    }
+    
+    
+    printf("BRIDGE PATH:\n");
+    for (int i = 0; i < lenPass; i++)
+    {
+        printf("BRIDGE[%d] BLOCKED: %d IDALIEN: %d\n",i, bridge2print->pass[i].blocked, bridge2print->pass[i].alienID);        
+    }
+    
+    
+    printf("SOUTH PATH:\n");
+    for (int i = 0; i < lenQueue; i++)
+    {
+        printf("QUEUESOUTH[%d] BLOCKED: %d IDALIEN: %d\n",i, bridge2print->queueSouth[i].blocked, bridge2print->queueSouth[i].alienID);        
+    }
+    
+
+}
