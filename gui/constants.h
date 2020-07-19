@@ -110,6 +110,7 @@ typedef struct ALIEN
     ROUTE * way;
     //Selected boolean
     int selected;
+    int weight;
 
     
 } ALIEN;
