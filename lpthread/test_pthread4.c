@@ -10,35 +10,37 @@
 #endif
 
 
-#define NTHREADS 10
-void *thread_function(void *);
+#define NTHREADS  2
+void *thread_function1(void *);
+
 lpthread_mutex_t mutex1;
 int  counter = 0;
 
-int main()
-{
-   lpthread_t thread_id[NTHREADS];
-   int i, j;
 
-   for(i=0; i < NTHREADS; i++)
-   {
-      lpthread_create( &thread_id[i], NULL, thread_function, NULL );
-   }
-
-   for(j=0; j < NTHREADS; j++)
-   {
-      lpthread_join( thread_id[j], NULL); 
-   }
-  
-                                                 
-
-   printf("Final counter value: %d\n", counter);
-}
 
 void *thread_function(void *dummyPtr)
 {
-   printf("Thread number %d\n", lpthread_self());
    lpthread_mutex_lock( &mutex1 );
-   counter++;
-   lpthread_mutex_unlock( &mutex1 );
+   printf("Soy la funcion  lockie el mutex \n");
+   lpthread_mutex_unlock(&mutex1 );
+   lpthread_mutex_destroy(&mutex1);
 }
+
+
+int main()
+{
+  lpthread_t thread1, thread2;
+
+   lpthread_mutex_init(&mutex1,NULL);
+   lpthread_create( &thread1, NULL, thread_function, NULL );
+   lpthread_create( &thread2, NULL, thread_function, NULL );
+
+//Join
+   //lpthread_join( thread_id[0], NULL); 
+   //lpthread_join( thread_id[1], NULL); 
+
+   
+  
+                                          
+}
+
