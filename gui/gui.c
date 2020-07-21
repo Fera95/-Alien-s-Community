@@ -58,6 +58,7 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_mouse_event_source());
     ctx->done = false;
     ctx->redraw = true;
+    ctx->mouse_released = 0;
     printf("Init success\n");
     return 0;
 }
@@ -243,10 +244,9 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
      *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
      */
     enum alienType type = (enum alienType)(rand() % 3); // beta;//
-
+    enum origin start = (enum origin)(rand() % 2);      //alfaPlanet;//betaPlanet;//
     // RANDOM COMMUNITY
     int emptyqueue = 1;
-    enum origin start = (enum origin)(rand() % 2); //alfaPlanet;//betaPlanet;//
     if (start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
         emptyqueue = 0;
@@ -358,21 +358,19 @@ int loop_gui(GUI_CONTEXT *ctx)
     int count = 20, flag = 0;
     // CABEZA DE LA LISTA
     NODE_ALIEN *tempNode;
-    NODE_ALIEN *head = (NODE_ALIEN *)malloc(sizeof(NODE_ALIEN *));
-    head->data = generateAlien(ctx);
-    head->next = NULL;
-    head->data->id = -7;
-
+    ctx->head = (NODE_ALIEN *)malloc(sizeof(NODE_ALIEN *));
+    ctx->head->data = generateAlien(ctx);
+    ctx->head->next = NULL;
+    ctx->head->data->id = -7;
     pthread_t t;
-    pthread_create(&t, NULL, moveAlien, (void *)head->data);
-
-    ALIEN *first = head->data;
+    pthread_create(&t, NULL, moveAlien, (void *)ctx->head->data);
+    // ALIEN *first = head->data;
 
     while (1)
     {
         /**
          */
-        clickedAlien(ctx, head);
+        clickedAlien(ctx, ctx->head);
         al_wait_for_event(ctx->queue, &(ctx->event));
         /**
          */
@@ -421,12 +419,13 @@ int loop_gui(GUI_CONTEXT *ctx)
             {
                 flag = !flag;
                 count = rand() % 100;
-                ALIEN *myAlien = generateAlien(ctx);
+                // ALIEN *myAlien = generateAlien(ctx);
+                ALIEN *myAlien = NULL;
                 if (myAlien != NULL)
                 {
                     pthread_t t2;
                     pthread_create(&t2, NULL, moveAlien, (void *)myAlien);
-                    ADD_Alien(head, myAlien);
+                    ADD_Alien((ctx->head), myAlien);
                 }
                 else
                 {
@@ -457,7 +456,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             drawBridge(ctx->midBridge, ctx);
             drawBridge(ctx->westBridge, ctx);
 
-            tempNode = head;
+            tempNode = ctx->head;
             while (tempNode != NULL)
             {
                 if (!tempNode->data->way->finished)
@@ -505,7 +504,7 @@ int loop_gui(GUI_CONTEXT *ctx)
                 else
                 {
                     NODE_ALIEN *temp2 = tempNode->next;
-                    REMOVE_Alien(&head, tempNode->data->id);
+                    REMOVE_Alien(&(ctx->head), tempNode->data->id);
                     tempNode = temp2;
                 }
             }
@@ -612,30 +611,126 @@ void *moveAlien(void *args)
     // printf("ROAD COMPLETED\n");
 }
 
+ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType alien_t)
+{
+    // RANDOM COMMUNITY
+    int emptyqueue = 1;
+    if (start == alfaPlanet && (ctx->map[0][2]).blocked)
+    {
+        emptyqueue = 0;
+        printf("SALIDA ALFA NO DISPONIBLE\n");
+    }
+    else if (start == betaPlanet && (ctx->map[6][2]).blocked)
+    {
+        emptyqueue = 0;
+        printf("SALIDA BETA NO DISPONIBLE\n");
+    }
+    //  RANDOM BRIDGE
+    BRIDGE *tempBridge;
+    enum bridgePosition tempPos = (enum bridgePosition)(rand() % 3);
+    if (tempPos == east)
+    {
+        tempBridge = ctx->eastBridge;
+        // if(start == alfaPlanet){
+        //     if(ctx->eastBridge->queueNorth[0].blocked  && ctx->eastBridge->queueNorth[ctx->eastBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+        // else if(start == betaPlanet){
+        //     if(ctx->eastBridge->queueSouth[0].blocked  && ctx->eastBridge->queueSouth[ctx->eastBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+    }
+    else if (tempPos == west)
+    {
+        tempBridge = ctx->westBridge;
+        // if(start == alfaPlanet){
+        //     if(ctx->westBridge->queueNorth[0].blocked  && ctx->westBridge->queueNorth[ctx->westBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+        // else if(start == betaPlanet){
+        //     if(ctx->westBridge->queueSouth[0].blocked  && ctx->westBridge->queueSouth[ctx->westBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+    }
+    else if (tempPos == mid)
+    {
+        tempBridge = ctx->midBridge;
+        // if(start == alfaPlanet){
+        //     if(ctx->midBridge->queueNorth[0].blocked  && ctx->midBridge->queueNorth[ctx->midBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+        // else if(start == betaPlanet){
+        //     if(ctx->midBridge->queueSouth[0].blocked  && ctx->midBridge->queueSouth[ctx->midBridge->queueSize-1].blocked ){
+        //         emptyqueue = 0;
+        //     }
+        // }
+    }
+    ALIEN *newAlien;
+    if (emptyqueue)
+    {
+        float initPosX, initPosY;
+        ROUTE *tempRoute = create_route(&tempBridge, ctx->map, start);
+        if (start == alfaPlanet)
+        {
+            // printf("ORIGING ALFA PLANET\n");
+            initPosX = COMMUNITY_ALFA_POSX;
+            initPosY = COMMUNITY_ALFA_POSY;
+        }
+        else if (start == betaPlanet)
+        {
+            // printf("ORIGING BETA PLANET\n");
+            initPosX = COMMUNITY_BETA_POSX;
+            initPosY = COMMUNITY_BETA_POSY;
+        }
+        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
+        countIDs++;
+    }
+
+    else
+    {
+
+        newAlien = NULL;
+    }
+    return newAlien;
+}
+
 void handleMenu(GUI_CONTEXT *ctx)
 {
+    ALIEN *temp = NULL;
     char str[30];
-    char *planet = ctx->sideSelected == 0 ? "Alfa" : "Beta";
+    char *planet = ctx->sideSelected == alfaPlanet ? "Alfa" : "Beta";
     if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
-        printf("Creando normal en planeta: %s \n", planet);
+        printf("Creando normal en planeta: %s\n", planet);
+        temp = generateManualAlien(ctx, ctx->sideSelected, normal);
         ctx->mouse_released = 0;
     }
     /*** Second**/
     if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
     {
         printf("Creando alfa en planeta: %s \n", planet);
+        temp = generateManualAlien(ctx, ctx->sideSelected, alfa);
         ctx->mouse_released = 0;
     }
     /*** Third**/
     if (ctx->mouse_released && ctx->x >= (1190) && ctx->x <= (1190 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
     {
         printf("Creando beta en planeta: %s\n", planet);
+        temp = generateManualAlien(ctx, ctx->sideSelected, beta);
         ctx->mouse_released = 0;
     }
-    // else{
-    //     printf("no action\n");
-    // }
+
+    if (temp != NULL)
+    {
+        ADD_Alien((ctx->head), temp);
+        pthread_t t;
+        pthread_create(&t, NULL, moveAlien, (void *)temp);
+    }
 }
 
 void drawMenu(GUI_CONTEXT *ctx)
@@ -669,11 +764,11 @@ void drawMenu(GUI_CONTEXT *ctx)
     /*** Switch**/
     if (ctx->mouse_pressed && ctx->x >= (1190) && ctx->x <= (1190 + 157 / 2) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
-        ctx->sideSelected = 0;
+        ctx->sideSelected = alfaPlanet;
     }
     if (ctx->mouse_pressed && ctx->x >= (1190 + 157 / 2) && ctx->x <= (1190 + 157) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
-        ctx->sideSelected = 1;
+        ctx->sideSelected = betaPlanet;
     }
 
     if (ctx->sideSelected == 0)

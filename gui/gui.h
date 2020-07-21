@@ -74,9 +74,11 @@ typedef struct GUI_CONTEXT
     // handle y mouse coordinate
     int y;
     // side selected 0 alfa, 1 is beta
-    int sideSelected;
+    enum origin sideSelected;
     // selected alien
     ALIEN *alienSelected;
+    //head the first node
+    NODE_ALIEN *head;
 } GUI_CONTEXT;
 
 int init_gui(GUI_CONTEXT *ctx);

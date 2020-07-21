@@ -42,7 +42,7 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
 
  
 
-void ADD_Alien (struct NODE_ALIEN * head, struct ALIEN *newData)
+void ADD_Alien (struct NODE_ALIEN *head, struct ALIEN *newData)
 {
     NODE_ALIEN *newNode = (NODE_ALIEN *) malloc(sizeof(NODE_ALIEN*));
     newNode->data = newData;
