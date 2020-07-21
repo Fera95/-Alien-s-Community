@@ -96,7 +96,8 @@ int set_background(GUI_CONTEXT *ctx)
     ctx->bp = al_load_bitmap("assets/bp.png");
     ctx->c = al_load_bitmap("assets/c.png");
     ctx->cp = al_load_bitmap("assets/cp.png");
-
+    ctx->i = al_load_bitmap("assets/i.png");
+    ctx->ip = al_load_bitmap("assets/ip.png");
     ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
     ctx->sideBeta = al_load_bitmap("assets/sideBeta.png");
 
@@ -365,11 +366,9 @@ int loop_gui(GUI_CONTEXT *ctx)
     pthread_t t;
     pthread_create(&t, NULL, moveAlien, (void *)ctx->head->data);
     // ALIEN *first = head->data;
-
+    ctx->mouse_pressed = 1;
     while (1)
     {
-        ctx->mouse_pressed = 0;
-        ctx->mouse_released = 0;
         /**
          */
         clickedAlien(ctx, ctx->head);
@@ -380,12 +379,14 @@ int loop_gui(GUI_CONTEXT *ctx)
         switch (ctx->event.type)
         {
         case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-            ctx->mouse_pressed = 1;
-            ctx->mouse_released = 0;
+            // ctx->mouse_pressed = 1;
+            // ctx->mouse_released = 0;
             break;
         case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-            ctx->mouse_pressed = 0;
             ctx->mouse_released = 1;
+            handleMenu(ctx);
+            ctx->mouse_released = 0;
+            // ctx->mouse_pressed = 0;
             break;
         case ALLEGRO_EVENT_MOUSE_AXES:
             ctx->x = ctx->event.mouse.x;
@@ -738,6 +739,7 @@ void handleMenu(GUI_CONTEXT *ctx)
 
 void drawMenu(GUI_CONTEXT *ctx)
 {
+    
     if (ctx->mouse_pressed && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
         al_draw_bitmap(ctx->ap, 1100, 70, 0);
@@ -764,6 +766,17 @@ void drawMenu(GUI_CONTEXT *ctx)
     {
         al_draw_bitmap(ctx->c, 1190, 160, 0);
     }
+
+    /**     * Fourth **/
+    if (ctx->mouse_pressed && ctx->x >= (1010) && ctx->x <= (1010 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        al_draw_bitmap(ctx->ip, 1010, 70, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->i, 1010, 70, 0);
+    }
+
     /*** Switch**/
     if (ctx->mouse_pressed && ctx->x >= (1190) && ctx->x <= (1190 + 157 / 2) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {

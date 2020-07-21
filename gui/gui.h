@@ -53,6 +53,8 @@ typedef struct GUI_CONTEXT
     ALLEGRO_BITMAP *bp;
     ALLEGRO_BITMAP *c;
     ALLEGRO_BITMAP *cp;
+    ALLEGRO_BITMAP *i;
+    ALLEGRO_BITMAP *ip;
     ALLEGRO_BITMAP *sideAlfa;
     ALLEGRO_BITMAP *sideBeta;
 
