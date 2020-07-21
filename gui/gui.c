@@ -368,12 +368,15 @@ int loop_gui(GUI_CONTEXT *ctx)
 
     while (1)
     {
+        ctx->mouse_pressed = 0;
+        ctx->mouse_released = 0;
         /**
          */
         clickedAlien(ctx, ctx->head);
         al_wait_for_event(ctx->queue, &(ctx->event));
         /**
          */
+
         switch (ctx->event.type)
         {
         case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
