@@ -38,10 +38,10 @@ int main()
      /* wait we run the risk of executing an exit which will terminate   */
      /* the process and all threads before the threads have completed.   */
 
-     lpthread_join( thread1, NULL);
-     lpthread_join( thread4, NULL);
-     lpthread_join( thread3, NULL);
-     lpthread_join( thread2, NULL);
+     //lpthread_join( thread1, NULL);
+     //lpthread_join( thread4, NULL);
+     //lpthread_join( thread3, NULL);
+     //lpthread_join( thread2, NULL);
   
 
      printf("Thread 1 returns: %d\n",iret1);

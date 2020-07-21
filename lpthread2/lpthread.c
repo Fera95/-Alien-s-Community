@@ -50,6 +50,10 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 	// Copies thread to list
 	thread->detached=0;
 	memcpy((void*)&lpthreadList[numLPthreads++], (void*)thread, sizeof(lpthread_t));
+
+		
+	
+	
 	return LF_NOERROR;
 }
 
@@ -68,7 +72,7 @@ int lpthread_join(lpthread_t thread, void **retval){
 
 	if(lpthreadList[index].detached==0){
 		waitpid(thread.pid, 0, 0); // Key is here, wait for it to end
-		/*printf("%s\n", "done join");*/
+		printf("%s\n", "done join");
 
 		return 0;
 	}
@@ -84,36 +88,65 @@ int lpthread_detach(lpthread_t thread){
 
 int lpmutex_init(lpthread_mutex_t* restrict mutex, const lpthread_mutexattr_t *restrict attr){
 	mutex->locked=0; // Set the mutex as unlocked
-	mutex->magic= 0;
+	mutex->magic= 1;
 	mutex->pid=0;
 	return 0;
 }
 int lpmutex_destroy(lpthread_mutex_t *mutex){
 	mutex->locked = 0; // Set the mutex as unlocked chequear cono se hace en real
-	mutex ->magic = 1;
+	mutex ->magic = 0;
 	mutex->pid = 0;
 	return 0;
 }
 int lpthread_mutex_unlock(lpthread_mutex_t *mutex){
 	//Chequear magic
+	int alive = mutex->magic;
+	if(!alive || !mutex){
+    
+    printf("Unlock: Mutex no existente: Violación de segmento (`core' generado) %d \n",mutex->magic );
+     
+    kill(getpid(),SIGINT);
+     }
+
 	
 	mutex->locked = 0; // Set the mutex as unlocked
 	mutex->pid = 0;
+	printf("Desbloqueo exitoso \n");
 	return 0;
 }
 int lpmutex_trylock(lpthread_mutex_t *mutex){
 	//Chequear magic
 	
+	int alive = mutex->magic;
+	if(!alive || !mutex){
+    
+    printf("Trylock: Mutex no existente: Violación de segmento (`core' generado) %d \n",mutex->magic );
+     
+    kill(getpid(),SIGINT);
+     }
+
+
 	if(mutex->locked==0){ // If mutex is not locked, lock it
 		mutex->locked=1;
 		mutex->pid = getpid();
+		printf("Bloqueo exitoso \n");
 		return 0;
 	}
+	printf("Bloqueo exitoso \n");
 	return 1;
 }
 int lpthread_mutex_lock(lpthread_mutex_t *mutex){
 	//Chequear magic
-	
+
+	int alive = mutex->magic;
+	if(!alive || !mutex){
+    
+    printf("Lock: Mutex no existente: Violación de segmento (`core' generado) %d \n",mutex->magic );
+     
+    kill(getpid(),SIGINT);
+     }
+
+
 	LOOP: while(mutex->locked); // Race condition !!!!!!!!! Wait for mutex to unlock
 	pid_t id = getpid();
 	mutex->locked= 1;
@@ -121,6 +154,7 @@ int lpthread_mutex_lock(lpthread_mutex_t *mutex){
 	if(mutex->pid != id){ // Method one to eliminate race condition
 		goto LOOP;
 	}
+	printf("Bloqueo exitoso \n");
 	return 0;
 }
 

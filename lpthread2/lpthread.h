@@ -154,7 +154,7 @@ int map_pid_index(pid_t id);
 waitForAllLPthreads: Waits for all the pthreads to end
 */
 
-int waitForAllLPthreads();
+int wait_all();
 
 /*
 sync_printf: Printf blocked with lpthread mutex

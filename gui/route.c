@@ -284,21 +284,30 @@ void next_move(ALIEN *alien)//)
                 }
                 else
                 {
+                    printf("Add to queue List: ");
                     if(get_by_id(list,alien->id) == NULL)
                     {
                         push_back( &list, alien);
                     }
                 }
                 // LLAMAR AL ORGANIZADOR AQUÍ
-                swap(list, 0,1);
-                // 
+                // swap(list, 0,1);
+                NODE_ALIEN *sortedList = list;
+                if(get_length(list) > 1){
+                    print_list2(list,2);
+                    order_list_by_priority(sortedList);
+                    print_list2(sortedList,2);
+
+                    // sortedList = order_list_by_lotery(list);
+
+                }
                 // printf("Agregar nuevo:\t");
                 // print_list2(list, 0);
-                draw_sorted_queue(list, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
+                draw_sorted_queue(sortedList, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
                 
                 alienRoute->current = nextPath;
                 alienRoute->limit = tempLimit;
-                alienRoute->bridge->northList = (void *) list;
+                alienRoute->bridge->northList = (void *) sortedList;
             }
             else if( dequeue ){
                 NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northList;
@@ -375,44 +384,72 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
         result = 0;
     }
     else
-    {    
-        if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
+    {   
+        bool debug = 0; 
+        if (debug && alienMoving->way->current == alienMoving->way->bridge->queueNorth && alienMoving->way->bridge->position == east)
         {
+            // printf("DEBUG NORTH EAST BRIDGE\n");
+            print_bridge(alienMoving->way->bridge);
+            printf("ALIEN ID: %d\n",alienMoving->id);
+            printf("nextPATH: %p\nCurrent: %p\nBridge pass: %p\n\n",(void *)nextPATH, (void *)alienMoving->way->current, (void *)myBridge->pass);
+        }
+
+        if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
+        {             
+            if(debug){
+                printf("INTENTO PASAR PUENTE \n");
+            }  
             if( !myBridge->full){
                 if(myBridge->yield && alienMoving->way->start == alfaPlanet){
                     myBridge->full = 1;
                     result = 1;
-                    myBridge->countAliens++;
+                    if(debug){
+                        printf("TENGO LA VIA Y LLENE el Puente \n");
+                    }  
                     // printf("Puente: %d Coutner Alfa:%d\n", myBridge->position, myBridge->countAliens);
                 }
                 else if (!myBridge->yield && alienMoving->way->start == betaPlanet)
                 {
                     myBridge->full = 1;
                     result = 1;
-                    myBridge->countAliens++;
                     // printf("Puente: %d Coutner BetA: %d\n", myBridge->position, myBridge->countAliens);   
                 }
                 else
                 {
+                    if(debug){
+                        printf("NO TENGO LA VIA \n");
+                    }  
                     result = 0;
                 }
             }
             else
             {
+                if(debug){
+                    printf("PUENTE LLENO \n");
+                }  
                 result = 0;
             }
             
         }
         else if (nextPATH == myBridge->exitNorth || nextPATH == myBridge->exitSouth)
         {
-            myBridge->full = 0;
-            if(myBridge->countAliens >= 3)
-            {
-                myBridge->countAliens = 0;
-                myBridge->yield = !myBridge->yield;
-            }
+            if(debug){
+                printf("SALIENDO DEL PUENTE LIBERANDO ESPACIO \n");
+            } 
+            if(pos == 0){
+                myBridge->full = 0;
+                myBridge->countAliens++;
+                // printf("COUNT: %d",myBridge->countAliens);
+                if(myBridge->countAliens >= 3)
+                {
+                    if(debug){
+                        printf("CAMBIO DE LA VIA \n");
+                    }  
+                    myBridge->countAliens = 0;
+                    myBridge->yield = !myBridge->yield;
+                }
+            } 
             result = 1;
-
         }
         else
         {

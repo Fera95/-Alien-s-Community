@@ -87,13 +87,17 @@ typedef struct ROUTE
  * ALIEN
  */ 
 enum alienType { alfa, beta, normal };
-enum priority { high, medium, low };
+// enum priority { 0, 1, low };
 
 
 typedef struct ALIEN
 {
     // IDENTIFER
     int id;
+    // LOTERY
+    int tickets;
+    // Priority
+    int alienPriority;
     // COORDENADAS
     float x, y;
     // SPEED
@@ -102,12 +106,12 @@ typedef struct ALIEN
     // pthread_t idThread;
     // TYPE
     enum alienType type;
-    // Priority
-    enum priority alienPriority;
     // highway
     ROUTE * way;
     //Selected boolean
     int selected;
+    int weight;
+
     
 } ALIEN;
 

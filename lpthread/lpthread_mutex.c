@@ -1,4 +1,7 @@
 #include "lpthread.h"
+#include <stdlib.h>
+#include <stdio.h>
+void destroy(struct lpthread_mutex_t  *);
 
 /* initial the mutex lock */
 int lpthread_mutex_init(lpthread_mutex_t *mutex, const lpthread_mutexattr_t *mutexattr)
@@ -25,9 +28,12 @@ int lpthread_mutex_lock(lpthread_mutex_t *mutex)
 {
     lpthread_mutex_t m = *mutex;
     int alive = m.exist;
-   if(!alive){
-    printf("Mutex no existente");
-    return -2;  
+    if(!alive || !mutex){
+    
+    printf("Lock: Mutex no existente: Violación de segmento (`core' generado) \n");
+     
+    kill(getpid(),SIGINT);
+     
   }
   
   //printf("Mutex lock !\n");
@@ -86,10 +92,16 @@ int lpthread_mutex_trylock(lpthread_mutex_t *mutex)
 
   lpthread_mutex_t m = *mutex;
     int alive = m.exist;
-  if(!alive){
-    printf("Mutex no existente");
-    return -1;  
+
+    if(!alive){
+    
+    printf("Trylock: Mutex no existente: Violación de segmento (`core' generado)  \n");
+     
+    kill(getpid(),SIGINT);
+     
   }
+  
+  
 
   //printf("Mutex lock !\n");
   if(!mainContextInitialized)
@@ -138,11 +150,15 @@ int lpthread_mutex_unlock(lpthread_mutex_t *mutex)
 {
   lpthread_mutex_t m = *mutex;
     int alive = m.exist;
-  if(!alive){
-    printf("Mutex no existente");
-    return -1;  
+  
+    if(!alive){
+    
+    printf("Unlock: Mutex no existente: Violación de segmento (`core' generado)  \n");
+     
+    kill(getpid(),SIGINT);
+     
   }
-
+  
   //printf("Mutex unlock !\n");
   if(!mainContextInitialized)
   {
@@ -201,7 +217,10 @@ int lpthread_mutex_destroy(lpthread_mutex_t *mutex)
   }
   *mutex = m;
   printf("Mutex destruido \n");
+  sleep(0.1);
   return 0;
+  //se libera la memoria
+   
   
 };
 
