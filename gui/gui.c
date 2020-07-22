@@ -265,44 +265,14 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
     if (tempPos == east)
     {
         tempBridge = ctx->eastBridge;
-        // if(start == alfaPlanet){
-        //     if(ctx->eastBridge->queueNorth[0].blocked  && ctx->eastBridge->queueNorth[ctx->eastBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
-        // else if(start == betaPlanet){
-        //     if(ctx->eastBridge->queueSouth[0].blocked  && ctx->eastBridge->queueSouth[ctx->eastBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
     }
     else if (tempPos == west)
     {
         tempBridge = ctx->westBridge;
-        // if(start == alfaPlanet){
-        //     if(ctx->westBridge->queueNorth[0].blocked  && ctx->westBridge->queueNorth[ctx->westBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
-        // else if(start == betaPlanet){
-        //     if(ctx->westBridge->queueSouth[0].blocked  && ctx->westBridge->queueSouth[ctx->westBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
     }
     else if (tempPos == mid)
     {
         tempBridge = ctx->midBridge;
-        // if(start == alfaPlanet){
-        //     if(ctx->midBridge->queueNorth[0].blocked  && ctx->midBridge->queueNorth[ctx->midBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
-        // else if(start == betaPlanet){
-        //     if(ctx->midBridge->queueSouth[0].blocked  && ctx->midBridge->queueSouth[ctx->midBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
     }
     ALIEN *newAlien;
     if (emptyqueue)
@@ -363,8 +333,10 @@ int loop_gui(GUI_CONTEXT *ctx)
     ctx->head->data = generateAlien(ctx);
     ctx->head->next = NULL;
     ctx->head->data->id = -7;
-    pthread_t t;
-    pthread_create(&t, NULL, moveAlien, (void *)ctx->head->data);
+    
+    lpthread_t t;
+    lpthread_create(&t, NULL, moveAlien, (void *)ctx->head->data);
+    
     // ALIEN *first = head->data;
     ctx->mouse_pressed = 1;
     while (1)
@@ -419,21 +391,22 @@ int loop_gui(GUI_CONTEXT *ctx)
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx->map, ctx);
 
+            count--;
             if (count <= 0)
             {
                 flag = !flag;
                 count = rand() % 100;
-                // ALIEN *myAlien = generateAlien(ctx);
-                ALIEN *myAlien = NULL;
+                ALIEN *myAlien = generateAlien(ctx);
+                // ALIEN *myAlien = NULL;
                 if (myAlien != NULL)
                 {
-                    pthread_t t2;
-                    pthread_create(&t2, NULL, moveAlien, (void *)myAlien);
+                    lpthread_t t2;
+                    lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
                     ADD_Alien((ctx->head), myAlien);
                 }
                 else
                 {
-                    printf("QUEUE LLENA\n");
+                    printf("ALIEN NO CREADO ESPACIO NO DISPONIBLE\n");
                 }
             }
             PATH *primer = ctx->map[0];
@@ -515,7 +488,6 @@ int loop_gui(GUI_CONTEXT *ctx)
 
             al_flip_display();
             ctx->redraw = false;
-            count--;
         }
     }
     finalize_gui(ctx);
@@ -635,53 +607,22 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
     if (tempPos == east)
     {
         tempBridge = ctx->eastBridge;
-        // if(start == alfaPlanet){
-        //     if(ctx->eastBridge->queueNorth[0].blocked  && ctx->eastBridge->queueNorth[ctx->eastBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
-        // else if(start == betaPlanet){
-        //     if(ctx->eastBridge->queueSouth[0].blocked  && ctx->eastBridge->queueSouth[ctx->eastBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
     }
     else if (tempPos == west)
     {
         tempBridge = ctx->westBridge;
-        // if(start == alfaPlanet){
-        //     if(ctx->westBridge->queueNorth[0].blocked  && ctx->westBridge->queueNorth[ctx->westBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
-        // else if(start == betaPlanet){
-        //     if(ctx->westBridge->queueSouth[0].blocked  && ctx->westBridge->queueSouth[ctx->westBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
     }
     else if (tempPos == mid)
     {
         tempBridge = ctx->midBridge;
-        // if(start == alfaPlanet){
-        //     if(ctx->midBridge->queueNorth[0].blocked  && ctx->midBridge->queueNorth[ctx->midBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
-        // else if(start == betaPlanet){
-        //     if(ctx->midBridge->queueSouth[0].blocked  && ctx->midBridge->queueSouth[ctx->midBridge->queueSize-1].blocked ){
-        //         emptyqueue = 0;
-        //     }
-        // }
     }
-    ALIEN *newAlien;
+    ALIEN *newAlien = NULL;
     if (emptyqueue)
     {
         float initPosX, initPosY;
         ROUTE *tempRoute = create_route(&tempBridge, ctx->map, start);
         if (start == alfaPlanet)
         {
-            // printf("ORIGING ALFA PLANET\n");
             initPosX = COMMUNITY_ALFA_POSX;
             initPosY = COMMUNITY_ALFA_POSY;
         }
@@ -691,6 +632,7 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
             initPosX = COMMUNITY_BETA_POSX;
             initPosY = COMMUNITY_BETA_POSY;
         }
+        printf("Creando (MANUAL) nuevo alien %d\n",countIDs);
         newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
         countIDs++;
     }
@@ -711,6 +653,7 @@ void handleMenu(GUI_CONTEXT *ctx)
     if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
         printf("Creando normal en planeta: %s\n", planet);
+        printf("BREAKPOINT\n");
         temp = generateManualAlien(ctx, ctx->sideSelected, normal);
         ctx->mouse_released = 0;
     }
@@ -732,8 +675,8 @@ void handleMenu(GUI_CONTEXT *ctx)
     if (temp != NULL)
     {
         ADD_Alien((ctx->head), temp);
-        pthread_t t;
-        pthread_create(&t, NULL, moveAlien, (void *)temp);
+        lpthread_t t;
+        lpthread_create(&t, NULL, moveAlien, (void *)temp);
     }
 }
 

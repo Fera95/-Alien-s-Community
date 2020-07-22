@@ -3,7 +3,6 @@
 
 void create_bridge (BRIDGE **ctxBridge, int length, int strength, enum bridgePosition position, int scheduler )
 {
-    printf("CREATING \n");
     if(length > 10 || length < 0)
         length = 10;
     BRIDGE * newBridge = malloc(sizeof(BRIDGE));
