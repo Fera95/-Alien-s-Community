@@ -284,7 +284,7 @@ void next_move(ALIEN *alien)//)
                 }
                 else
                 {
-                    printf("Add to queue List: ");
+                    // printf("Add to queue List: ");
                     if(get_by_id(list,alien->id) == NULL)
                     {
                         push_back( &list, alien);
@@ -390,8 +390,8 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
         {
             // printf("DEBUG NORTH EAST BRIDGE\n");
             print_bridge(alienMoving->way->bridge);
-            printf("ALIEN ID: %d\n",alienMoving->id);
-            printf("nextPATH: %p\nCurrent: %p\nBridge pass: %p\n\n",(void *)nextPATH, (void *)alienMoving->way->current, (void *)myBridge->pass);
+            // printf("ALIEN ID: %d\n",alienMoving->id);
+            // printf("nextPATH: %p\nCurrent: %p\nBridge pass: %p\n\n",(void *)nextPATH, (void *)alienMoving->way->current, (void *)myBridge->pass);
         }
 
         if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
@@ -459,7 +459,6 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
     return result;
 
 }
-
 
 void draw_sorted_queue(NODE_ALIEN *sorted_list, PATH *queuePATH, int sizequeue )
 {

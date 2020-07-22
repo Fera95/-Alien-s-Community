@@ -24,7 +24,7 @@
 
 
 #define maxThread 1000
-#define threadStack (1024*1024)
+#define threadStack (4096*4096)
 #define thread_noError 0
 #define thread_maxThreads 1
 #define thread_mallocError 2
@@ -56,11 +56,14 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 /**
  * 
  */ 
-int lpthread_exit(lpthread_t thread);
-
+void lpthread_exit(lpthread_t thread);
 
 void init_threads();
 
 void lpthread_end();
+
+int lpthread_yield();
+
+int lpthread_join(lpthread_t thread, void **retval);
 
 #endif

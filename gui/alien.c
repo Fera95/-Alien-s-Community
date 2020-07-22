@@ -46,25 +46,26 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
 
  
 
-void ADD_Alien (struct NODE_ALIEN *head, struct ALIEN *newData)
+void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData)
 {
     NODE_ALIEN *newNode = (NODE_ALIEN *) malloc(sizeof(NODE_ALIEN*));
     newNode->data = newData;
     newNode->next = NULL;
-    if(head != NULL)
+    if(*head != NULL)
     {   
-        NODE_ALIEN *temp = head;
+        NODE_ALIEN *temp = *head;
         while ( temp->next != NULL )
             temp = temp ->next;
         temp->next = newNode;
     
     }
-    else
-        head = newNode;
+    else{
+        *head = newNode;
+    }
     
 }
 
-void REMOVE_Alien ( struct NODE_ALIEN ** head, int idRemove)
+void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
 {
     NODE_ALIEN * temp = (*head);
 
@@ -462,7 +463,7 @@ NODE_ALIEN *order_list_by_lotery(NODE_ALIEN *head)
     // se elimina de la lista actual
 
     // remove_by_id(head,id_winner);
-    REMOVE_Alien(&head,winner->id);
+    REMOVE_ALIEN(&head,winner->id);
     printf("DESPUES DE PUSH BACK\n");
 
 

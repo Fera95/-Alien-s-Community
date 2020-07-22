@@ -5,17 +5,23 @@ void * moveAlien (void * alien);
 
 void * moveAlien (void * alien)
 {
+    int * id = (int*) alien;
     while (1)
     {
-        printf("CHILD THREAD\n");
+        printf("CHILD THREAD %d\n",*id);
         sleep(3);
     }
 }
 
 
 int main () {
-    lpthread_t t1;
-    lpthread_create(&t1, NULL, moveAlien, NULL);
+    for (int i = 0; i < maxThread+1; i++)
+    {
+        lpthread_t t1;
+        int a = i;
+        lpthread_create(&t1, NULL, moveAlien, (void *)&a);
+    }
+    
     while (1)
     {
         printf("MAIN THREAD\n");

@@ -36,7 +36,6 @@ void init_threads(){
 }
 
 
-
 int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*start_routine)(void*), void* arg)
 {
     if(started_ == 0){ // Singleton for the system
@@ -67,7 +66,7 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 	// Copies thread to list
 	thread->detached=0;
 	memcpy((void*)&lpthreadList[numLPthreads++], (void*)thread, sizeof(lpthread_t));
-
+    // printf("Contador de ids %d\n",numLPthreads);
     return thread_noError;
 }
 
@@ -75,4 +74,41 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 void lpthread_end(){
 	// Kills the thread
 	killpg(getpgrp(), SIGKILL);
+}
+
+
+void lpthread_exit(lpthread_t thread){
+	kill(thread.pid, SIGKILL);
+	// return 0;
+}
+
+int lpthread_yield(){
+	/* Call the sched_yield system call which moves the current process to the
+	end of the process queue. */
+	sched_yield();
+	return 0;
+}
+
+int map_pid_index(pid_t id){
+	// Search for that pid
+	for(int i = 0; i < maxThread; ++i){
+		if(lpthreadList[i].pid == id){
+			return i;
+		}
+	}
+	return -1;
+}
+
+int lpthread_join(lpthread_t thread, void **retval){
+	int index = map_pid_index(thread.pid);
+
+	if(lpthreadList[index].detached==0){
+		waitpid(thread.pid, 0, 0); // Key is here, wait for it to end
+		printf("%s\n", "done join");
+
+		return 0;
+	}
+	else{
+		return 1;
+	}
 }

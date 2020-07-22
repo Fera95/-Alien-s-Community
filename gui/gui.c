@@ -56,9 +56,18 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_display_event_source(ctx->disp));
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
     al_register_event_source(ctx->queue, al_get_mouse_event_source());
+
+    create_map(ctx);
+    create_bridge(&ctx->eastBridge, 3, 8, east, 0);
+    create_bridge(&ctx->midBridge, 5, 5, mid, 0);
+    create_bridge(&ctx->westBridge, 9, 1, west, 0);
+    ctx->mouse_pressed = 0;
     ctx->done = false;
+    ctx->head = NULL;
     ctx->redraw = true;
     ctx->mouse_released = 0;
+    ctx->sideSelected = alfa;
+    ctx->run = true;
     printf("Init success\n");
     return 0;
 }
@@ -251,12 +260,12 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
     if (start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
         emptyqueue = 0;
-        printf("SALIDA ALFA NO DISPONIBLE\n");
+        // printf("SALIDA ALFA NO DISPONIBLE\n");
     }
     else if (start == betaPlanet && (ctx->map[6][2]).blocked)
     {
         emptyqueue = 0;
-        printf("SALIDA BETA NO DISPONIBLE\n");
+        // printf("SALIDA BETA NO DISPONIBLE\n");
     }
 
     //  RANDOM BRIDGE
@@ -302,114 +311,120 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
     return newAlien;
 }
 
-// DIBUJAR Y MOVER
+ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType alien_t)
+{
+    // RANDOM COMMUNITY
+    int emptyqueue = 1;
+    if (start == alfaPlanet && (ctx->map[0][2]).blocked)
+    {
+        emptyqueue = 0;
+        printf("SALIDA ALFA NO DISPONIBLE\n");
+    }
+    else if (start == betaPlanet && (ctx->map[6][2]).blocked)
+    {
+        emptyqueue = 0;
+        printf("SALIDA BETA NO DISPONIBLE\n");
+    }
+    //  RANDOM BRIDGE
+    BRIDGE *tempBridge;
+    enum bridgePosition tempPos = (enum bridgePosition)(rand() % 3);
+    if (tempPos == east)
+    {
+        tempBridge = ctx->eastBridge;
+    }
+    else if (tempPos == west)
+    {
+        tempBridge = ctx->westBridge;
+    }
+    else if (tempPos == mid)
+    {
+        tempBridge = ctx->midBridge;
+    }
+    ALIEN *newAlien = NULL;
+    if (emptyqueue)
+    {
+        float initPosX, initPosY;
+        ROUTE *tempRoute = create_route(&tempBridge, ctx->map, start);
+        if (start == alfaPlanet)
+        {
+            initPosX = COMMUNITY_ALFA_POSX;
+            initPosY = COMMUNITY_ALFA_POSY;
+        }
+        else if (start == betaPlanet)
+        {
+            // printf("ORIGING BETA PLANET\n");
+            initPosX = COMMUNITY_BETA_POSX;
+            initPosY = COMMUNITY_BETA_POSY;
+        }
+        // printf("Creando (MANUAL) nuevo alien %d\n",countIDs);
+        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
+        countIDs++;
+    }
+
+    else
+    {
+
+        newAlien = NULL;
+    }
+    return newAlien;
+}
+
+/**
+ * DRAW AND MOVING FUNCTIONS
+ */
 
 int loop_gui(GUI_CONTEXT *ctx)
 {
-    /**
-     */
     al_start_timer(ctx->timer);
 
     timer = al_create_timer(1.0 / 60);
     al_start_timer(timer);
 
-    // printf("BEFORE CREATING THE LIST\n");
-
-    create_map(ctx);
-
-    create_bridge(&ctx->eastBridge, 3, 8, east, 0);
-    // ctx->eastBridge->queueNorth[4].blocked = 1;
-    // for (int i = 0; i < 5; i++)
-    // {
-    //     printf("QUEUE[%d] bloqueado:%d\n",i, ctx->eastBridge->queueNorth[i].blocked);
-    // }
-    create_bridge(&ctx->midBridge, 5, 5, mid, 0);
-    create_bridge(&ctx->westBridge, 9, 1, west, 0);
-
     int count = 20, flag = 0;
-    // CABEZA DE LA LISTA
-    NODE_ALIEN *tempNode;
-    ctx->head = (NODE_ALIEN *)malloc(sizeof(NODE_ALIEN *));
-    ctx->head->data = generateAlien(ctx);
-    ctx->head->next = NULL;
-    ctx->head->data->id = -7;
-    
-    lpthread_t t;
-    lpthread_create(&t, NULL, moveAlien, (void *)ctx->head->data);
-    
-    // ALIEN *first = head->data;
-    ctx->mouse_pressed = 1;
     while (1)
     {
-        /**
-         */
         clickedAlien(ctx, ctx->head);
         al_wait_for_event(ctx->queue, &(ctx->event));
-        /**
-         */
 
         switch (ctx->event.type)
         {
-        case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-            // ctx->mouse_pressed = 1;
-            // ctx->mouse_released = 0;
-            break;
-        case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-            ctx->mouse_released = 1;
-            handleMenu(ctx);
-            ctx->mouse_released = 0;
-            // ctx->mouse_pressed = 0;
-            break;
-        case ALLEGRO_EVENT_MOUSE_AXES:
-            ctx->x = ctx->event.mouse.x;
-            ctx->y = ctx->event.mouse.y;
-            break;
-        case ALLEGRO_EVENT_TIMER:
-            /**
-             * Logic here 
-             */
-            ctx->redraw = true;
-            break;
+            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+                ctx->mouse_pressed = 1;
+                break;
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                ctx->mouse_released = 1;
+                handleMenu(ctx);
+                ctx->mouse_released = 0;
+                ctx->mouse_pressed = 0;
+                break;
+            case ALLEGRO_EVENT_MOUSE_AXES:
+                ctx->x = ctx->event.mouse.x;
+                ctx->y = ctx->event.mouse.y;
+                break;
+            case ALLEGRO_EVENT_TIMER:
+                /**
+                 * Logic here 
+                 */
+                ctx->redraw = true;
+                break;
 
-        case ALLEGRO_EVENT_KEY_DOWN:
-        case ALLEGRO_EVENT_DISPLAY_CLOSE:
-            ctx->done = true;
-            break;
+            case ALLEGRO_EVENT_KEY_DOWN:
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                ctx->done = true;
+                break;
         }
         if (ctx->done)
         {
             printf("Done\n");
             break;
         }
-        /**
-         */
-        handleMenu(ctx);
+        
         if (ctx->redraw && al_is_event_queue_empty(ctx->queue))
         {
 
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx->map, ctx);
-
-            count--;
-            if (count <= 0)
-            {
-                flag = !flag;
-                count = rand() % 100;
-                ALIEN *myAlien = generateAlien(ctx);
-                // ALIEN *myAlien = NULL;
-                if (myAlien != NULL)
-                {
-                    lpthread_t t2;
-                    lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
-                    ADD_Alien((ctx->head), myAlien);
-                }
-                else
-                {
-                    printf("ALIEN NO CREADO ESPACIO NO DISPONIBLE\n");
-                }
-            }
-            PATH *primer = ctx->map[0];
 
             al_draw_bitmap(ctx->alfaCommunity, 5, 470, flag);
             al_draw_bitmap(ctx->betaCommunity, 765, 20, flag);
@@ -433,7 +448,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             drawBridge(ctx->midBridge, ctx);
             drawBridge(ctx->westBridge, ctx);
 
-            tempNode = ctx->head;
+            NODE_ALIEN *tempNode = ctx->head;
             while (tempNode != NULL)
             {
                 if (!tempNode->data->way->finished)
@@ -481,13 +496,31 @@ int loop_gui(GUI_CONTEXT *ctx)
                 else
                 {
                     NODE_ALIEN *temp2 = tempNode->next;
-                    REMOVE_Alien(&(ctx->head), tempNode->data->id);
+                    REMOVE_ALIEN(&(ctx->head), tempNode->data->id);
                     tempNode = temp2;
+                    
                 }
             }
 
             al_flip_display();
             ctx->redraw = false;
+            
+            /**
+             * ALIEN GENERATOR IN A RANDOM NUMBER OF FRAMES
+             */
+            count--;
+            if (count <= 0 && ctx->run )
+            {
+                flag = !flag;
+                count = rand() % 100;
+                ALIEN *myAlien = generateAlien(ctx);
+                if (myAlien != NULL)
+                {
+                    lpthread_t t2;
+                    lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
+                    ADD_ALIEN(&(ctx->head), myAlien);
+                }
+            }
         }
     }
     finalize_gui(ctx);
@@ -587,64 +620,11 @@ void *moveAlien(void *args)
     // printf("ROAD COMPLETED\n");
 }
 
-ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType alien_t)
-{
-    // RANDOM COMMUNITY
-    int emptyqueue = 1;
-    if (start == alfaPlanet && (ctx->map[0][2]).blocked)
-    {
-        emptyqueue = 0;
-        printf("SALIDA ALFA NO DISPONIBLE\n");
-    }
-    else if (start == betaPlanet && (ctx->map[6][2]).blocked)
-    {
-        emptyqueue = 0;
-        printf("SALIDA BETA NO DISPONIBLE\n");
-    }
-    //  RANDOM BRIDGE
-    BRIDGE *tempBridge;
-    enum bridgePosition tempPos = (enum bridgePosition)(rand() % 3);
-    if (tempPos == east)
-    {
-        tempBridge = ctx->eastBridge;
-    }
-    else if (tempPos == west)
-    {
-        tempBridge = ctx->westBridge;
-    }
-    else if (tempPos == mid)
-    {
-        tempBridge = ctx->midBridge;
-    }
-    ALIEN *newAlien = NULL;
-    if (emptyqueue)
-    {
-        float initPosX, initPosY;
-        ROUTE *tempRoute = create_route(&tempBridge, ctx->map, start);
-        if (start == alfaPlanet)
-        {
-            initPosX = COMMUNITY_ALFA_POSX;
-            initPosY = COMMUNITY_ALFA_POSY;
-        }
-        else if (start == betaPlanet)
-        {
-            // printf("ORIGING BETA PLANET\n");
-            initPosX = COMMUNITY_BETA_POSX;
-            initPosY = COMMUNITY_BETA_POSY;
-        }
-        printf("Creando (MANUAL) nuevo alien %d\n",countIDs);
-        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
-        countIDs++;
-    }
 
-    else
-    {
-
-        newAlien = NULL;
-    }
-    return newAlien;
-}
-
+/** 
+ * MENU RELATED FUNCTIONS
+ * 
+ */ 
 void handleMenu(GUI_CONTEXT *ctx)
 {
     ALIEN *temp = NULL;
@@ -652,29 +632,28 @@ void handleMenu(GUI_CONTEXT *ctx)
     char *planet = ctx->sideSelected == alfaPlanet ? "Alfa" : "Beta";
     if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
-        printf("Creando normal en planeta: %s\n", planet);
-        printf("BREAKPOINT\n");
+        // printf("Creando normal en planeta: %s\n", planet);
         temp = generateManualAlien(ctx, ctx->sideSelected, normal);
         ctx->mouse_released = 0;
     }
     /*** Second**/
     if (ctx->mouse_released && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
     {
-        printf("Creando alfa en planeta: %s \n", planet);
+        // printf("Creando alfa en planeta: %s \n", planet);
         temp = generateManualAlien(ctx, ctx->sideSelected, alfa);
         ctx->mouse_released = 0;
     }
     /*** Third**/
     if (ctx->mouse_released && ctx->x >= (1190) && ctx->x <= (1190 + 79) && ctx->y <= (160 + 79) && ctx->y >= (160))
     {
-        printf("Creando beta en planeta: %s\n", planet);
+        // printf("Creando beta en planeta: %s\n", planet);
         temp = generateManualAlien(ctx, ctx->sideSelected, beta);
         ctx->mouse_released = 0;
     }
 
     if (temp != NULL)
     {
-        ADD_Alien((ctx->head), temp);
+        ADD_ALIEN(&(ctx->head), temp);
         lpthread_t t;
         lpthread_create(&t, NULL, moveAlien, (void *)temp);
     }
@@ -742,7 +721,6 @@ void drawMenu(GUI_CONTEXT *ctx)
 
 void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
 {
-
     NODE_ALIEN *temp = NULL;
     if (ctx->mouse_pressed == 1)
     {
@@ -758,7 +736,7 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                 float dy = abs(temp->data->y - ctx->y);
                 if (dx <= 20 && dy <= 20)
                 {
-                    printf("Index of alien selected %d\n", count);
+                    // printf("Index of alien selected %d\n", count);
                     // printf("dx: %f dy : %f\n", dx, dy);
                     if (ctx->alienSelected != NULL)
                     {
@@ -767,14 +745,11 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     ctx->alienSelected = temp->data;
                     ctx->alienSelected->selected = 1;
                     // printf("x: %f y : %f\n", alien->x, alien->y);
-                    printf("x: %f y : %f %d\n", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->id);
+                    // printf("x: %f y : %f %d\n", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->id);
                     break;
                 }
             }
             temp = temp->next;
         }
-    }
-    else
-    {
     }
 }

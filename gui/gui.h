@@ -6,7 +6,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include <time.h>
-// #include <pthread.h>
+#include <pthread.h>
 #include "LPTHREAD/lpthread.h"
 #include "constants.h"
 #include "bridge.h"
@@ -66,6 +66,8 @@ typedef struct GUI_CONTEXT
     bool redraw;
     // Controls when to finisthe game
     bool done;
+    // PAUSE FLAG
+    bool run;
 
     // This var is used to handle pressed click
     int mouse_pressed; // 1 true 0 false
