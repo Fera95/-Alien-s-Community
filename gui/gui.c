@@ -722,30 +722,27 @@ void drawMenu(GUI_CONTEXT *ctx)
 void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
 {
     NODE_ALIEN *temp = NULL;
-    if (ctx->mouse_pressed == 1)
+    if(head!=NULL)
     {
         temp = head;
-
-        int count = 0;
         while (temp != NULL)
         {
             if (temp->data != NULL)
             {
-                count = count + 1;
                 float dx = abs(temp->data->x - ctx->x);
                 float dy = abs(temp->data->y - ctx->y);
                 if (dx <= 20 && dy <= 20)
                 {
-                    // printf("Index of alien selected %d\n", count);
-                    // printf("dx: %f dy : %f\n", dx, dy);
                     if (ctx->alienSelected != NULL)
                     {
                         ctx->alienSelected->selected = 0;
                     }
                     ctx->alienSelected = temp->data;
                     ctx->alienSelected->selected = 1;
-                    // printf("x: %f y : %f\n", alien->x, alien->y);
-                    // printf("x: %f y : %f %d\n", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->id);
+                    if (ctx->mouse_pressed == 1)
+                    {
+                       KILL_ALIEN( temp->data );                      
+                    }  
                     break;
                 }
             }

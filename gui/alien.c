@@ -65,6 +65,25 @@ void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData)
     
 }
 
+void KILL_ALIEN(struct ALIEN *deadAlien)
+{
+  int position = deadAlien->way->pos;
+  deadAlien->way->current[position].alienID = -1;
+  deadAlien->way->current[position].blocked = 0;
+  deadAlien->way->finished = 1;
+  // if(deadAlien->way->start == alfaPlanet){
+  //   if(get_by_id(deadAlien->way->bridge->northList, deadAlien->id))
+  //   {
+  //     REMOVE_ALIEN
+  //   }
+  // }
+  // else if(deadAlien->way->start == betaPlanet)
+  // {
+    
+  // }
+  
+}
+
 void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
 {
     NODE_ALIEN * temp = (*head);
@@ -89,7 +108,7 @@ void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
 }
 
 
-void printList(NODE_ALIEN *head)
+void PRINT_LIST(NODE_ALIEN *head)
 {
     NODE_ALIEN *temp = head;
     int countNode = 0;
