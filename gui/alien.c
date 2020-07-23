@@ -37,6 +37,7 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     newAlien->way = *myWay;
     newAlien->x = firstX;
     newAlien->y = firstY;
+    newAlien->deleted = 0;
     newAlien->tickets = 20;
     newAlien->alienPriority = (rand()%10) + 1;
     newAlien->weight = (rand()%5)+1;
@@ -70,8 +71,10 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
   if(deadAlien != NULL)
   {
     ROUTE *deadWay = deadAlien->way;
-    if(deadWay->current != deadWay->bridge->pass)
+    if(deadWay->current != deadWay->bridge->pass )
     {
+      deadWay->current[deadWay->pos].blocked = 0;
+      deadWay->current[deadWay->pos].alienID = -1;
       if(deadWay->start == alfaPlanet){
         if(deadWay->current == deadWay->bridge->northHead){
           REMOVE_ALIEN(deadWay->bridge->northHead, deadAlien->id);
@@ -83,8 +86,6 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
           REMOVE_ALIEN(deadWay->bridge->southHead, deadAlien->id);
         }
       }
-      deadWay->current[deadWay->pos].blocked = 0;
-      deadWay->current[deadWay->pos].alienID = -1;
       deadWay->finished = 1;
     }
     else
@@ -93,7 +94,6 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
     }
   }
 }
-
 
 /**
  * DELETES AN ALIEN FROM MEMORY
@@ -122,7 +122,6 @@ void DELETE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
     }
 }
 
-
 /**
  * SAME AS DELETE BUT NOT FREEING THE MEMORY 
  * KEEP EXISTING FOR FURTHER REFERENCES
@@ -150,7 +149,6 @@ void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
   }
 }
 
-
 void PRINT_LIST(NODE_ALIEN *head)
 {
     NODE_ALIEN *temp = head;
@@ -171,8 +169,6 @@ void PRINT_LIST(NODE_ALIEN *head)
 
     
 }
-
-
 
 //Funciones de prueba
 
@@ -380,8 +376,6 @@ ALIEN *get_by_id(NODE_ALIEN *head, int id) {
   return NULL;
 }
 
-
-
 ALIEN *remove_by_id(NODE_ALIEN *head, int id) {
   int length = get_length(head);
   NODE_ALIEN * current = head;
@@ -409,14 +403,12 @@ ALIEN *remove_by_id(NODE_ALIEN *head, int id) {
   return NULL;
 }
 
-
 void swap_one_by_one(struct NODE_ALIEN *a, struct NODE_ALIEN *b) 
 { 
     struct ALIEN * temp = a->data; 
     a->data = b->data; 
     b->data = temp; 
 } 
-
 
 void order_list_by_priority(NODE_ALIEN *head){
   int swapped, i; 

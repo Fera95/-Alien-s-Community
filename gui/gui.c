@@ -451,7 +451,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             NODE_ALIEN *tempNode = ctx->head;
             while (tempNode != NULL)
             {
-                if (!tempNode->data->way->finished)
+                if (!tempNode->data->deleted)
                 {
                     ALLEGRO_BITMAP *image;
                     if (tempNode->data->type == alfa)
@@ -615,10 +615,14 @@ void *moveAlien(void *args)
             usleep(25000);
         }
         else
+        {
             break;
+        }
     }
-    
+    myAlien->deleted = 1; 
 }
+
+
 
 /** 
  * MENU RELATED FUNCTIONS
