@@ -67,24 +67,35 @@ void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData)
 
 void KILL_ALIEN(struct ALIEN *deadAlien)
 {
-  int position = deadAlien->way->pos;
-  deadAlien->way->current[position].alienID = -1;
-  deadAlien->way->current[position].blocked = 0;
-  deadAlien->way->finished = 1;
-  // if(deadAlien->way->start == alfaPlanet){
-  //   if(get_by_id(deadAlien->way->bridge->northList, deadAlien->id))
-  //   {
-  //     REMOVE_ALIEN
-  //   }
-  // }
-  // else if(deadAlien->way->start == betaPlanet)
-  // {
-    
-  // }
-  
+  if(deadAlien != NULL)
+  {
+    ROUTE *deadWay = deadAlien->way;
+    if(deadWay->current != deadWay->bridge->pass)
+    {
+      if(deadWay->start == alfaPlanet){
+         REMOVE_ALIEN(deadWay->bridge->northHead, deadAlien->id);
+      }
+      else if(deadWay->start == betaPlanet)
+      {
+         REMOVE_ALIEN(deadWay->bridge->southHead, deadAlien->id);
+      }
+      deadWay->current[deadWay->pos].blocked = 0;
+      deadWay->current[deadWay->pos].alienID = -1;
+      deadWay->finished = 1;    
+    }
+    else
+    {
+      printf("ERROR :THE ALIEN ID: %d CAN NOT BE KILLED DURING HIS TIME IN THE PROCESSOR\n", deadAlien->id);
+    }
+  }
 }
 
-void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
+
+/**
+ * DELETES AN ALIEN FROM MEMORY
+ * CAN CAUSE SEGMENTATION FAULT 
+ */
+void DELETE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
 {
     NODE_ALIEN * temp = (*head);
 
@@ -105,6 +116,34 @@ void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
         }
         
     }
+}
+
+
+/**
+ * SAME AS DELETE BUT NOT FREEING THE MEMORY 
+ * KEEP EXISTING FOR FURTHER REFERENCES
+ */
+void REMOVE_ALIEN ( struct NODE_ALIEN ** head, int idRemove)
+{
+  if(head != NULL && *head != NULL){
+    NODE_ALIEN * temp = (*head);
+    if((*head)->data->id == idRemove)
+    {
+      *head =  temp->next;
+    }
+    else
+    {
+      while (temp->next != NULL && temp->next->data->id != idRemove)
+      {
+        temp = temp->next;
+      }
+      if(temp->next != NULL)
+      {
+        NODE_ALIEN *temp2 = temp->next;
+        temp->next = temp2->next;
+      }
+    }
+  }
 }
 
 
@@ -482,7 +521,7 @@ NODE_ALIEN *order_list_by_lotery(NODE_ALIEN *head)
     // se elimina de la lista actual
 
     // remove_by_id(head,id_winner);
-    REMOVE_ALIEN(&head,winner->id);
+    DELETE_ALIEN(&head,winner->id);
     printf("DESPUES DE PUSH BACK\n");
 
 

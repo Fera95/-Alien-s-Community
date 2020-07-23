@@ -10,6 +10,7 @@ ALIEN * create_alien (int ID, enum alienType type, ROUTE ** myWay, float firstX,
 void KILL_ALIEN(struct ALIEN *deadAlien);
 void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData);
 void REMOVE_ALIEN (struct NODE_ALIEN ** head, int id);
+void DELETE_ALIEN (struct NODE_ALIEN ** head, int id);
 void PRINT_LIST(NODE_ALIEN *head);
 
 

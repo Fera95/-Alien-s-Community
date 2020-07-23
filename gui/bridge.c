@@ -19,8 +19,8 @@ void create_bridge (BRIDGE **ctxBridge, int length, int strength, enum bridgePos
     newBridge->full = 0;
     newBridge->position = position;
 
-    newBridge->southList = NULL;
-    newBridge->northList = NULL;
+    newBridge->southHead = NULL;
+    newBridge->northHead = NULL;
 
     // CAMBIAR POR UN ENUMERATE
     int init_posx;

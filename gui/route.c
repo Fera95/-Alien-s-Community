@@ -277,7 +277,7 @@ void next_move(ALIEN *alien)//)
             { //&& alienRoute->bridge->position == east//
                 alienRoute->current[alienRoute->pos].blocked = 0;
                 alienRoute->current[alienRoute->pos].alienID = -1;
-                NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northList;
+                NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northHead;
                 if(list == NULL){
                     list = malloc(sizeof(NODE_ALIEN));
                     list->data = alien;
@@ -307,10 +307,10 @@ void next_move(ALIEN *alien)//)
                 
                 alienRoute->current = nextPath;
                 alienRoute->limit = tempLimit;
-                alienRoute->bridge->northList = (void *) sortedList;
+                alienRoute->bridge->northHead = (void *) sortedList;
             }
             else if( dequeue ){
-                NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northList;
+                NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northHead;
                 pop_front(&list,0);
                 // printf("Remover Head:\t");
                 // print_list2(list, 0);
@@ -320,7 +320,7 @@ void next_move(ALIEN *alien)//)
                 alienRoute->pos = tempPos;
                 alienRoute->current = nextPath;
                 alienRoute->limit = tempLimit;
-                alienRoute->bridge->northList = (void *) list;
+                alienRoute->bridge->northHead = (void *) list;
                 alienRoute->current[alienRoute->pos].blocked = 1;
 
                 beforePaht[beforeInt].blocked = 0;
@@ -377,14 +377,18 @@ void next_move(ALIEN *alien)//)
 }
 
 int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
-{   
+{ 
+    
     int result;
-    BRIDGE * myBridge = alienMoving->way->bridge;
-    if( nextPATH[pos].blocked ){
+    if(alienMoving->way->finished){
+        result = 0;
+    }  
+    else if( nextPATH[pos].blocked ){
         result = 0;
     }
     else
     {   
+        BRIDGE * myBridge = alienMoving->way->bridge;
         bool debug = 0; 
         if (debug && alienMoving->way->current == alienMoving->way->bridge->queueNorth && alienMoving->way->bridge->position == east)
         {

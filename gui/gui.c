@@ -496,7 +496,7 @@ int loop_gui(GUI_CONTEXT *ctx)
                 else
                 {
                     NODE_ALIEN *temp2 = tempNode->next;
-                    REMOVE_ALIEN(&(ctx->head), tempNode->data->id);
+                    DELETE_ALIEN(&(ctx->head), tempNode->data->id);
                     tempNode = temp2;
                     
                 }
@@ -742,7 +742,8 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     if (ctx->mouse_pressed == 1)
                     {
                        KILL_ALIEN( temp->data );                      
-                    }  
+                    } 
+                    // sleep(1); 
                     break;
                 }
             }

@@ -47,8 +47,8 @@ typedef struct BRIDGE
     double crossTime;
     enum bridgePosition position;
     
-    void *northList;
-    void *southList;
+    void *northHead;
+    void *southHead;
 
     PATH *queueNorth;
     PATH *queueSouth;
