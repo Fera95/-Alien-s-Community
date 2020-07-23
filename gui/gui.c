@@ -14,6 +14,14 @@ bool done = false;
 bool render = false;
 
 #define MAPSIZE 8
+
+int cuenta1=0;
+int cuenta2=0;
+
+lpthread_t lista1[maxThread];
+lpthread_t lista2[maxThread];
+
+
 int countIDs = 0;
 // CAMBIAR X ARCHIVO DE CONFIGURACION
 float SPEED_NORMAL = 2;
@@ -85,31 +93,162 @@ int finalize_gui(GUI_CONTEXT *ctx)
 int set_background(GUI_CONTEXT *ctx)
 {
     must_init(al_init_image_addon(), "image addon");
-    ctx->background = al_load_bitmap("assets/background.png");
-    ctx->pathImage = al_load_bitmap("assets/path.png");
-    ctx->passImage = al_load_bitmap("assets/bridge2.png");
-    ctx->queueImage = al_load_bitmap("assets/queue.png");
-    ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
-    ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
-    ctx->betaImage = al_load_bitmap("assets/beta25.png");
-    ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
-    ctx->normalImage = al_load_bitmap("assets/normal25.png");
+   
+    if(al_load_bitmap("assets/background.png")!=NULL){
+        ctx->background = al_load_bitmap("assets/background.png");
+    }    else{
+        printf("Error imagen");
+   }
+   if( al_load_bitmap("assets/path.png")!=NULL){
+       ctx->pathImage = al_load_bitmap("assets/path.png");
+   }    else{
+        printf("Error imagen");
+   }
+   
+    
+    
+      if(al_load_bitmap("assets/bridge2.png")!=NULL){
+        ctx->passImage = al_load_bitmap("assets/bridge2.png");
+     }    
+       else{
+        printf("Error imagen");
+   }
+   
+      if( al_load_bitmap("assets/queue.png")!=NULL){
+        ctx->queueImage = al_load_bitmap("assets/queue.png");
+     }
+        else{
+        printf("Error imagen");
+   }
+   
+      if(al_load_bitmap("assets/alfaplanet.png")!=NULL){
+       ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
+     }
+      else{
+        printf("Error imagen");
+   }
+    
+      if( al_load_bitmap("assets/betaplanet.png")!=NULL){
+       ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
+    }
+     else{
+       printf("Error imagen");
+   }
+    
+      if(al_load_bitmap("assets/beta25.png")!=NULL){
+        ctx->betaImage = al_load_bitmap("assets/beta25.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+   
+      if(al_load_bitmap("assets/alfa25.png")!=NULL){
+       ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+    
+      if( al_load_bitmap("assets/normal25.png")!=NULL){
+       ctx->normalImage = al_load_bitmap("assets/normal25.png");
+    }
+     else{
+       printf("Error imagen");
+   }
+    
+      if(  al_load_bitmap("assets/alfaSelected.png")!=NULL){
+         ctx->alfaSelected = al_load_bitmap("assets/alfaSelected.png");
+     }
+      else{
+       printf("Error imagen");
+   }
 
-    ctx->alfaSelected = al_load_bitmap("assets/alfaSelected.png");
-    ctx->betaSelected = al_load_bitmap("assets/betaSelected.png");
-    ctx->normalSelected = al_load_bitmap("assets/normalSelected.png");
+  
+      if(al_load_bitmap("assets/betaSelected.png")!=NULL){
+        ctx->betaSelected = al_load_bitmap("assets/betaSelected.png");
+    }
+     else{
+       printf("Error imagen");
+   }
+   
+      if(al_load_bitmap("assets/normalSelected.png")!=NULL){
+         ctx->normalSelected = al_load_bitmap("assets/normalSelected.png");
+    }
+     else{
+       printf("Error imagen");
+   }
+  
+      if(al_load_bitmap("assets/a.png")!=NULL){
+        ctx->a = al_load_bitmap("assets/a.png");
+    }
+     else{
+       printf("Error imagen");
+   }
 
-    ctx->a = al_load_bitmap("assets/a.png");
-    ctx->ap = al_load_bitmap("assets/ap.png");
-    ctx->b = al_load_bitmap("assets/b.png");
-    ctx->bp = al_load_bitmap("assets/bp.png");
-    ctx->c = al_load_bitmap("assets/c.png");
-    ctx->cp = al_load_bitmap("assets/cp.png");
-    ctx->i = al_load_bitmap("assets/i.png");
-    ctx->ip = al_load_bitmap("assets/ip.png");
-    ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
-    ctx->sideBeta = al_load_bitmap("assets/sideBeta.png");
-
+   
+      if(al_load_bitmap("assets/ap.png")!=NULL){
+         ctx->ap = al_load_bitmap("assets/ap.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+  
+      if(al_load_bitmap("assets/b.png")!=NULL){
+        ctx->b = al_load_bitmap("assets/b.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+   
+      if(al_load_bitmap("assets/bp.png")!=NULL){
+       ctx->bp = al_load_bitmap("assets/bp.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+    
+      if(al_load_bitmap("assets/c.png")!=NULL){
+       ctx->c = al_load_bitmap("assets/c.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+    
+      if(al_load_bitmap("assets/cp.png")!=NULL){
+         ctx->cp = al_load_bitmap("assets/cp.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+  
+      if(al_load_bitmap("assets/i.png")!=NULL){
+        ctx->i = al_load_bitmap("assets/i.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+   
+      if(al_load_bitmap("assets/ip.png")!=NULL){
+        ctx->ip = al_load_bitmap("assets/ip.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+   
+      if( al_load_bitmap("assets/sideAlfa.png")!=NULL){
+          ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
+   }
+    else{
+       printf("Error imagen");
+   }
+ 
+      if(al_load_bitmap("assets/sideBeta.png")!=NULL){
+        ctx->sideBeta = al_load_bitmap("assets/sideBeta.png");
+   }
+   else{
+       printf("Error imagen");
+   }
+   
     must_init(ctx->background, "background");
     must_init(ctx->pathImage, "path");
     return 0;
@@ -517,8 +656,11 @@ int loop_gui(GUI_CONTEXT *ctx)
                 if (myAlien != NULL)
                 {
                     lpthread_t t2;
+                    t2 = lista2[cuenta2];
                     lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
                     ADD_ALIEN(&(ctx->head), myAlien);
+                    printf("Cuenta2 %d",cuenta2);
+                    cuenta2++;
                 }
             }
         }
@@ -655,7 +797,10 @@ void handleMenu(GUI_CONTEXT *ctx)
     {
         ADD_ALIEN(&(ctx->head), temp);
         lpthread_t t;
+        t=lista1[cuenta1];
         lpthread_create(&t, NULL, moveAlien, (void *)temp);
+            printf("Cuenta1 %d",cuenta1);
+        cuenta1++;
     }
 }
 
