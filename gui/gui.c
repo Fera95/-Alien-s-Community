@@ -519,6 +519,7 @@ int loop_gui(GUI_CONTEXT *ctx)
                     lpthread_t t2;
                     lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
                     ADD_ALIEN(&(ctx->head), myAlien);
+                    printf("NEW ALIEN ID: %d\n",myAlien->id);
                 }
             }
         }
@@ -610,7 +611,6 @@ void *moveAlien(void *args)
         if (myAlien != NULL)
         {
             onRoad = !myAlien->way->finished;
-            // next_move(&myAlien->x,&myAlien->y,myAlien->way, myAlien->dx, myAlien->dy);
             next_move(myAlien);
             usleep(25000);
         }
@@ -743,7 +743,6 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     {
                        KILL_ALIEN( temp->data );                      
                     } 
-                    // sleep(1); 
                     break;
                 }
             }

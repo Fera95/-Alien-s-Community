@@ -50,6 +50,7 @@ typedef struct{
 	char magic;
 	pid_t pid;
 } lpthread_mutex_t;
+
 typedef struct{
 	int id;
 } lpthread_mutexattr_t;

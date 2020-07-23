@@ -73,15 +73,19 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
     if(deadWay->current != deadWay->bridge->pass)
     {
       if(deadWay->start == alfaPlanet){
-         REMOVE_ALIEN(deadWay->bridge->northHead, deadAlien->id);
+        if(deadWay->current == deadWay->bridge->northHead){
+          REMOVE_ALIEN(deadWay->bridge->northHead, deadAlien->id);
+        }
       }
       else if(deadWay->start == betaPlanet)
       {
-         REMOVE_ALIEN(deadWay->bridge->southHead, deadAlien->id);
+        if(deadWay->current == deadWay->bridge->southHead){
+          REMOVE_ALIEN(deadWay->bridge->southHead, deadAlien->id);
+        }
       }
       deadWay->current[deadWay->pos].blocked = 0;
       deadWay->current[deadWay->pos].alienID = -1;
-      deadWay->finished = 1;    
+      deadWay->finished = 1;
     }
     else
     {
@@ -373,7 +377,6 @@ ALIEN *get_by_id(NODE_ALIEN *head, int id) {
     if(current->data->id == id) return current->data;
     current = current->next;
   }
-  printf("This id is not in the list\n");
   return NULL;
 }
 

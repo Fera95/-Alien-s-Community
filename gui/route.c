@@ -291,19 +291,13 @@ void next_move(ALIEN *alien)//)
                     }
                 }
                 // LLAMAR AL ORGANIZADOR AQUÍ
-                // swap(list, 0,1);
                 NODE_ALIEN *sortedList = list;
                 if(get_length(list) > 1){
-                    print_list2(list,2);
                     order_list_by_priority(sortedList);
-                    print_list2(sortedList,2);
-
                     // sortedList = order_list_by_lotery(list);
-
                 }
-                // printf("Agregar nuevo:\t");
-                // print_list2(list, 0);
                 draw_sorted_queue(sortedList, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
+
                 
                 alienRoute->current = nextPath;
                 alienRoute->limit = tempLimit;
@@ -393,7 +387,7 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
         if (debug && alienMoving->way->current == alienMoving->way->bridge->queueNorth && alienMoving->way->bridge->position == east)
         {
             // printf("DEBUG NORTH EAST BRIDGE\n");
-            print_bridge(alienMoving->way->bridge);
+            // print_bridge(alienMoving->way->bridge);
             // printf("ALIEN ID: %d\n",alienMoving->id);
             // printf("nextPATH: %p\nCurrent: %p\nBridge pass: %p\n\n",(void *)nextPATH, (void *)alienMoving->way->current, (void *)myBridge->pass);
         }
