@@ -296,7 +296,7 @@ void next_move(ALIEN *alien)//)
                     order_list_by_priority(sortedList);
                     // sortedList = order_list_by_lotery(list);
                 }
-                draw_sorted_queue(sortedList, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
+                setSortedPath(sortedList, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
 
                 
                 alienRoute->current = nextPath;
@@ -319,7 +319,7 @@ void next_move(ALIEN *alien)//)
 
                 beforePaht[beforeInt].blocked = 0;
                 beforePaht[beforeInt].alienID = -1;
-                // draw_sorted_queue(list, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
+                // setSortedPath(list, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
             }
             else
             {   
@@ -458,18 +458,27 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
 
 }
 
-void draw_sorted_queue(NODE_ALIEN *sorted_list, PATH *queuePATH, int sizequeue )
+void setSortedPath(NODE_ALIEN *sorted_list, PATH *queuePATH, int sizequeue )
 {
     int index = sizequeue - 1;
     NODE_ALIEN *temp = sorted_list;
     for (index; index >= 0; index--){
         if(temp != NULL){
-            queuePATH[index].blocked = 1;
-            queuePATH[index].alienID = temp->data->id;
-            temp->data->x = queuePATH[index].x;
-            temp->data->y = queuePATH[index].y;
-            temp->data->way->pos = index;
-            temp = temp->next;
+            if(!temp->data->way->finished)
+            {
+                queuePATH[index].blocked = 1;
+                queuePATH[index].alienID = temp->data->id;
+                temp->data->x = queuePATH[index].x;
+                temp->data->y = queuePATH[index].y;
+                temp->data->way->pos = index;
+                temp = temp->next;
+            }
+            else
+            {
+                queuePATH[index].alienID = -1;
+                queuePATH[index].blocked = 0;
+            }
+            
         }
         else
         {

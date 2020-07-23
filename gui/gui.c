@@ -617,9 +617,8 @@ void *moveAlien(void *args)
         else
             break;
     }
-    // printf("ROAD COMPLETED\n");
+    
 }
-
 
 /** 
  * MENU RELATED FUNCTIONS
@@ -739,7 +738,7 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     }
                     ctx->alienSelected = temp->data;
                     ctx->alienSelected->selected = 1;
-                    if (ctx->mouse_pressed == 1)
+                    if (ctx->mouse_pressed == 1 && temp->data->selected)
                     {
                        KILL_ALIEN( temp->data );                      
                     } 

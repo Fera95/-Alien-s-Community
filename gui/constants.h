@@ -92,26 +92,16 @@ enum alienType { alfa, beta, normal };
 
 typedef struct ALIEN
 {
-    // IDENTIFER
-    int id;
-    // LOTERY
-    int tickets;
-    // Priority
-    int alienPriority;
-    // COORDENADAS
-    float x, y;
-    // SPEED
-    float dx, dy;
-    // THREAD
-    // pthread_t idThread;
-    // TYPE
-    enum alienType type;
-    // highway
-    ROUTE * way;
-    //Selected boolean
-    int selected;
-    int weight;
-
+    int selected;           // FLAG TO SELECT ALIEN
+    int deleted;            // FLAG TO FREE MEMORY
+    int id;                 // IDENTIFER
+    int tickets;            // LOTTERY ALGORITHM
+    int alienPriority;      // PRIORITY ALGORITHM
+    int weight;             // ALIEN WEIGHT TO PASS THE BRIDGE
+    float x, y;             // COORDS IN SPACE
+    float dx, dy;           // SPEED
+    enum alienType type;    // TYPE OF ALIEN
+    ROUTE * way;            // ROUTE THE ALIEN IS GOING TO TAKE
     
 } ALIEN;
 

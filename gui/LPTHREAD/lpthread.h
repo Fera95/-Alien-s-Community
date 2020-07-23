@@ -23,8 +23,8 @@
 
 
 
-#define maxThread 1000
-#define threadStack (4096*4096)
+#define maxThread 1024
+#define threadStack (1024*8)
 #define thread_noError 0
 #define thread_maxThreads 1
 #define thread_mallocError 2

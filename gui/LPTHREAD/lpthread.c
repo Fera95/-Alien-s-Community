@@ -44,7 +44,9 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 	}
     
     /*Allocate the stack*/
-	thread->stack=malloc(threadStack);
+	void * child_stack = malloc(threadStack);
+	posix_memalign(&child_stack,8,threadStack);
+	thread->stack = child_stack;
 	if(thread->stack==0){
 		printf("Error: Could not allocate stack.\n");
 		// return LF_MALLOCERROR;

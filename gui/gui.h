@@ -6,7 +6,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include <time.h>
-#include <pthread.h>
+// #include <pthread.h>
 #include "LPTHREAD/lpthread.h"
 #include "constants.h"
 #include "bridge.h"
