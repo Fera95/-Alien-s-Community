@@ -4,7 +4,6 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <sched.h> /* For clone */
 #include <signal.h> /* For SIGCHLD */
 #include <sys/types.h> /* For pid_t */
@@ -13,14 +12,11 @@
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <sys/syscall.h> // For call to gettid
-
+#include <sys/time.h>
 #include <sys/queue.h>
 #include <ucontext.h>
-#include <sys/time.h>
 #include <errno.h>
-
 
 
 #define maxThread 1000
@@ -48,6 +44,14 @@ typedef struct{
 } lpthread_attr_t;
 
 
+
+
+/*Struct para mutex*/
+
+
+
+
+
 /**
  * 
  */ 
@@ -65,5 +69,6 @@ void lpthread_end();
 int lpthread_yield();
 
 int lpthread_join(lpthread_t thread, void **retval);
+
 
 #endif

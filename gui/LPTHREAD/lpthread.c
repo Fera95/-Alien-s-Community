@@ -112,3 +112,8 @@ int lpthread_join(lpthread_t thread, void **retval){
 		return 1;
 	}
 }
+
+
+//Mutex functions
+
+
