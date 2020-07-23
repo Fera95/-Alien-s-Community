@@ -873,13 +873,13 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
     if(head!=NULL)
     {
         temp = head;
-        while (temp != NULL)
+        while (temp != NULL )
         {
             if (temp->data != NULL)
             {
-                float dx = abs(temp->data->x - ctx->x);
-                float dy = abs(temp->data->y - ctx->y);
-                if (dx <= 20 && dy <= 20)
+                float dx = abs(ctx->x - temp->data->x - 20 );
+                float dy = abs(ctx->y - temp->data->y - 20 );
+                if (dx <= 10 && dy <= 10)
                 {
                     if (ctx->alienSelected != NULL)
                     {
@@ -889,7 +889,11 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     ctx->alienSelected->selected = 1;
                     if (ctx->mouse_pressed == 1 && temp->data->selected)
                     {
-                       KILL_ALIEN( temp->data );                      
+                        ROUTE *tempR = temp->data->way;
+
+                        printf("\nSELECTED CURRENT[%d] : %p -> BLOCKED:%d -> ALIEN ID:%d\n", tempR->pos, (void*) &tempR->current[tempR->pos], tempR->current[tempR->pos].blocked, tempR->current[tempR->pos].alienID);
+                        KILL_ALIEN( temp->data );
+                        printf("\nKILLED CURRENT[%d] : %p -> BLOCKED:%d -> ALIEN ID:%d\n", tempR->pos, (void*) &tempR->current[tempR->pos], tempR->current[tempR->pos].blocked, tempR->current[tempR->pos].alienID);
                     } 
                     break;
                 }

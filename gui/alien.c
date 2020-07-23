@@ -73,8 +73,6 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
     ROUTE *deadWay = deadAlien->way;
     if(deadWay->current != deadWay->bridge->pass )
     {
-      deadWay->current[deadWay->pos].blocked = 0;
-      deadWay->current[deadWay->pos].alienID = -1;
       if(deadWay->start == alfaPlanet){
         if(deadWay->current == deadWay->bridge->northHead){
           REMOVE_ALIEN(deadWay->bridge->northHead, deadAlien->id);
@@ -87,6 +85,11 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
         }
       }
       deadWay->finished = 1;
+      if(deadWay->current[deadWay->pos].alienID == deadAlien->id)
+      {
+          deadWay->current[deadWay->pos].blocked = 0;
+          deadWay->current[deadWay->pos].alienID = 1;
+      }
     }
     else
     {

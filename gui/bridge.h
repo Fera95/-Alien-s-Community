@@ -7,5 +7,6 @@ void create_bridge( BRIDGE **ctxBridge, int length, int weight, enum bridgePosit
 void print_bridge(BRIDGE * bridge2print);
 BRIDGE * load_bridge(enum bridgePosition pos);
 
+
 #endif
 
