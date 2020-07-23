@@ -31,7 +31,7 @@ void * moveAlien1 (void * alien)
  
     lpthread_mutex_unlock(&test);
     //Se destruye mutex
-   lpthread_mutex_destroy(&test);
+   //lpthread_mutex_destroy(&test);
 }
 
 
@@ -54,7 +54,7 @@ void * moveAlien2 (void * alien)
  
     lpthread_mutex_unlock(&test);
     //Se destruye mutex
-    lpthread_mutex_destroy(&test);
+    //lpthread_mutex_destroy(&test);
 }
 
 
