@@ -72,8 +72,9 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         
         // SETTING ONE WAY BRIDGE
         int posxOff = init_posx + 20;
-        
-        int posyOff = INIT_POSY + 40 * newBridge->queueSize;
+        int space2bridge = 12 - (newBridge->queueSize * 2);
+        int blankSpace = (space2bridge - length)/2;
+        int posyOff = INIT_POSY +(newBridge->queueSize * 40) + (40 * blankSpace);
         if (length%2!=0)
             posyOff+=20;
         

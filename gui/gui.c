@@ -37,14 +37,15 @@ void must_init(bool test, const char *description)
 // EXPONENCIAL FUNCTION
 double ran_expo(double lambda)
 {
-
-  long idum = rand();
-  double u;
-  u = rand() / (RAND_MAX + 1.0);
-  return -log(1 - u) / lambda;
+    long idum = rand();
+    double u;
+    u = rand() / (RAND_MAX + 1.0);
+    //   return -log(1 - u) / lambda;
+    return 2;
 }
 /**
-*/
+ * 
+ */ 
 int init_gui(GUI_CONTEXT *ctx)
 {
     must_init(al_init(), "allegro");
@@ -114,8 +115,9 @@ int init_gui(GUI_CONTEXT *ctx)
     else
     {
         ctx->generate = 0;
+        printf("Wait time: %d\n",ctx->config.medium_time_creation);
         ctx->waitTime = ran_expo((double) ctx->config.medium_time_creation);
-        printf("Wait time: %d\n",ctx->waitTime);
+        printf("EXPO Wait time: %d\n",ctx->waitTime);
     }
     
     if(ERROR_LOADING){
@@ -455,12 +457,10 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
     if (start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
         emptyqueue = 0;
-        // printf("SALIDA ALFA NO DISPONIBLE\n");
     }
     else if (start == betaPlanet && (ctx->map[6][2]).blocked)
     {
         emptyqueue = 0;
-        // printf("SALIDA BETA NO DISPONIBLE\n");
     }
 
     BRIDGE *tempBridge;                                 // RANDOM BRIDGE
@@ -484,13 +484,11 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
         ROUTE *tempRoute = create_route(&tempBridge, ctx->map, start);
         if (start == alfaPlanet)
         {
-            // printf("ORIGING ALFA PLANET\n");
             initPosX = COMMUNITY_ALFA_POSX;
             initPosY = COMMUNITY_ALFA_POSY;
         }
         else if (start == betaPlanet)
         {
-            // printf("ORIGING BETA PLANET\n");
             initPosX = COMMUNITY_BETA_POSX;
             initPosY = COMMUNITY_BETA_POSY;
         }
