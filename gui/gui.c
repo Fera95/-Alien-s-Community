@@ -82,8 +82,8 @@ int init_gui(GUI_CONTEXT *ctx)
     {
         ERROR_LOADING = 1;
     }
-    // ctx->config = load_alien();
-    ctx->config.base_speed = 1;
+    ctx->config = load_alien();
+    // ctx->config.base_speed = 1;
     if(ctx->config.base_speed > 10 || ctx->config.base_speed < 0 )
     {
         ERROR_LOADING = 1;
@@ -94,6 +94,7 @@ int init_gui(GUI_CONTEXT *ctx)
         printf("CLOSING PROGRAM\n");
         kill(getpid(),SIGINT);
     }
+    ctx->alienSelected = NULL;
     ctx->mouse_pressed = 0;
     ctx->done = false;
     ctx->head = NULL;
@@ -911,11 +912,7 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     ctx->alienSelected->selected = 1;
                     if (ctx->mouse_pressed == 1 && temp->data->selected)
                     {
-                        ROUTE *tempR = temp->data->way;
-
-                        printf("\nSELECTED CURRENT[%d] : %p -> BLOCKED:%d -> ALIEN ID:%d\n", tempR->pos, (void*) &tempR->current[tempR->pos], tempR->current[tempR->pos].blocked, tempR->current[tempR->pos].alienID);
                         KILL_ALIEN( temp->data );
-                        printf("\nKILLED CURRENT[%d] : %p -> BLOCKED:%d -> ALIEN ID:%d\n", tempR->pos, (void*) &tempR->current[tempR->pos], tempR->current[tempR->pos].blocked, tempR->current[tempR->pos].alienID);
                     } 
                     break;
                 }

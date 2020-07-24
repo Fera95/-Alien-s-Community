@@ -56,10 +56,8 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     newAlien->id = ID;
     if(type == normal){
         // printf("TIPO: Normal\n");
-
         newAlien->dx = baseSpeed;
         newAlien->dy = baseSpeed;
-        // newAlien->image = al_load_bitmap("assets/normal25.png");
     }
     else if(type == alfa){
         // printf("TIPO: Alfa\n");
