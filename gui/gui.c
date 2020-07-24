@@ -35,13 +35,13 @@ void must_init(bool test, const char *description)
 }
 
 // EXPONENCIAL FUNCTION
-double ran_expo(double lambda)
+double ran_expo(float medium)
 {
-    long idum = rand();
+    double lambda = (1/medium);
+    printf("Lambda:%f\n",lambda);
     double u;
     u = rand() / (RAND_MAX + 1.0);
-    //   return -log(1 - u) / lambda;
-    return 2;
+    return -log(1 - u) / lambda;
 }
 /**
  * 
@@ -116,7 +116,7 @@ int init_gui(GUI_CONTEXT *ctx)
     {
         ctx->generate = 0;
         printf("Wait time: %d\n",ctx->config.medium_time_creation);
-        ctx->waitTime = ran_expo((double) ctx->config.medium_time_creation);
+        ctx->waitTime = ran_expo(ctx->config.medium_time_creation);
         printf("EXPO Wait time: %d\n",ctx->waitTime);
     }
     
