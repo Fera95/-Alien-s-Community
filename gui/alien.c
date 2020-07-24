@@ -1,8 +1,54 @@
 #include "alien.h"
 
+/**
+ * LOAD FILE
+ */
 
+alien_config load_alien()
+{
+    alien_config conf;
+    FILE* file = fopen(ALIEN_CONF_PATH, "r");
+    if(file==NULL){
+        printf ("Path to config not avaliable. \n");
+        exit(EXIT_FAILURE); 
+    }
+    char line[256];
+    char prev[256];
+    while (fgets(line, sizeof(line), file)) {
+        char* current = strtok (line, "=:");
+        //prev={0};
+        while (current) {
+            if(!strcmp(prev,"base_speed")){
+                conf.base_speed = atoi(current);
+            }
+            else if(!strcmp(prev,"medium_time_creation")){
+                conf.medium_time_creation = atoi(current);
+            }
+            else if(!strcmp(prev,"rto_time")){
+                conf.rto_time = atoi(current);
+            }            
+			else if(!strcmp(prev,"normal_percent")){
+                conf.normal_percent = atoi(current);
+            }
+            else if(!strcmp(prev,"alfa_percent")){
+                conf.alfa_percent = atoi(current);
+            }
+            else if(!strcmp(prev,"beta_percent")){
+                conf.beta_percent = atoi(current);
+            }
+            strcpy(prev, current);
+            current = strtok (NULL, "=:");
+        }
+    }
+    fclose(file);
+    return conf;
+}
+/**
+ * CREATE
+ */
 ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed)
 {
+
     // printf("Creating ALIEN\n");
     // printf("TIPO RECIBIDO: %d\n", type);
     ALIEN * newAlien = (ALIEN*) malloc(sizeof(ALIEN));
@@ -45,27 +91,6 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     return newAlien;
 }
 
- 
-
-void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData)
-{
-    NODE_ALIEN *newNode = (NODE_ALIEN *) malloc(sizeof(NODE_ALIEN*));
-    newNode->data = newData;
-    newNode->next = NULL;
-    if(*head != NULL)
-    {   
-        NODE_ALIEN *temp = *head;
-        while ( temp->next != NULL )
-            temp = temp ->next;
-        temp->next = newNode;
-    
-    }
-    else{
-        *head = newNode;
-    }
-    
-}
-
 void KILL_ALIEN(struct ALIEN *deadAlien)
 {
   if(deadAlien != NULL)
@@ -96,6 +121,27 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
       printf("ERROR :THE ALIEN ID: %d CAN NOT BE KILLED DURING HIS TIME IN THE PROCESSOR\n", deadAlien->id);
     }
   }
+}
+ 
+void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData)
+{
+    NODE_ALIEN *newNode = (NODE_ALIEN *) malloc(sizeof(NODE_ALIEN*));
+    newNode->data = newData;
+    newNode->next = NULL;
+    if(*head != NULL)
+    {   
+        NODE_ALIEN *temp = *head;
+        while ( temp->next != NULL ){
+            temp = temp ->next;
+        }
+          
+        temp->next = newNode;
+    
+    }
+    else{
+        *head = newNode;
+    }
+    
 }
 
 /**
@@ -406,6 +452,27 @@ ALIEN *remove_by_id(NODE_ALIEN *head, int id) {
   return NULL;
 }
 
+
+/**
+ * LIST SORT OPERATIONS
+ * SCHEDULER
+ */
+
+void sort_list(NODE_ALIEN **head, int option)
+{
+    switch (option)
+    {
+    case 1:
+        order_list_by_priority(*head);
+        break;
+    case 2:
+        *head = order_list_by_lotery(*head);
+        break;
+    default:
+        break;
+    }
+}
+
 void swap_one_by_one(struct NODE_ALIEN *a, struct NODE_ALIEN *b) 
 { 
     struct ALIEN * temp = a->data; 
@@ -439,7 +506,6 @@ void order_list_by_priority(NODE_ALIEN *head){
         lptr = ptr1; 
     } 
     while (swapped); 
-
 }
 
 NODE_ALIEN *order_list_by_lotery(NODE_ALIEN *head)
@@ -531,3 +597,4 @@ return result;
 
 
 }
+

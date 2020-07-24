@@ -158,6 +158,7 @@ void next_move(ALIEN *alien)//)
             else if(alienRoute->current == alienRoute->bridge->pass){
                 tempLimit = alienRoute->bridge->queueSize;
                 tempPos = 0;
+               
                 if(alienRoute->start == alfaPlanet){
                     nextPath = alienRoute->bridge->exitNorth;
                 }
@@ -237,12 +238,15 @@ void next_move(ALIEN *alien)//)
             nextPath[tempPos].blocked = 1;
             nextPath[tempPos].alienID = alien->id;
 
-            alienRoute->current[alienRoute->pos].blocked = 0;
-            alienRoute->current[alienRoute->pos].alienID = -1;
-
+            PATH *queuePath = alienRoute->bridge->queueNorth;
+            PATH *past = alienRoute->current;
+            int pastPos = alienRoute->pos;
+            int sorted = 0;
+            
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
             alienRoute->pos = tempPos;
+            
             if( enqueue )
             {
                 NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->northHead;
@@ -254,60 +258,26 @@ void next_move(ALIEN *alien)//)
                 else
                 {
                     ADD_ALIEN( &head, alien);
+                    // sort_list(&head,1);               
+                    // set_sorted_path(head, queuePath, alienRoute->bridge->queueSize);
+                    // sorted = 1;             
                 }
-                if(get_length(head) > 1){
-                    
-                }
+                alienRoute->bridge->northHead = (void *) head; 
             }
-            // if( enqueue )
-            // { //&& alienRoute->bridge->position == east//
-            //     alienRoute->current[alienRoute->pos].blocked = 0;
-            //     alienRoute->current[alienRoute->pos].alienID = -1;
-            //     NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northHead;
-            //     if(list == NULL){
-            //         list = malloc(sizeof(NODE_ALIEN));
-            //         list->data = alien;
-            //         list->next = NULL;
-            //     }
-            //     else
-            //     {
-            //         // printf("Add to queue List: ");
-            //         if(get_by_id(list,alien->id) == NULL)
-            //         {
-            //             push_back( &list, alien);
-            //         }
-            //     }
-            //     // LLAMAR AL ORGANIZADOR AQUÍ
-            //     NODE_ALIEN *sortedList = list;
-            //     if(get_length(list) > 1){
-            //         order_list_by_priority(sortedList);
-            //         // sortedList = order_list_by_lotery(list);
-            //     }
-            //     setSortedPath(sortedList, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
-
-                
-            //     alienRoute->current = nextPath;
-            //     alienRoute->limit = tempLimit;
-            //     alienRoute->bridge->northHead = (void *) sortedList;
-            // }
-            // else if( dequeue ){
-            //     NODE_ALIEN *list = (NODE_ALIEN*) alienRoute->bridge->northHead;
-            //     pop_front(&list,0);
-            //     // printf("Remover Head:\t");
-            //     // print_list2(list, 0);
-            //     PATH *beforePaht = alienRoute->current;
-            //     int beforeInt = alienRoute->pos;
-                
-            //     alienRoute->pos = tempPos;
-            //     alienRoute->current = nextPath;
-            //     alienRoute->limit = tempLimit;
-            //     alienRoute->bridge->northHead = (void *) list;
-            //     alienRoute->current[alienRoute->pos].blocked = 1;
-
-            //     beforePaht[beforeInt].blocked = 0;
-            //     beforePaht[beforeInt].alienID = -1;
-            //     // setSortedPath(list, alienRoute->bridge->queueNorth, alienRoute->bridge->queueSize );
-            // }
+            else if ( dequeue )
+            {
+                NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->northHead;
+                REMOVE_ALIEN(&head, alien->id);
+            }
+            
+            if(!sorted || past != queuePath)
+            {
+                past[pastPos].blocked = 0;
+                past[pastPos].alienID = -1;                   
+            }
+            
+        
+            
             
             /**
              * Direction of speed
@@ -417,13 +387,14 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
     return result;
 }
 
-void setSortedPath(NODE_ALIEN *sorted_list, PATH *queuePATH, int sizequeue )
+void set_sorted_path(NODE_ALIEN *sorted_list, PATH *queuePATH, int sizequeue )
 {
     int index = sizequeue - 1;
     NODE_ALIEN *temp = sorted_list;
+    ROUTE *tempRoute = temp->data->way;
     for (index; index >= 0; index--){
         if(temp != NULL){
-            if(!temp->data->way->finished)
+            if(!tempRoute->finished )
             {
                 queuePATH[index].blocked = 1;
                 queuePATH[index].alienID = temp->data->id;

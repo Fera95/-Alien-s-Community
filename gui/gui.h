@@ -62,27 +62,20 @@ typedef struct GUI_CONTEXT
     BRIDGE *eastBridge;
     BRIDGE *midBridge;
     BRIDGE *westBridge;
-    // Controls when to repaint the window
-    bool redraw;
-    // Controls when to finisthe game
-    bool done;
-    // PAUSE FLAG
-    bool run;
-
+    
+    bool redraw;                // Controls when to repaint the window
+    bool done;                  // Controls when to finisthe game
+    bool run;                   // PAUSE FLAG
     // This var is used to handle pressed click
-    int mouse_pressed; // 1 true 0 false
+    int mouse_pressed;          // 1 true 0 false
     // This var uis used to handle released click
-    int mouse_released; // 1 true 0 false
-    // handle x mouse coordinate
-    int x;
-    // handle y mouse coordinate
-    int y;
-    // side selected 0 alfa, 1 is beta
-    enum origin sideSelected;
-    // selected alien
-    ALIEN *alienSelected;
-    //head the first node
-    NODE_ALIEN *head;
+    int mouse_released;         // 1 true 0 false
+    int x;                      // handle x mouse coordinate
+    int y;                      // handle y mouse coordinate
+    alien_config config;        // Config from file
+    enum origin sideSelected;   // side selected 0 alfa, 1 is beta   
+    ALIEN *alienSelected;       // selected alien
+    NODE_ALIEN *head;           //head the first node
 } GUI_CONTEXT;
 
 int init_gui(GUI_CONTEXT *ctx);

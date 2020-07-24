@@ -23,8 +23,7 @@ lpthread_t lista2[maxThread];
 
 
 int countIDs = 0;
-// CAMBIAR X ARCHIVO DE CONFIGURACION
-float SPEED_NORMAL = 2;
+
 
 void must_init(bool test, const char *description)
 {
@@ -65,10 +64,36 @@ int init_gui(GUI_CONTEXT *ctx)
     al_register_event_source(ctx->queue, al_get_timer_event_source(ctx->timer));
     al_register_event_source(ctx->queue, al_get_mouse_event_source());
 
+    /**
+     * LOADING FILES
+     */ 
+    bool ERROR_LOADING = 0;
     create_map(ctx);
-    create_bridge(&ctx->eastBridge, 3, 8, east, 0);
-    create_bridge(&ctx->midBridge, 5, 5, mid, 0);
-    create_bridge(&ctx->westBridge, 9, 1, west, 0);
+    config_bridge temp = load_bridge(east);
+    create_bridge(&ctx->eastBridge, temp, east);
+    
+    temp = load_bridge(west);
+    create_bridge(&ctx->westBridge, temp, west);
+    
+    temp = load_bridge(mid);
+    create_bridge(&ctx->midBridge, temp, mid);
+
+    if(ctx->eastBridge == NULL ||ctx->midBridge == NULL || ctx->westBridge == NULL )
+    {
+        ERROR_LOADING = 1;
+    }
+    // ctx->config = load_alien();
+    ctx->config.base_speed = 1;
+    if(ctx->config.base_speed > 10 || ctx->config.base_speed < 0 )
+    {
+        ERROR_LOADING = 1;
+        printf("INVALID BASE SPEED FOR NORMAL ALIENS\n");
+
+    }
+    if(ERROR_LOADING){
+        printf("CLOSING PROGRAM\n");
+        kill(getpid(),SIGINT);
+    }
     ctx->mouse_pressed = 0;
     ctx->done = false;
     ctx->head = NULL;
@@ -392,9 +417,8 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
     /**
      *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
      */
-    enum alienType type = (enum alienType)(rand() % 3); // beta;//
-    enum origin start = (enum origin)(rand() % 2);      //alfaPlanet;//betaPlanet;//
-    // RANDOM COMMUNITY
+    enum alienType type = (enum alienType)(rand() % 3); // RANDOM TYPE
+    enum origin start = (enum origin)(rand() % 2);      // RANDOM COMMUNITY
     int emptyqueue = 1;
     if (start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
@@ -407,8 +431,7 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
         // printf("SALIDA BETA NO DISPONIBLE\n");
     }
 
-    //  RANDOM BRIDGE
-    BRIDGE *tempBridge;
+    BRIDGE *tempBridge;                                 // RANDOM BRIDGE
     enum bridgePosition tempPos = (enum bridgePosition)(rand() % 3);
     if (tempPos == east)
     {
@@ -439,7 +462,7 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
             initPosX = COMMUNITY_BETA_POSX;
             initPosY = COMMUNITY_BETA_POSY;
         }
-        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
+        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, 1); //ctx->config.base_speed
         countIDs++;
     }
 
@@ -496,7 +519,7 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
             initPosY = COMMUNITY_BETA_POSY;
         }
         // printf("Creando (MANUAL) nuevo alien %d\n",countIDs);
-        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, SPEED_NORMAL);
+        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, ctx->config.base_speed);
         countIDs++;
     }
 
@@ -560,7 +583,6 @@ int loop_gui(GUI_CONTEXT *ctx)
         
         if (ctx->redraw && al_is_event_queue_empty(ctx->queue))
         {
-
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_draw_bitmap(ctx->background, 0, 0, 1);
             drawmap(ctx->map, ctx);

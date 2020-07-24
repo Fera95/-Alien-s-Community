@@ -3,12 +3,34 @@
 #define CONSTANTS_HEADER_FILE
 
 #include <stdlib.h>
-
+#include <string.h>
 
 // PATH
 #define EXIT_COUNT 11
 #define ENTRY_COUNT 11
 #define AVENUE_COUNT 16
+
+
+/**
+ * GUI
+ */ 
+#define COMMUNITY_ALFA_POSX 125
+#define COMMUNITY_ALFA_POSY 520
+
+#define COMMUNITY_BETA_POSX 820
+#define COMMUNITY_BETA_POSY 100
+
+// BRIDGE
+#define TOTAL_LENGTH 12
+#define EAST_POSX 270
+#define MID_POSX 430
+#define WEST_POSX 630
+#define INIT_POSY 100
+#define END_POSY 540  //INIT_POSY - 40*TOTAL_LENGTH
+#define MAX_LENGTH 10
+
+enum bridgePosition{east, mid, west} ;
+
 
 typedef struct PATH
 {
@@ -21,31 +43,25 @@ typedef struct PATH
     
 } PATH;
 
-// BRIDGE
-#define TOTAL_LENGTH 12
-#define EAST_POSX 270
-#define MID_POSX 430
-#define WEST_POSX 630
-#define INIT_POSY 100
-#define END_POSY 540  //INIT_POSY - 40*TOTAL_LENGTH
-#define MAX_LENGTH 10
- enum bridgePosition{east, mid, west} ;
 
 typedef struct BRIDGE
 {
-    // 
-    int blocked;
-    // 
-    int countAliens;
     int length;
     int strength;
     int queueSize;
+    int scheduler;
+    int planner;
+    int planner_north_count;
+    int planner_south_count;
+    int planner_time;
+    // CONFIG
+    enum bridgePosition position;
+    double crossTime;
+    int countAliens;
+    int blocked;
     int full;
     int yield; // 1 SOUTH 0 NORTH
-    int scheduler;
-    double quatum;
-    double crossTime;
-    enum bridgePosition position;
+    // double quatum;
     
     void *northHead;
     void *southHead;
@@ -59,6 +75,17 @@ typedef struct BRIDGE
 }
 BRIDGE;
 
+typedef struct 
+{
+    int length;
+    int strength;
+    int queueSize;
+    int scheduler;
+    int planner;
+    int planner_time;
+    int planner_north_count;
+    int planner_south_count;
+} config_bridge;
 
 enum origin { alfaPlanet, betaPlanet };
 enum direction{left, right, up, down};
@@ -87,8 +114,18 @@ typedef struct ROUTE
  * ALIEN
  */ 
 enum alienType { alfa, beta, normal };
-// enum priority { 0, 1, low };
 
+typedef struct alien_config
+{
+    int base_speed;
+    int rto_time;
+    int medium_time_creation;
+    int normal_percent;
+    int alfa_percent;
+    int beta_percent;
+
+    
+}alien_config;
 
 typedef struct ALIEN
 {
@@ -115,47 +152,11 @@ typedef struct NODE_ALIEN
 
 typedef struct INVADER
 {
-    // IDENTIFER
-    int id;
-    // COORDENADAS
-    float x, y;
-    // SPEED
-    float dx, dy;
-    // THREAD
-    // highway
-    ROUTE * way;
-    // IMAGE
-    
+    int id;         // IDENTIFER
+    float x, y;     // COORDENADAS
+    float dx, dy;   // SPEED
+    ROUTE * way;    // HIGHWAY    
 } INVADER;
-
-
-/**
- * GUI
- */ 
-
-#define COMMUNITY_ALFA_POSX 125
-#define COMMUNITY_ALFA_POSY 520
-
-#define COMMUNITY_BETA_POSX 820
-#define COMMUNITY_BETA_POSY 100
-
-/**
- * CONFIGURATION
- */ 
-#define WEST_BRIDGE_CONF_PATH  "../config/top_band.conf"
-#define MID_BRIDGE_CONF_PATH  "../config/mid_band.conf"
-#define EAST_BRIDGE_CONF_PATH  "../config/bottom_band.conf"
-#define AUX_FILE_PATH  "../config/config.aux"
-
-
-struct configBridge
-{
-    enum bridgePosition pos;
-    int length;
-    int strength;
-    // scheduler option
-    int scheduler;
-};
 
 
 #endif
