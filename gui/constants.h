@@ -30,6 +30,10 @@
 #define MAX_LENGTH 10
 
 enum bridgePosition{east, mid, west} ;
+enum origin { alfaPlanet, betaPlanet };
+enum direction{left, right, up, down};
+enum alienType { alfa, beta, normal };
+// enum state {kill, };
 
 
 typedef struct PATH
@@ -87,8 +91,6 @@ typedef struct
     int planner_south_count;
 } config_bridge;
 
-enum origin { alfaPlanet, betaPlanet };
-enum direction{left, right, up, down};
 typedef struct ROUTE 
 {
     // 
@@ -113,7 +115,6 @@ typedef struct ROUTE
 /**
  * ALIEN
  */ 
-enum alienType { alfa, beta, normal };
 
 typedef struct alien_config
 {

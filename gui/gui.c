@@ -33,6 +33,16 @@ void must_init(bool test, const char *description)
     printf("couldn't initialize %s\n", description);
     exit(1);
 }
+
+// EXPONENCIAL FUNCTION
+double ran_expo(double lambda)
+{
+
+  long idum = rand();
+  double u;
+  u = rand() / (RAND_MAX + 1.0);
+  return -log(1 - u) / lambda;
+}
 /**
 */
 int init_gui(GUI_CONTEXT *ctx)
@@ -82,14 +92,32 @@ int init_gui(GUI_CONTEXT *ctx)
     {
         ERROR_LOADING = 1;
     }
+    
     ctx->config = load_alien();
-    // ctx->config.base_speed = 1;
     if(ctx->config.base_speed > 10 || ctx->config.base_speed < 0 )
     {
         ERROR_LOADING = 1;
-        printf("INVALID BASE SPEED FOR NORMAL ALIENS\n");
+        printf("ERROR: INVALID BASE SPEED FOR NORMAL ALIENS\n");
 
     }
+    int total_percent = ctx->config.normal_percent + ctx->config.alfa_percent + ctx->config.beta_percent;
+    if(total_percent != 100){
+        ERROR_LOADING = 1;
+        printf("ERROR: INVALID PERCENTS FOR ALIENS GENERATIONS, ADD NOT EQUAL TO 100\n");
+        
+    }
+    if(ctx->config.medium_time_creation < 0 || ctx->config.medium_time_creation > 60)
+    {
+           ERROR_LOADING = 1;
+           printf("ERROR: INVALID MEDIUM TIME FOR CREATION\n");
+    }
+    else
+    {
+        ctx->generate = 0;
+        ctx->waitTime = ran_expo((double) ctx->config.medium_time_creation);
+        printf("Wait time: %d\n",ctx->waitTime);
+    }
+    
     if(ERROR_LOADING){
         printf("CLOSING PROGRAM\n");
         kill(getpid(),SIGINT);
@@ -295,14 +323,12 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     // Alfa Community enter
     int posxInit = 70;
     int posyInit = 100;
+    int x, y;
     for (int i = 0; i < ENTRY_COUNT; i++)
     {
-        alfaentry[i].x = posxInit;
-        alfaentry[i].y = posyInit + 40 * i;
-        alfaentry[i].height = 40;
-        alfaentry[i].width = 40;
-        // alfaentry[i].image = ctx->pathImage;
-        alfaentry[i].blocked = 0;
+        x = posxInit;
+        y = posyInit + 40 * i;
+        create_path(&alfaentry[i],x,y,40,40);
     }
 
     // Alfa Community Exit
@@ -310,12 +336,9 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     posyInit = 500;
     for (int i = 0; i < EXIT_COUNT; i++)
     {
-        alfaexit[i].x = posxInit;
-        alfaexit[i].y = posyInit - 40 * i;
-        alfaexit[i].height = 40;
-        alfaexit[i].width = 40;
-        // alfaexit[i].image = ctx->pathImage;
-        alfaexit[i].blocked = 0;
+        x = posxInit;
+        y = posyInit - 40 * i;
+        create_path(&alfaexit[i],x,y,40,40);
     }
     posxInit = 670;
     posyInit = 20;
@@ -323,25 +346,19 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     // North Avenue
     for (int i = 0; i < AVENUE_COUNT; i++)
     {
-        northavenueB[i].x = posxInit - 40 * k;
-        northavenueB[i].y = posyInit;
-        northavenueB[i].height = 40;
-        northavenueB[i].width = 40;
-        // northavenueB[i].image = ctx->pathImage;
-        northavenueB[i].blocked = 0;
-        k++;
+        x = posxInit - 40 * k;
+        y = posyInit;
+        create_path(&northavenueB[i],x,y,40,40);
+        k++;   
     }
     posxInit = 70;
     posyInit += 40;
     k = 0;
     for (int i = 0; i < AVENUE_COUNT; i++)
     {
-        northavenueA[i].x = posxInit + 40 * k;
-        northavenueA[i].y = posyInit;
-        northavenueA[i].height = 40;
-        northavenueA[i].width = 40;
-        // northavenueA[i].image = ctx->pathImage;
-        northavenueA[i].blocked = 0;
+        x = posxInit + 40 * k;
+        y = posyInit;
+        create_path(&northavenueA[i],x,y,40,40);
         k++;
     }
     // #########################################
@@ -350,12 +367,9 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     posyInit = 140;
     for (int i = 0; i < EXIT_COUNT; i++)
     {
-        betaexit[i].x = posxInit;
-        betaexit[i].y = posyInit + 40 * i;
-        betaexit[i].height = 40;
-        betaexit[i].width = 40;
-        // betaexit[i].image = ctx->pathImage;
-        betaexit[i].blocked = 0;
+        x = posxInit;
+        y = posyInit + 40 * i;
+        create_path(&betaexit[i],x,y,40,40);
     }
 
     // Beta Community enter
@@ -363,12 +377,9 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     posyInit = 100 + EXIT_COUNT * 40;
     for (int i = 0; i < ENTRY_COUNT; i++)
     {
-        betaentry[i].x = posxInit;
-        betaentry[i].y = posyInit - 40 * i;
-        betaentry[i].height = 40;
-        betaentry[i].width = 40;
-        // betaentry[i].image = ctx->pathImage;
-        betaentry[i].blocked = 0;
+        x = posxInit;
+        y = posyInit - 40 * i;
+        create_path(&betaentry[i],x,y,40,40);
     }
 
     posxInit = 870;
@@ -377,12 +388,9 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     // South Avenue
     for (int i = 0; i < AVENUE_COUNT; i++)
     {
-        southavenueB[i].x = posxInit - 40 * k;
-        southavenueB[i].y = posyInit;
-        southavenueB[i].height = 40;
-        southavenueB[i].width = 40;
-        // southavenueB[i].image = ctx->pathImage;
-        southavenueB[i].blocked = 0;
+        x = posxInit - 40 * k;
+        y = posyInit;
+        create_path(&southavenueB[i],x,y,40,40);
         k++;
     }
     posxInit = 910 - AVENUE_COUNT * 40;
@@ -390,11 +398,9 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     k = 0;
     for (int i = 0; i < AVENUE_COUNT; i++)
     {
-        southavenueA[i].x = posxInit + 40 * k;
-        southavenueA[i].y = posyInit;
-        southavenueA[i].height = 40;
-        southavenueA[i].width = 40;
-        southavenueA[i].blocked = 0;
+        x = posxInit + 40 * k;
+        y = posyInit;
+        create_path(&southavenueA[i],x,y,40,40);
         k++;
     }
     // ##################################
@@ -410,15 +416,40 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     ctx->map[7] = betaentry;
 }
 
+int get_type(GUI_CONTEXT *ctx)
+{
+    int percentAlfa = ctx->config.alfa_percent;
+    int percentBeta = ctx->config.beta_percent;
+    int percentNormal = ctx->config.normal_percent;
+    int arrayPercent[100];
+    int index = 0;
+    for (int i = 0; i < percentAlfa; i++)
+    {
+        arrayPercent[index] = alfa;
+        index++;
+    }
+    for (int i = 0; i < percentBeta; i++)
+    {
+        arrayPercent[index] = beta;
+        index++;
+    }
+    for (int i = 0; i < percentNormal; i++)
+    {
+        arrayPercent[index] = normal;
+        index++;
+    }
+    int select = rand()%100;
+    // printf("array[%d] = %d\n",select, arrayPercent[select]);
+    return arrayPercent[select];
+
+}
 /**
  * CREATE A RANDOM ALIEN 
  */
 ALIEN *generateAlien(GUI_CONTEXT *ctx)
 {
-    /**
-     *  LLAMAR A FUNCIONES DE ALEATORIEDAD EXPONENCIAL ETC...
-     */
-    enum alienType type = (enum alienType)(rand() % 3); // RANDOM TYPE
+ 
+    enum alienType type = (enum alienType) get_type(ctx); // RANDOM TYPE
     enum origin start = (enum origin)(rand() % 2);      // RANDOM COMMUNITY
     int emptyqueue = 1;
     if (start == alfaPlanet && (ctx->map[0][2]).blocked)
@@ -535,6 +566,20 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
 /**
  * DRAW AND MOVING FUNCTIONS
  */
+// WAIT FOR A PERIOD OF TIME
+void * wait_generation(void *arg )
+{
+    GUI_CONTEXT *ctx = (GUI_CONTEXT *)arg;
+    while (1)
+    {
+        if (ctx->done)
+        {
+            break;
+        }
+        ctx->generate = 1;
+        sleep(ctx->waitTime);
+    }
+}
 
 int loop_gui(GUI_CONTEXT *ctx)
 {
@@ -542,8 +587,9 @@ int loop_gui(GUI_CONTEXT *ctx)
 
     timer = al_create_timer(1.0 / 60);
     al_start_timer(timer);
-
-    int count = 20, flag = 0;
+    lpthread_t t;
+    lpthread_create(&t, NULL, wait_generation, (void *)ctx);
+    int flag = 0;
     while (1)
     {
         clickedAlien(ctx, ctx->head);
@@ -670,11 +716,10 @@ int loop_gui(GUI_CONTEXT *ctx)
             /**
              * ALIEN GENERATOR IN A RANDOM NUMBER OF FRAMES
              */
-            count--;
-            if (count <= 0 && ctx->run )
+            if (ctx->generate && ctx->run )
             {
+                ctx->generate = 0;
                 flag = !flag;
-                count = rand() % 100;
                 ALIEN *myAlien = generateAlien(ctx);
                 if (myAlien != NULL)
                 {

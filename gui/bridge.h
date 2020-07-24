@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include <stdio.h>
+#include "path.h"
 
 
 #define EAST_BRIDGE_CONF_PATH  "./config/east_bridge.conf"

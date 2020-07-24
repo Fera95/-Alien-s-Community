@@ -6,12 +6,14 @@
 #include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include <time.h>
-// #include <pthread.h>
+#include <math.h>
 #include "LPTHREAD/lpthread.h"
 #include "constants.h"
 #include "bridge.h"
 #include "route.h"
 #include "alien.h"
+#include "path.h"
+
 
 /**
  * Basic Structure to render a gui
@@ -72,6 +74,8 @@ typedef struct GUI_CONTEXT
     int mouse_released;         // 1 true 0 false
     int x;                      // handle x mouse coordinate
     int y;                      // handle y mouse coordinate
+    int generate;               // Automatic Alien Generation
+    int waitTime;               // Wait for a period of time
     alien_config config;        // Config from file
     enum origin sideSelected;   // side selected 0 alfa, 1 is beta   
     ALIEN *alienSelected;       // selected alien

@@ -61,45 +61,18 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         else if(position == west)
             init_posx = WEST_POSX; 
         
-        
-        
+            
         for (int i = 0; i < queueSize; i++)
         {
-            /**
-             *  SETTING VALUES
-             */
-            // POSITION X AXIS
-            newBridge->queueNorth[i].x = init_posx ;
-            newBridge->queueSouth[i].x = init_posx + 40;
-            newBridge->exitNorth[i].x = init_posx;
-            newBridge->exitSouth[i].x = init_posx  + 40;
-
-            // POSITION Y AXIS
-
-            newBridge->queueNorth[i].y = INIT_POSY + 40*i;
-            newBridge->queueSouth[i].y = END_POSY - 40*i;
-            newBridge->exitNorth[i].y = (END_POSY-40*(queueSize-1))  + 40*i;
-            newBridge->exitSouth[i].y = (INIT_POSY+40*(queueSize-1)) - 40*i;
-
-            // BLOCKED 
-            newBridge->queueNorth[i].blocked = 0;
-            newBridge->queueSouth[i].blocked = 0;
-            newBridge->exitNorth[i].blocked = 0;
-            newBridge->exitSouth[i].blocked = 0;
-
-            // METERING
-            newBridge->queueNorth[i].height = 40;
-            newBridge->queueSouth[i].height = 40;
-            newBridge->exitNorth[i].height = 40;
-            newBridge->exitSouth[i].height = 40;
-            newBridge->queueNorth[i].width = 40;
-            newBridge->queueSouth[i].width = 40;
-            newBridge->exitNorth[i].width = 40;
-            newBridge->exitSouth[i].width = 40;
+            create_path(&(newBridge->queueNorth[i]), init_posx, INIT_POSY + 40*i, 40, 40);
+            create_path(&(newBridge->queueSouth[i]), init_posx + 40, END_POSY - 40*i, 40, 40);
+            create_path(&(newBridge->exitNorth[i]), init_posx, (END_POSY-40*(queueSize-1))  + 40*i, 40, 40);
+            create_path(&(newBridge->exitSouth[i]), init_posx  + 40, (INIT_POSY+40*(queueSize-1)) - 40*i, 40, 40);
         }
         
         // SETTING ONE WAY BRIDGE
         int posxOff = init_posx + 20;
+        
         int posyOff = INIT_POSY + 40 * newBridge->queueSize;
         if (length%2!=0)
             posyOff+=20;

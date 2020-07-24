@@ -6,7 +6,7 @@
 #include <allegro5/allegro_font.h>
 int main()
 {
-    // srand(time(NULL));
+    srand(time(NULL));
     GUI_CONTEXT ctx;
     if (!init_gui(&ctx))
     {
