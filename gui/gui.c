@@ -131,8 +131,10 @@ int init_gui(GUI_CONTEXT *ctx)
     ctx->head = NULL;
     ctx->redraw = true;
     ctx->mouse_released = 0;
-    ctx->sideSelected = alfa;
+    ctx->sideSelected = alfaPlanet;
     ctx->run = true;
+    ctx->invader = createInvader(ctx);
+    moveInvader(ctx);
     printf("Init success\n");
     return 0;
 }
@@ -365,7 +367,14 @@ int set_background(GUI_CONTEXT *ctx)
     {
         printf("Error imagen");
     }
-
+    if (al_load_bitmap("assets/invader20.png") != NULL)
+    {
+        ctx->invaderImage = al_load_bitmap("assets/invader20.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
     must_init(ctx->background, "background");
     must_init(ctx->pathImage, "path");
     return 0;
@@ -642,6 +651,7 @@ void *wait_generation(void *arg)
 
 int loop_gui(GUI_CONTEXT *ctx)
 {
+    printf("Invader %f  %f \n", ctx->invader->x, ctx->invader->y);
     al_start_timer(ctx->timer);
 
     timer = al_create_timer(1.0 / 60);
@@ -722,6 +732,10 @@ int loop_gui(GUI_CONTEXT *ctx)
             drawBridge(ctx->midBridge, ctx);
             drawBridge(ctx->westBridge, ctx);
             applySemaphoreState(ctx);
+            if (!ctx->invader->hidden)
+            {
+                al_draw_bitmap(ctx->invaderImage, ctx->invader->x, ctx->invader->y, flag);
+            }
             NODE_ALIEN *tempNode = ctx->head;
             while (tempNode != NULL)
             {
@@ -927,6 +941,12 @@ void handleMenu(GUI_CONTEXT *ctx)
         ctx->mouse_released = 0;
     }
 
+    /**     * Fourth **/
+    if (ctx->mouse_released && ctx->x >= (1010) && ctx->x <= (1010 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
+    {
+        ctx->invader->hidden = !ctx->invader->hidden;
+    }
+
     if (temp != NULL)
     {
         ADD_ALIEN(&(ctx->head), temp);
@@ -1064,4 +1084,95 @@ void applySemaphoreState(GUI_CONTEXT *ctx)
         al_draw_bitmap(ctx->open, 592, 115, 0);
         al_draw_bitmap(ctx->close, 592, 471, 0);
     }
+}
+
+INVADER *createInvader(GUI_CONTEXT *ctx)
+{
+    ROUTE *route = (ROUTE *)malloc(sizeof(ROUTE));
+    route->bridge = NULL;
+    route->exit = NULL;
+
+    INVADER *invader = (INVADER *)malloc(sizeof(INVADER));
+    invader->id = -100;
+    invader->hidden = 0;
+    //  which the origin gin
+    if (ctx->sideSelected == alfaPlanet)
+    {
+        route->start = alfaPlanet;
+        route->dirx = right;
+        route->diry = down;
+        invader->x = 91;
+        invader->y = 37;
+    }
+    // Betaplanet
+    else
+    {
+        route->start = betaPlanet;
+        route->dirx = left;
+        route->diry = up;
+        invader->x = 888;
+        invader->y = 637;
+    }
+    invader->way = route;
+    return invader;
+}
+void dismissInvader(GUI_CONTEXT *ctx)
+{
+}
+void *canInvaderMove(void *args)
+{
+    GUI_CONTEXT *ctx = (GUI_CONTEXT *)args;
+    while (1)
+    {
+        ctx->invader->y = 41;
+        if (ctx->invader->x > 700)
+        {
+            ctx->invader->way->dirx = left;
+        }
+        else if (ctx->invader->x < 82)
+        {
+            ctx->invader->way->dirx = right;
+        }
+
+        if (ctx->invader->way->dirx == left)
+        {
+            ctx->invader->x = ctx->invader->x - 1.9;
+        }
+        else if (ctx->invader->way->dirx == right)
+        {
+            ctx->invader->x = ctx->invader->x + 1.9;
+        }
+        NODE_ALIEN *temp = NULL;
+        if (ctx->head != NULL)
+        {
+            temp = ctx->head;
+            while (temp != NULL)
+            {
+                if (temp->data != NULL)
+                {
+                    float dx = abs(ctx->invader->x - temp->data->x );
+                    float dy = abs(ctx->invader->y  - temp->data->y );
+                    if (dx <= 20 && dy <= 20 && temp->data->type == alfa && ctx->invader->hidden == 0)
+                    {
+                        if (ctx->alienSelected != NULL)
+                        {
+                            ctx->alienSelected->selected = 0;
+                        }
+                        ctx->alienSelected = temp->data;
+                        ctx->alienSelected->selected = 1;
+                        KILL_ALIEN(ctx->alienSelected);
+                        ctx->invader->hidden = 1;
+                        break;
+                    }
+                }
+                temp = temp->next;
+            }
+        }
+        usleep(25000);
+    }
+}
+void moveInvader(GUI_CONTEXT *ctx)
+{
+    lpthread_t t;
+    lpthread_create(&t, NULL, canInvaderMove, (void *)(ctx));
 }

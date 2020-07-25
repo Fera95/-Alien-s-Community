@@ -157,6 +157,7 @@ typedef struct INVADER
     float x, y;     // COORDENADAS
     float dx, dy;   // SPEED
     ROUTE * way;    // HIGHWAY    
+    int hidden; // 1 is hidden 0 is shown
 } INVADER;
 
 

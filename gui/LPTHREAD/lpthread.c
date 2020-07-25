@@ -55,7 +55,7 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 						SIGCHLD|
 						// CLONE_FS|
 						// CLONE_FILES|
-						CLONE_SIGHAND|
+						// CLONE_SIGHAND|
 						CLONE_VM|
 						CLONE_PARENT_SETTID|
 						CLONE_CHILD_CLEARTID|
