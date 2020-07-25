@@ -98,22 +98,6 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
     {
       if(deadWay->start == alfaPlanet){
         if(deadWay->current == deadWay->bridge->queueNorth){
-          char* bridgeName;
-            switch (deadWay->bridge->position)
-            {
-            case 0:
-                bridgeName = "east";
-                break;
-            case 1:
-                bridgeName = "mid";
-                break;
-            case 2:
-                bridgeName = "west";
-                break;
-            
-            default:
-                break;
-            }
           REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->northHead), deadAlien->id);
         }
       }

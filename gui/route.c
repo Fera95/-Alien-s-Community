@@ -251,22 +251,22 @@ void next_move(ALIEN *alien)//)
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
             alienRoute->pos = tempPos;
-             char* bridgeName;
-                switch (alienRoute->bridge->position)
-                {
-                case 0:
-                    bridgeName = "east";
-                    break;
-                case 1:
-                    bridgeName = "mid";
-                    break;
-                case 2:
-                    bridgeName = "west";
-                    break;
-                
-                default:
-                    break;
-                }
+            // char* bridgeName;
+            // switch (alienRoute->bridge->position)
+            // {
+            // case 0:
+            //     bridgeName = "east";
+            //     break;
+            // case 1:
+            //     bridgeName = "mid";
+            //     break;
+            // case 2:
+            //     bridgeName = "west";
+            //     break;
+            
+            // default:
+            //     break;
+            // }
 
             // printf("PUENTE: %s enqueue: %d dequeue: %d\n", bridgeName, enqueue, dequeue);
             if( enqueue && !dequeue )
@@ -285,15 +285,15 @@ void next_move(ALIEN *alien)//)
                     sorted = 1;             
                 }
                
-                printf("PUENTE: %s\n", bridgeName);
-                print_list2(head, 0);
+                // printf("PUENTE: %s\n", bridgeName);
+                // print_list2(head, 0);
                 alienRoute->bridge->northHead = (void *) head; 
             }
             else if ( dequeue )
             {
                 NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->northHead;
                 REMOVE_ALIEN(&head, alien->id);
-                print_list2(head, 0);
+                // print_list2(head, 0);
                 alienRoute->bridge->northHead = (void *) head; 
 
 
