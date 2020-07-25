@@ -1032,36 +1032,36 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
 
 void applySemaphoreState(GUI_CONTEXT *ctx)
 {
-    if (1)
-    {
-        al_draw_bitmap(ctx->open, 235, 115, 0);
-        al_draw_bitmap(ctx->close, 235, 471, 0);
-    }
-    else
+    if (ctx->westBridge->yield == 0)
     {
         al_draw_bitmap(ctx->close, 235, 115, 0);
         al_draw_bitmap(ctx->open, 235, 471, 0);
     }
-
-    if (1)
-    {
-        al_draw_bitmap(ctx->open, 392, 115, 0);
-        al_draw_bitmap(ctx->close, 392, 471, 0);
-    }
     else
+    {
+        al_draw_bitmap(ctx->open, 235, 115, 0);
+        al_draw_bitmap(ctx->close, 235, 471, 0);
+    }
+
+    if (ctx->midBridge->yield == 0)
     {
         al_draw_bitmap(ctx->close, 392, 115, 0);
         al_draw_bitmap(ctx->open, 392, 471, 0);
     }
-
-    if (1)
-    {
-        al_draw_bitmap(ctx->open, 592, 115, 0);
-        al_draw_bitmap(ctx->close, 592, 471, 0);
-    }
     else
+    {
+        al_draw_bitmap(ctx->open, 392, 115, 0);
+        al_draw_bitmap(ctx->close, 392, 471, 0);
+    }
+
+    if (ctx->eastBridge->yield == 0)
     {
         al_draw_bitmap(ctx->close, 592, 115, 0);
         al_draw_bitmap(ctx->open, 592, 471, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->open, 592, 115, 0);
+        al_draw_bitmap(ctx->close, 592, 471, 0);
     }
 }
