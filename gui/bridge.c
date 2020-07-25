@@ -47,6 +47,7 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->yield = 0;
         newBridge->countAliens = 0;
         newBridge->holdup = 0;
+        newBridge->crossTime = length * 40 * 0.025;
 
         newBridge->queueNorth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->queueSouth = malloc(newBridge->queueSize*sizeof(PATH));

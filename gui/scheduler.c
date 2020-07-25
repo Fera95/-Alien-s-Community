@@ -15,13 +15,13 @@ void schedule_list (NODE_ALIEN **head, int option)
     case Lottery:
         *head = order_list_by_lotery(*head);
         break;
-    case FIFO:
-        break;
     case ShortestFirst:
         order_list_by_shortest(*head);
         break;
     case RoundRobin:
         order_list_by_rr(*head);
+        break;
+    case FIFO:
         break;
     default:
         break;
