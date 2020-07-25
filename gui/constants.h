@@ -66,8 +66,6 @@ typedef struct BRIDGE
     int countAliens;
     int holdup;
     int yield;      // 1 SOUTH 0 NORTH
-    int sorting;
-    // double quatum;
     
     void *northHead;
     void *southHead;

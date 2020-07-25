@@ -149,7 +149,6 @@ void next_move(ALIEN *alien)//)
                 tempPos = 0;
                 dequeue = 1;
                 enqueue = 0;
-                nextStatus = running;
 
 
             }
@@ -158,7 +157,6 @@ void next_move(ALIEN *alien)//)
                 nextPath = alienRoute->bridge->pass;
                 tempLimit = -1;
                 tempPos = alienRoute->bridge->length-1;
-                nextStatus = running;
 
             }
             // Puente -> salida

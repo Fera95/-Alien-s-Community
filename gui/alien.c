@@ -84,7 +84,7 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     newAlien->status = new;
     newAlien->tickets = 20;
     newAlien->alienPriority = (rand()%10) + 1;
-    newAlien->weight = (rand()%5)+1;
+    newAlien->weight = 1;//(rand()%5)+1;
     newAlien->quatum = 1;
     return newAlien;
 }
@@ -97,13 +97,29 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
     if(deadWay->current != deadWay->bridge->pass )
     {
       if(deadWay->start == alfaPlanet){
-        if(deadWay->current == deadWay->bridge->northHead){
-          REMOVE_ALIEN(deadWay->bridge->northHead, deadAlien->id);
+        if(deadWay->current == deadWay->bridge->queueNorth){
+          char* bridgeName;
+            switch (deadWay->bridge->position)
+            {
+            case 0:
+                bridgeName = "east";
+                break;
+            case 1:
+                bridgeName = "mid";
+                break;
+            case 2:
+                bridgeName = "west";
+                break;
+            
+            default:
+                break;
+            }
+          REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->northHead), deadAlien->id);
         }
       }
       else if(deadWay->start == betaPlanet)
       {
-        if(deadWay->current == deadWay->bridge->southHead){
+        if(deadWay->current == deadWay->bridge->queueSouth){
           REMOVE_ALIEN(deadWay->bridge->southHead, deadAlien->id);
         }
       }
