@@ -18,7 +18,11 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
     }
     else if (strength < 1)
     {
-        printf("ERROR: Bridge %d strength not allowed, please enter a value between 1 and 10\n",position);   
+        printf("ERROR: Bridge %d strength not allowed, please enter a value between 1 and %d\n",position,length);   
+    }
+    else if (scheduler < 0 || scheduler > 4)
+    {
+        printf("ERROR: Bridge %d scheduler not allowed, please enter a value between 0 and 4\n",position);   
     }
     
     else
@@ -34,19 +38,21 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
             printf("WARNING: Bridge %d  Queue Size is out of limits, value set to: %d\n",position,1);   
             queueSize = 1;
         }
-        
         newBridge = malloc(sizeof(BRIDGE));
         newBridge->queueSize = queueSize;
         newBridge->length = length;
+        newBridge->position = position;
+        newBridge->strength = strength;
+        newBridge->scheduler = (enum scheduler_method) scheduler;
+        newBridge->yield = 0;
+        newBridge->countAliens = 0;
+        newBridge->holdup = 0;
+
         newBridge->queueNorth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->queueSouth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->exitNorth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->exitSouth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->pass = malloc(newBridge->length*sizeof(PATH));   
-        newBridge->yield = 0;
-        newBridge->countAliens = 0;
-        newBridge->full = 0;
-        newBridge->position = position;
         newBridge->southHead = NULL;
         newBridge->northHead = NULL;
 
@@ -97,7 +103,7 @@ void print_bridge(BRIDGE * bridge2print)
     
     int lenPass = bridge2print->length;
     int lenQueue = bridge2print->queueSize;
-    printf("POS: %d\nYIELD: %d\nFULL: %d\nBRIDGE SIZE: %d\nQUEUE LEN: %d\nSTRENGH: %d",bridge2print->position,bridge2print->yield,bridge2print->full, lenPass, lenQueue, bridge2print->strength);
+    printf("POS: %d\nYIELD: %d\nFULL: %d\nBRIDGE SIZE: %d\nQUEUE LEN: %d\nSTRENGH: %d",bridge2print->position,bridge2print->yield,bridge2print->holdup, lenPass, lenQueue, bridge2print->strength);
     // POSICIon, largo
     printf("NORTH PATH:\n");
     for (int i = 0; i < lenQueue; i++)

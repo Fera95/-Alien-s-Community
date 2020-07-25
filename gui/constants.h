@@ -34,7 +34,7 @@ enum origin { alfaPlanet, betaPlanet };
 enum direction{left, right, up, down};
 enum alienType { alfa, beta, normal };
 enum state {new, ready, waiting, running, terminated, killed};
-enum scheduler {RoundRobin, Priority, Lottery, FIFO, ShortestFirst};
+enum scheduler_method {RoundRobin, Priority, Lottery, FIFO, ShortestFirst};
 enum algorithm {count, Semaphore, Survive };
 
 typedef struct PATH
@@ -64,8 +64,7 @@ typedef struct BRIDGE
     enum bridgePosition position;
     double crossTime;
     int countAliens;
-    int blocked;
-    int full;
+    int holdup;
     int yield;      // 1 SOUTH 0 NORTH
     int sorting;
     // double quatum;
@@ -79,8 +78,7 @@ typedef struct BRIDGE
     PATH *exitSouth;
     PATH *pass;
     
-}
-BRIDGE;
+} BRIDGE;
 
 typedef struct 
 {

@@ -282,7 +282,7 @@ void next_move(ALIEN *alien)//)
                 else
                 {
                     ADD_ALIEN( &head, alien);
-                    sort_list(&head,1);               
+                    schedule_list(&head, alienRoute->bridge->scheduler);               
                     set_sorted_path(head, queuePath, alienRoute->bridge->queueSize);
                     sorted = 1;             
                 }
@@ -367,16 +367,17 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
         }
         else if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
         {      
-            if( !myBridge->full){
+            int nextholdup = alienMoving->weight + myBridge->holdup;
+            if( nextholdup <= myBridge->strength){
                 if(myBridge->yield && alienMoving->way->start == alfaPlanet){
-                    myBridge->full = 1;
                     
+                    myBridge->holdup = nextholdup;
                     result = 1;
                     
                 }
                 else if (!myBridge->yield && alienMoving->way->start == betaPlanet)
                 {
-                    myBridge->full = 1;
+                    myBridge->holdup = nextholdup;
                     result = 1;
                     // printf("Puente: %d Coutner BetA: %d\n", myBridge->position, myBridge->countAliens);   
                 }
@@ -394,9 +395,8 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
         else if (nextPATH == myBridge->exitNorth || nextPATH == myBridge->exitSouth)
         {
             if(pos == 0){
-                myBridge->full = 0;
+                myBridge->holdup -= alienMoving->weight;
                 myBridge->countAliens++;
-                // printf("COUNT: %d",myBridge->countAliens);
                 if(myBridge->countAliens >= 3)
                 {
                     if(debug){
