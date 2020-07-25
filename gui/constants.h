@@ -33,8 +33,9 @@ enum bridgePosition{east, mid, west} ;
 enum origin { alfaPlanet, betaPlanet };
 enum direction{left, right, up, down};
 enum alienType { alfa, beta, normal };
-// enum state {kill, };
-
+enum state {new, ready, waiting, running, terminated, killed};
+enum scheduler {RoundRobin, Priority, Lottery, FIFO, ShortestFirst};
+enum algorithm {count, Semaphore, Survive };
 
 typedef struct PATH
 {
@@ -50,6 +51,7 @@ typedef struct PATH
 
 typedef struct BRIDGE
 {
+    // CONFIG
     int length;
     int strength;
     int queueSize;
@@ -58,13 +60,14 @@ typedef struct BRIDGE
     int planner_north_count;
     int planner_south_count;
     int planner_time;
-    // CONFIG
+    // VARIABLES
     enum bridgePosition position;
     double crossTime;
     int countAliens;
     int blocked;
     int full;
-    int yield; // 1 SOUTH 0 NORTH
+    int yield;      // 1 SOUTH 0 NORTH
+    int sorting;
     // double quatum;
     
     void *northHead;
@@ -131,13 +134,14 @@ typedef struct alien_config
 typedef struct ALIEN
 {
     int selected;           // FLAG TO SELECT ALIEN
-    int deleted;            // FLAG TO FREE MEMORY
+    enum state status;            // FLAG TO FREE MEMORY
     int id;                 // IDENTIFER
     int tickets;            // LOTTERY ALGORITHM
     int alienPriority;      // PRIORITY ALGORITHM
     int weight;             // ALIEN WEIGHT TO PASS THE BRIDGE
     float x, y;             // COORDS IN SPACE
     float dx, dy;           // SPEED
+    float quatum;           // Quatum
     enum alienType type;    // TYPE OF ALIEN
     ROUTE * way;            // ROUTE THE ALIEN IS GOING TO TAKE
     

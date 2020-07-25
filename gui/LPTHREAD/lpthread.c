@@ -53,8 +53,8 @@ int lpthread_create(lpthread_t* thread, const lpthread_attr_t *attr, void *(*sta
 	}
     thread->pid = clone((int (*)(void *))start_routine, (char*) (thread->stack + threadStack),
 						SIGCHLD|
-						CLONE_FS|
-						CLONE_FILES|
+						// CLONE_FS|
+						// CLONE_FILES|
 						CLONE_SIGHAND|
 						CLONE_VM|
 						CLONE_PARENT_SETTID|

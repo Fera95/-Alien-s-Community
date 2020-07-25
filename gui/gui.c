@@ -34,7 +34,7 @@ void must_init(bool test, const char *description)
     exit(1);
 }
 
-// EXPONENCIAL FUNCTION
+// EXPONENTIAL FUNCTION
 double ran_expo(float medium)
 {
     double lambda = (1/medium);
@@ -44,7 +44,7 @@ double ran_expo(float medium)
     return -log(1 - u) / lambda;
 }
 /**
- * 
+ * INITIALIZE ALL COMPONENTS OF THE INTERFACE
  */ 
 int init_gui(GUI_CONTEXT *ctx)
 {
@@ -115,9 +115,11 @@ int init_gui(GUI_CONTEXT *ctx)
     else
     {
         ctx->generate = 0;
-        printf("Wait time: %d\n",ctx->config.medium_time_creation);
         ctx->waitTime = ran_expo(ctx->config.medium_time_creation);
-        printf("EXPO Wait time: %d\n",ctx->waitTime);
+        if(ctx->waitTime <= 0){
+            ctx->waitTime++;
+        }
+        printf("WAIT TIME GENERATION: %d\n",ctx->waitTime);
     }
     
     if(ERROR_LOADING){
@@ -492,7 +494,7 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
             initPosX = COMMUNITY_BETA_POSX;
             initPosY = COMMUNITY_BETA_POSY;
         }
-        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, 1); //ctx->config.base_speed
+        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, ctx->config.base_speed); //
         countIDs++;
     }
 
@@ -562,9 +564,10 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
 }
 
 /**
- * DRAW AND MOVING FUNCTIONS
+ * FUNCTIONS FOR DRAWING AND MOVING
  */
-// WAIT FOR A PERIOD OF TIME
+
+// WAIT GENERATOR
 void * wait_generation(void *arg )
 {
     GUI_CONTEXT *ctx = (GUI_CONTEXT *)arg;
@@ -640,9 +643,16 @@ int loop_gui(GUI_CONTEXT *ctx)
             if (ctx->alienSelected != NULL)
             {
 
-                char strAlienStatus[40];
-                sprintf(strAlienStatus, " x: %.2f, y: %.2f, type: %d,  id: %d ", ctx->alienSelected->x, ctx->alienSelected->y, ctx->alienSelected->type, ctx->alienSelected->id);
-                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 658, 0, strAlienStatus);
+                ALIEN * temp =ctx->alienSelected;
+                char strAlienStatus[140];
+                sprintf(strAlienStatus, "id: %d, type: %d",temp->id, (int) temp->type);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 610, 0, strAlienStatus);
+                sprintf(strAlienStatus, "x: %.2f, y: %.2f ",temp->x, temp->y);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 620, 0, strAlienStatus);
+                sprintf(strAlienStatus, "status: %d, speed: %f, weight: %d",temp->status, temp->dx, temp->weight);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 630, 0, strAlienStatus);
+                sprintf(strAlienStatus, "priority: %d, quatum: %f",temp->alienPriority, temp->quatum);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 640, 0, strAlienStatus);                
             }
             else
             {
@@ -657,7 +667,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             NODE_ALIEN *tempNode = ctx->head;
             while (tempNode != NULL)
             {
-                if (!tempNode->data->deleted)
+                if (!(tempNode->data->status == killed))
                 {
                     ALLEGRO_BITMAP *image;
                     if (tempNode->data->type == alfa)
@@ -725,8 +735,8 @@ int loop_gui(GUI_CONTEXT *ctx)
                     t2 = lista2[cuenta2];
                     lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
                     ADD_ALIEN(&(ctx->head), myAlien);
-                    printf("NEW ALIEN ID: %d\n",myAlien->id);
-                    printf("Cuenta2 %d",cuenta2);
+                    // printf("NEW ALIEN ID: %d\n",myAlien->id);
+                    // printf("Cuenta2 %d",cuenta2);
                     cuenta2++;
                 }
             }
@@ -827,7 +837,7 @@ void *moveAlien(void *args)
             break;
         }
     }
-    myAlien->deleted = 1; 
+    myAlien->status = killed; 
 }
 
 
@@ -868,7 +878,7 @@ void handleMenu(GUI_CONTEXT *ctx)
         lpthread_t t;
         t=lista1[cuenta1];
         lpthread_create(&t, NULL, moveAlien, (void *)temp);
-            printf("Cuenta1 %d",cuenta1);
+            // printf("Cuenta1 %d",cuenta1);
         cuenta1++;
     }
 }

@@ -72,7 +72,7 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
         // printf("TIPO: Beta\n");
 
         // CAMBIAR A VALOR RANDOM
-        float speed = baseSpeed + baseSpeed * 2;
+        float speed = baseSpeed*2;
         newAlien->dx = speed;
         newAlien->dy = speed;
         // newAlien->image = al_load_bitmap("assets/beta25.png");
@@ -81,11 +81,11 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     newAlien->way = *myWay;
     newAlien->x = firstX;
     newAlien->y = firstY;
-    newAlien->deleted = 0;
+    newAlien->status = new;
     newAlien->tickets = 20;
     newAlien->alienPriority = (rand()%10) + 1;
     newAlien->weight = (rand()%5)+1;
-
+    newAlien->quatum = 1;
     return newAlien;
 }
 
