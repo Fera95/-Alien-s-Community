@@ -15,15 +15,13 @@ bool render = false;
 
 #define MAPSIZE 8
 
-int cuenta1=0;
-int cuenta2=0;
+int cuenta1 = 0;
+int cuenta2 = 0;
 
 lpthread_t lista1[maxThread];
 lpthread_t lista2[maxThread];
 
-
 int countIDs = 0;
-
 
 void must_init(bool test, const char *description)
 {
@@ -37,15 +35,15 @@ void must_init(bool test, const char *description)
 // EXPONENTIAL FUNCTION
 double ran_expo(float medium)
 {
-    double lambda = (1/medium);
-    printf("Lambda:%f\n",lambda);
+    double lambda = (1 / medium);
+    printf("Lambda:%f\n", lambda);
     double u;
     u = rand() / (RAND_MAX + 1.0);
     return -log(1 - u) / lambda;
 }
 /**
  * INITIALIZE ALL COMPONENTS OF THE INTERFACE
- */ 
+ */
 int init_gui(GUI_CONTEXT *ctx)
 {
     must_init(al_init(), "allegro");
@@ -77,54 +75,55 @@ int init_gui(GUI_CONTEXT *ctx)
 
     /**
      * LOADING FILES
-     */ 
+     */
     bool ERROR_LOADING = 0;
     create_map(ctx);
     config_bridge temp = load_bridge(east);
     create_bridge(&ctx->eastBridge, temp, east);
-    
+
     temp = load_bridge(west);
     create_bridge(&ctx->westBridge, temp, west);
-    
+
     temp = load_bridge(mid);
     create_bridge(&ctx->midBridge, temp, mid);
 
-    if(ctx->eastBridge == NULL ||ctx->midBridge == NULL || ctx->westBridge == NULL )
+    if (ctx->eastBridge == NULL || ctx->midBridge == NULL || ctx->westBridge == NULL)
     {
         ERROR_LOADING = 1;
     }
-    
+
     ctx->config = load_alien();
-    if(ctx->config.base_speed > 10 || ctx->config.base_speed < 0 )
+    if (ctx->config.base_speed > 10 || ctx->config.base_speed < 0)
     {
         ERROR_LOADING = 1;
         printf("ERROR: INVALID BASE SPEED FOR NORMAL ALIENS\n");
-
     }
     int total_percent = ctx->config.normal_percent + ctx->config.alfa_percent + ctx->config.beta_percent;
-    if(total_percent != 100){
+    if (total_percent != 100)
+    {
         ERROR_LOADING = 1;
         printf("ERROR: INVALID PERCENTS FOR ALIENS GENERATIONS, ADD NOT EQUAL TO 100\n");
-        
     }
-    if(ctx->config.medium_time_creation < 0 || ctx->config.medium_time_creation > 60)
+    if (ctx->config.medium_time_creation < 0 || ctx->config.medium_time_creation > 60)
     {
-           ERROR_LOADING = 1;
-           printf("ERROR: INVALID MEDIUM TIME FOR CREATION\n");
+        ERROR_LOADING = 1;
+        printf("ERROR: INVALID MEDIUM TIME FOR CREATION\n");
     }
     else
     {
         ctx->generate = 0;
         ctx->waitTime = ran_expo(ctx->config.medium_time_creation);
-        if(ctx->waitTime <= 0){
+        if (ctx->waitTime <= 0)
+        {
             ctx->waitTime++;
         }
-        printf("WAIT TIME GENERATION: %d\n",ctx->waitTime);
+        printf("WAIT TIME GENERATION: %d\n", ctx->waitTime);
     }
-    
-    if(ERROR_LOADING){
+
+    if (ERROR_LOADING)
+    {
         printf("CLOSING PROGRAM\n");
-        kill(getpid(),SIGINT);
+        kill(getpid(), SIGINT);
     }
     ctx->alienSelected = NULL;
     ctx->mouse_pressed = 0;
@@ -151,162 +150,222 @@ int finalize_gui(GUI_CONTEXT *ctx)
 int set_background(GUI_CONTEXT *ctx)
 {
     must_init(al_init_image_addon(), "image addon");
-   
-    if(al_load_bitmap("assets/background.png")!=NULL){
-        ctx->background = al_load_bitmap("assets/background.png");
-    }    else{
-        printf("Error imagen");
-   }
-   if( al_load_bitmap("assets/path.png")!=NULL){
-       ctx->pathImage = al_load_bitmap("assets/path.png");
-   }    else{
-        printf("Error imagen");
-   }
-   
-    
-    
-      if(al_load_bitmap("assets/bridge2.png")!=NULL){
-        ctx->passImage = al_load_bitmap("assets/bridge2.png");
-     }    
-       else{
-        printf("Error imagen");
-   }
-   
-      if( al_load_bitmap("assets/queue.png")!=NULL){
-        ctx->queueImage = al_load_bitmap("assets/queue.png");
-     }
-        else{
-        printf("Error imagen");
-   }
-   
-      if(al_load_bitmap("assets/alfaplanet.png")!=NULL){
-       ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
-     }
-      else{
-        printf("Error imagen");
-   }
-    
-      if( al_load_bitmap("assets/betaplanet.png")!=NULL){
-       ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
-    }
-     else{
-       printf("Error imagen");
-   }
-    
-      if(al_load_bitmap("assets/beta25.png")!=NULL){
-        ctx->betaImage = al_load_bitmap("assets/beta25.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-   
-      if(al_load_bitmap("assets/alfa25.png")!=NULL){
-       ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-    
-      if( al_load_bitmap("assets/normal25.png")!=NULL){
-       ctx->normalImage = al_load_bitmap("assets/normal25.png");
-    }
-     else{
-       printf("Error imagen");
-   }
-    
-      if(  al_load_bitmap("assets/alfaSelected.png")!=NULL){
-         ctx->alfaSelected = al_load_bitmap("assets/alfaSelected.png");
-     }
-      else{
-       printf("Error imagen");
-   }
 
-  
-      if(al_load_bitmap("assets/betaSelected.png")!=NULL){
+    if (al_load_bitmap("assets/background.png") != NULL)
+    {
+        ctx->background = al_load_bitmap("assets/background.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+    if (al_load_bitmap("assets/path.png") != NULL)
+    {
+        ctx->pathImage = al_load_bitmap("assets/path.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/bridge2.png") != NULL)
+    {
+        ctx->passImage = al_load_bitmap("assets/bridge2.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/queue.png") != NULL)
+    {
+        ctx->queueImage = al_load_bitmap("assets/queue.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/alfaplanet.png") != NULL)
+    {
+        ctx->alfaCommunity = al_load_bitmap("assets/alfaplanet.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/betaplanet.png") != NULL)
+    {
+        ctx->betaCommunity = al_load_bitmap("assets/betaplanet.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/beta25.png") != NULL)
+    {
+        ctx->betaImage = al_load_bitmap("assets/beta25.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/alfa25.png") != NULL)
+    {
+        ctx->alfaImage = al_load_bitmap("assets/alfa25.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/normal25.png") != NULL)
+    {
+        ctx->normalImage = al_load_bitmap("assets/normal25.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/alfaSelected.png") != NULL)
+    {
+        ctx->alfaSelected = al_load_bitmap("assets/alfaSelected.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/betaSelected.png") != NULL)
+    {
         ctx->betaSelected = al_load_bitmap("assets/betaSelected.png");
     }
-     else{
-       printf("Error imagen");
-   }
-   
-      if(al_load_bitmap("assets/normalSelected.png")!=NULL){
-         ctx->normalSelected = al_load_bitmap("assets/normalSelected.png");
+    else
+    {
+        printf("Error imagen");
     }
-     else{
-       printf("Error imagen");
-   }
-  
-      if(al_load_bitmap("assets/a.png")!=NULL){
+
+    if (al_load_bitmap("assets/normalSelected.png") != NULL)
+    {
+        ctx->normalSelected = al_load_bitmap("assets/normalSelected.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/a.png") != NULL)
+    {
         ctx->a = al_load_bitmap("assets/a.png");
     }
-     else{
-       printf("Error imagen");
-   }
+    else
+    {
+        printf("Error imagen");
+    }
 
-   
-      if(al_load_bitmap("assets/ap.png")!=NULL){
-         ctx->ap = al_load_bitmap("assets/ap.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-  
-      if(al_load_bitmap("assets/b.png")!=NULL){
+    if (al_load_bitmap("assets/ap.png") != NULL)
+    {
+        ctx->ap = al_load_bitmap("assets/ap.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/b.png") != NULL)
+    {
         ctx->b = al_load_bitmap("assets/b.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-   
-      if(al_load_bitmap("assets/bp.png")!=NULL){
-       ctx->bp = al_load_bitmap("assets/bp.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-    
-      if(al_load_bitmap("assets/c.png")!=NULL){
-       ctx->c = al_load_bitmap("assets/c.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-    
-      if(al_load_bitmap("assets/cp.png")!=NULL){
-         ctx->cp = al_load_bitmap("assets/cp.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-  
-      if(al_load_bitmap("assets/i.png")!=NULL){
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/bp.png") != NULL)
+    {
+        ctx->bp = al_load_bitmap("assets/bp.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/c.png") != NULL)
+    {
+        ctx->c = al_load_bitmap("assets/c.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/cp.png") != NULL)
+    {
+        ctx->cp = al_load_bitmap("assets/cp.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/i.png") != NULL)
+    {
         ctx->i = al_load_bitmap("assets/i.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-   
-      if(al_load_bitmap("assets/ip.png")!=NULL){
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/ip.png") != NULL)
+    {
         ctx->ip = al_load_bitmap("assets/ip.png");
-   }
-    else{
-       printf("Error imagen");
-   }
-   
-      if( al_load_bitmap("assets/sideAlfa.png")!=NULL){
-          ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
-   }
-    else{
-       printf("Error imagen");
-   }
- 
-      if(al_load_bitmap("assets/sideBeta.png")!=NULL){
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/sideAlfa.png") != NULL)
+    {
+        ctx->sideAlfa = al_load_bitmap("assets/sideAlfa.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/sideBeta.png") != NULL)
+    {
         ctx->sideBeta = al_load_bitmap("assets/sideBeta.png");
-   }
-   else{
-       printf("Error imagen");
-   }
-   
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/open.png") != NULL)
+    {
+        ctx->open = al_load_bitmap("assets/open.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
+    if (al_load_bitmap("assets/close.png") != NULL)
+    {
+        ctx->close = al_load_bitmap("assets/close.png");
+    }
+    else
+    {
+        printf("Error imagen");
+    }
+
     must_init(ctx->background, "background");
     must_init(ctx->pathImage, "path");
     return 0;
@@ -332,7 +391,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit;
         y = posyInit + 40 * i;
-        create_path(&alfaentry[i],x,y,40,40);
+        create_path(&alfaentry[i], x, y, 40, 40);
     }
 
     // Alfa Community Exit
@@ -342,7 +401,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit;
         y = posyInit - 40 * i;
-        create_path(&alfaexit[i],x,y,40,40);
+        create_path(&alfaexit[i], x, y, 40, 40);
     }
     posxInit = 670;
     posyInit = 20;
@@ -352,8 +411,8 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit - 40 * k;
         y = posyInit;
-        create_path(&northavenueB[i],x,y,40,40);
-        k++;   
+        create_path(&northavenueB[i], x, y, 40, 40);
+        k++;
     }
     posxInit = 70;
     posyInit += 40;
@@ -362,7 +421,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit + 40 * k;
         y = posyInit;
-        create_path(&northavenueA[i],x,y,40,40);
+        create_path(&northavenueA[i], x, y, 40, 40);
         k++;
     }
     // #########################################
@@ -373,7 +432,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit;
         y = posyInit + 40 * i;
-        create_path(&betaexit[i],x,y,40,40);
+        create_path(&betaexit[i], x, y, 40, 40);
     }
 
     // Beta Community enter
@@ -383,7 +442,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit;
         y = posyInit - 40 * i;
-        create_path(&betaentry[i],x,y,40,40);
+        create_path(&betaentry[i], x, y, 40, 40);
     }
 
     posxInit = 870;
@@ -394,7 +453,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit - 40 * k;
         y = posyInit;
-        create_path(&southavenueB[i],x,y,40,40);
+        create_path(&southavenueB[i], x, y, 40, 40);
         k++;
     }
     posxInit = 910 - AVENUE_COUNT * 40;
@@ -404,7 +463,7 @@ void create_map(GUI_CONTEXT *ctx) //, int lenA, int lenB, int lenC)
     {
         x = posxInit + 40 * k;
         y = posyInit;
-        create_path(&southavenueA[i],x,y,40,40);
+        create_path(&southavenueA[i], x, y, 40, 40);
         k++;
     }
     // ##################################
@@ -442,19 +501,18 @@ int get_type(GUI_CONTEXT *ctx)
         arrayPercent[index] = normal;
         index++;
     }
-    int select = rand()%100;
+    int select = rand() % 100;
     // printf("array[%d] = %d\n",select, arrayPercent[select]);
     return arrayPercent[select];
-
 }
 /**
  * CREATE A RANDOM ALIEN 
  */
 ALIEN *generateAlien(GUI_CONTEXT *ctx)
 {
- 
-    enum alienType type = (enum alienType) get_type(ctx); // RANDOM TYPE
-    enum origin start = (enum origin)(rand() % 2);      // RANDOM COMMUNITY
+
+    enum alienType type = (enum alienType)get_type(ctx); // RANDOM TYPE
+    enum origin start = (enum origin)(rand() % 2);       // RANDOM COMMUNITY
     int emptyqueue = 1;
     if (start == alfaPlanet && (ctx->map[0][2]).blocked)
     {
@@ -465,7 +523,7 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
         emptyqueue = 0;
     }
 
-    BRIDGE *tempBridge;                                 // RANDOM BRIDGE
+    BRIDGE *tempBridge; // RANDOM BRIDGE
     enum bridgePosition tempPos = (enum bridgePosition)(rand() % 3);
     if (tempPos == east)
     {
@@ -568,7 +626,7 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
  */
 
 // WAIT GENERATOR
-void * wait_generation(void *arg )
+void *wait_generation(void *arg)
 {
     GUI_CONTEXT *ctx = (GUI_CONTEXT *)arg;
     while (1)
@@ -598,37 +656,37 @@ int loop_gui(GUI_CONTEXT *ctx)
 
         switch (ctx->event.type)
         {
-            case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                ctx->mouse_pressed = 1;
-                break;
-            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-                ctx->mouse_released = 1;
-                handleMenu(ctx);
-                ctx->mouse_released = 0;
-                ctx->mouse_pressed = 0;
-                break;
-            case ALLEGRO_EVENT_MOUSE_AXES:
-                ctx->x = ctx->event.mouse.x;
-                ctx->y = ctx->event.mouse.y;
-                break;
-            case ALLEGRO_EVENT_TIMER:
-                /**
+        case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+            ctx->mouse_pressed = 1;
+            break;
+        case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+            ctx->mouse_released = 1;
+            handleMenu(ctx);
+            ctx->mouse_released = 0;
+            ctx->mouse_pressed = 0;
+            break;
+        case ALLEGRO_EVENT_MOUSE_AXES:
+            ctx->x = ctx->event.mouse.x;
+            ctx->y = ctx->event.mouse.y;
+            break;
+        case ALLEGRO_EVENT_TIMER:
+            /**
                  * Logic here 
                  */
-                ctx->redraw = true;
-                break;
+            ctx->redraw = true;
+            break;
 
-            case ALLEGRO_EVENT_KEY_DOWN:
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                ctx->done = true;
-                break;
+        case ALLEGRO_EVENT_KEY_DOWN:
+        case ALLEGRO_EVENT_DISPLAY_CLOSE:
+            ctx->done = true;
+            break;
         }
         if (ctx->done)
         {
             printf("Done\n");
             break;
         }
-        
+
         if (ctx->redraw && al_is_event_queue_empty(ctx->queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -643,16 +701,16 @@ int loop_gui(GUI_CONTEXT *ctx)
             if (ctx->alienSelected != NULL)
             {
 
-                ALIEN * temp =ctx->alienSelected;
+                ALIEN *temp = ctx->alienSelected;
                 char strAlienStatus[140];
-                sprintf(strAlienStatus, "id: %d, type: %d",temp->id, (int) temp->type);
+                sprintf(strAlienStatus, "id: %d, type: %d", temp->id, (int)temp->type);
                 al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 610, 0, strAlienStatus);
-                sprintf(strAlienStatus, "x: %.2f, y: %.2f ",temp->x, temp->y);
+                sprintf(strAlienStatus, "x: %.2f, y: %.2f ", temp->x, temp->y);
                 al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 620, 0, strAlienStatus);
-                sprintf(strAlienStatus, "status: %d, speed: %f, weight: %d",temp->status, temp->dx, temp->weight);
+                sprintf(strAlienStatus, "status: %d, speed: %f, weight: %d", temp->status, temp->dx, temp->weight);
                 al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 630, 0, strAlienStatus);
-                sprintf(strAlienStatus, "priority: %d, quatum: %f",temp->alienPriority, temp->quatum);
-                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 640, 0, strAlienStatus);                
+                sprintf(strAlienStatus, "priority: %d, quatum: %f", temp->alienPriority, temp->quatum);
+                al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1000, 640, 0, strAlienStatus);
             }
             else
             {
@@ -663,7 +721,7 @@ int loop_gui(GUI_CONTEXT *ctx)
             drawBridge(ctx->eastBridge, ctx);
             drawBridge(ctx->midBridge, ctx);
             drawBridge(ctx->westBridge, ctx);
-
+            applySemaphoreState(ctx);
             NODE_ALIEN *tempNode = ctx->head;
             while (tempNode != NULL)
             {
@@ -714,17 +772,16 @@ int loop_gui(GUI_CONTEXT *ctx)
                     NODE_ALIEN *temp2 = tempNode->next;
                     DELETE_ALIEN(&(ctx->head), tempNode->data->id);
                     tempNode = temp2;
-                    
                 }
             }
 
             al_flip_display();
             ctx->redraw = false;
-            
+
             /**
              * ALIEN GENERATOR IN A RANDOM NUMBER OF FRAMES
              */
-            if (ctx->generate && ctx->run )
+            if (ctx->generate && ctx->run)
             {
                 ctx->generate = 0;
                 flag = !flag;
@@ -837,15 +894,13 @@ void *moveAlien(void *args)
             break;
         }
     }
-    myAlien->status = killed; 
+    myAlien->status = killed;
 }
-
-
 
 /** 
  * MENU RELATED FUNCTIONS
  * 
- */ 
+ */
 void handleMenu(GUI_CONTEXT *ctx)
 {
     ALIEN *temp = NULL;
@@ -876,16 +931,16 @@ void handleMenu(GUI_CONTEXT *ctx)
     {
         ADD_ALIEN(&(ctx->head), temp);
         lpthread_t t;
-        t=lista1[cuenta1];
+        t = lista1[cuenta1];
         lpthread_create(&t, NULL, moveAlien, (void *)temp);
-            // printf("Cuenta1 %d",cuenta1);
+        // printf("Cuenta1 %d",cuenta1);
         cuenta1++;
     }
 }
 
 void drawMenu(GUI_CONTEXT *ctx)
 {
-    
+
     if (ctx->mouse_pressed && ctx->x >= (1100) && ctx->x <= (1100 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
         al_draw_bitmap(ctx->ap, 1100, 70, 0);
@@ -946,15 +1001,15 @@ void drawMenu(GUI_CONTEXT *ctx)
 void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
 {
     NODE_ALIEN *temp = NULL;
-    if(head!=NULL)
+    if (head != NULL)
     {
         temp = head;
-        while (temp != NULL )
+        while (temp != NULL)
         {
             if (temp->data != NULL)
             {
-                float dx = abs(ctx->x - temp->data->x - 20 );
-                float dy = abs(ctx->y - temp->data->y - 20 );
+                float dx = abs(ctx->x - temp->data->x - 20);
+                float dy = abs(ctx->y - temp->data->y - 20);
                 if (dx <= 10 && dy <= 10)
                 {
                     if (ctx->alienSelected != NULL)
@@ -965,12 +1020,48 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
                     ctx->alienSelected->selected = 1;
                     if (ctx->mouse_pressed == 1 && temp->data->selected)
                     {
-                        KILL_ALIEN( temp->data );
-                    } 
+                        KILL_ALIEN(temp->data);
+                    }
                     break;
                 }
             }
             temp = temp->next;
         }
+    }
+}
+
+void applySemaphoreState(GUI_CONTEXT *ctx)
+{
+    if (ctx->westBridge->yield == 0)
+    {
+        al_draw_bitmap(ctx->close, 235, 115, 0);
+        al_draw_bitmap(ctx->open, 235, 471, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->open, 235, 115, 0);
+        al_draw_bitmap(ctx->close, 235, 471, 0);
+    }
+
+    if (ctx->midBridge->yield == 0)
+    {
+        al_draw_bitmap(ctx->close, 392, 115, 0);
+        al_draw_bitmap(ctx->open, 392, 471, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->open, 392, 115, 0);
+        al_draw_bitmap(ctx->close, 392, 471, 0);
+    }
+
+    if (ctx->eastBridge->yield == 0)
+    {
+        al_draw_bitmap(ctx->close, 592, 115, 0);
+        al_draw_bitmap(ctx->open, 592, 471, 0);
+    }
+    else
+    {
+        al_draw_bitmap(ctx->open, 592, 115, 0);
+        al_draw_bitmap(ctx->close, 592, 471, 0);
     }
 }

@@ -60,6 +60,9 @@ typedef struct GUI_CONTEXT
     ALLEGRO_BITMAP *ip;
     ALLEGRO_BITMAP *sideAlfa;
     ALLEGRO_BITMAP *sideBeta;
+    ALLEGRO_BITMAP *open;
+    ALLEGRO_BITMAP *close;
+
 
     PATH **map;
     BRIDGE *eastBridge;
@@ -95,6 +98,7 @@ void create_map(GUI_CONTEXT *ctx);
 void handleMenu(GUI_CONTEXT *ctx);
 void drawMenu(GUI_CONTEXT *ctx);
 void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head);
+void applySemaphoreState(GUI_CONTEXT *ctx);
 ALIEN *generateAlien(GUI_CONTEXT *ctx);
 
 #endif
