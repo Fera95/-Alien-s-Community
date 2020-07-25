@@ -660,17 +660,16 @@ int loop_gui(GUI_CONTEXT *ctx)
     lpthread_create(&t, NULL, wait_generation, (void *)ctx);
 
     planning(&(ctx->eastBridge));
-    cpu(&(ctx->eastBridge),0);
-    cpu(&(ctx->eastBridge),1);
+    cpu(&(ctx->eastBridge), 0);
+    cpu(&(ctx->eastBridge), 1);
 
     planning(&(ctx->midBridge));
-    cpu(&(ctx->midBridge),0);
-    cpu(&(ctx->midBridge),1);
-    
+    cpu(&(ctx->midBridge), 0);
+    cpu(&(ctx->midBridge), 1);
+
     planning(&(ctx->westBridge));
-    cpu(&(ctx->westBridge),0);
-    cpu(&(ctx->westBridge),1);
-    
+    cpu(&(ctx->westBridge), 0);
+    cpu(&(ctx->westBridge), 1);
 
     int flag = 0;
     while (1)
@@ -958,6 +957,10 @@ void handleMenu(GUI_CONTEXT *ctx)
     /**     * Fourth **/
     if (ctx->mouse_released && ctx->x >= (1010) && ctx->x <= (1010 + 79) && ctx->y <= (70 + 79) && ctx->y >= (70))
     {
+        time_t t;
+        srand((unsigned)time(&t));
+        enum origin myOrigin = rand() % 2;
+        ctx->invader->way->start = myOrigin;
         ctx->invader->hidden = !ctx->invader->hidden;
     }
 
@@ -1102,6 +1105,11 @@ void applySemaphoreState(GUI_CONTEXT *ctx)
 
 INVADER *createInvader(GUI_CONTEXT *ctx)
 {
+    int i, n;
+    time_t t;
+    srand((unsigned)time(&t));
+    enum origin myOrigin = rand() % 2;
+
     ROUTE *route = (ROUTE *)malloc(sizeof(ROUTE));
     route->bridge = NULL;
     route->exit = NULL;
@@ -1110,7 +1118,7 @@ INVADER *createInvader(GUI_CONTEXT *ctx)
     invader->id = -100;
     invader->hidden = 0;
     //  which the origin gin
-    if (ctx->sideSelected == alfaPlanet)
+    if (myOrigin == alfaPlanet)
     {
         route->start = alfaPlanet;
         route->dirx = right;
@@ -1125,7 +1133,7 @@ INVADER *createInvader(GUI_CONTEXT *ctx)
         route->dirx = left;
         route->diry = up;
         invader->x = 888;
-        invader->y = 637;
+        invader->y = 605;
     }
     invader->way = route;
     return invader;
@@ -1138,23 +1146,39 @@ void *canInvaderMove(void *args)
     GUI_CONTEXT *ctx = (GUI_CONTEXT *)args;
     while (1)
     {
-        ctx->invader->y = 41;
-        if (ctx->invader->x > 700)
+
+        if (ctx->invader->way->start == alfaPlanet)
         {
-            ctx->invader->way->dirx = left;
+            ctx->invader->y = 41;
+            if (ctx->invader->x > 700)
+            {
+                ctx->invader->way->dirx = left;
+            }
+            else if (ctx->invader->x < 82)
+            {
+                ctx->invader->way->dirx = right;
+            }
         }
-        else if (ctx->invader->x < 82)
+        else
         {
-            ctx->invader->way->dirx = right;
+            ctx->invader->y = 605;
+            if (ctx->invader->x > 900)
+            {
+                ctx->invader->way->dirx = left;
+            }
+            else if (ctx->invader->x < 275)
+            {
+                ctx->invader->way->dirx = right;
+            }
         }
 
         if (ctx->invader->way->dirx == left)
         {
-            ctx->invader->x = ctx->invader->x - 1.9;
+            ctx->invader->x = ctx->invader->x -2.5;
         }
         else if (ctx->invader->way->dirx == right)
         {
-            ctx->invader->x = ctx->invader->x + 1.9;
+            ctx->invader->x = ctx->invader->x +2.5;
         }
         NODE_ALIEN *temp = NULL;
         if (ctx->head != NULL)
@@ -1164,8 +1188,8 @@ void *canInvaderMove(void *args)
             {
                 if (temp->data != NULL)
                 {
-                    float dx = abs(ctx->invader->x - temp->data->x );
-                    float dy = abs(ctx->invader->y  - temp->data->y );
+                    float dx = abs(ctx->invader->x - temp->data->x);
+                    float dy = abs(ctx->invader->y - temp->data->y);
                     if (dx <= 20 && dy <= 20 && temp->data->type == alfa && ctx->invader->hidden == 0)
                     {
                         if (ctx->alienSelected != NULL)
