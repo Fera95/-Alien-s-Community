@@ -1149,25 +1149,28 @@ void *canInvaderMove(void *args)
 
         if (ctx->invader->way->start == alfaPlanet)
         {
-            ctx->invader->y = 41;
+            // ctx->invader->y = 41;
             if (ctx->invader->x > 700)
             {
+                ctx->invader->y = 61;
                 ctx->invader->way->dirx = left;
             }
             else if (ctx->invader->x < 82)
             {
+                ctx->invader->y = 21;
                 ctx->invader->way->dirx = right;
             }
         }
         else
         {
-            ctx->invader->y = 605;
             if (ctx->invader->x > 900)
             {
+                ctx->invader->y = 625;
                 ctx->invader->way->dirx = left;
             }
             else if (ctx->invader->x < 275)
             {
+                ctx->invader->y = 585;
                 ctx->invader->way->dirx = right;
             }
         }
