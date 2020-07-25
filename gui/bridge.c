@@ -44,7 +44,7 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->position = position;
         newBridge->strength = strength;
         newBridge->scheduler = (enum scheduler_method) scheduler;
-        newBridge->yield = 1;
+        newBridge->yield = northYield;
         newBridge->countAliens = 0;
         newBridge->holdup = 0;
         newBridge->crossTime = length * 40 * 0.025;
@@ -56,6 +56,7 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->pass = malloc(newBridge->length*sizeof(PATH));   
         newBridge->southHead = NULL;
         newBridge->northHead = NULL;
+        newBridge->crossing = NULL;
 
         // CAMBIAR POR UN ENUMERATE
         int init_posx;

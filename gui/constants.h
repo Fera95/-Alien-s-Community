@@ -33,9 +33,10 @@ enum bridgePosition{east, mid, west} ;
 enum origin { alfaPlanet, betaPlanet };
 enum direction{left, right, up, down};
 enum alienType { alfa, beta, normal };
-enum state {new, ready, waiting, running, terminated, killed};
+enum state {new, ready, running, waiting, terminated, killed};
 enum scheduler_method {RoundRobin, Priority, Lottery, FIFO, ShortestFirst};
-enum algorithm {count, Semaphore, Survive };
+enum algorithm {Count, Semaphore, Survive };
+enum yield_option {northYield, southYield, waitYield};
 
 typedef struct PATH
 {
@@ -56,19 +57,21 @@ typedef struct BRIDGE
     int strength;
     int queueSize;
     int scheduler;
-    int planner;
     int planner_north_count;
     int planner_south_count;
     int planner_time;
+    enum algorithm planner;
     // VARIABLES
     enum bridgePosition position;
     double crossTime;
     int countAliens;
     int holdup;
-    int yield;      // 1 SOUTH 0 NORTH
+    enum yield_option yield;      // 1 SOUTH 0 NORTH
     
+    // ALIEN LISTS
     void *northHead;
     void *southHead;
+    void *crossing;
 
     PATH *queueNorth;
     PATH *queueSouth;
@@ -114,7 +117,6 @@ typedef struct ROUTE
 /**
  * ALIEN
  */ 
-
 typedef struct alien_config
 {
     int base_speed;
