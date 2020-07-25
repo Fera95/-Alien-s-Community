@@ -44,7 +44,7 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->position = position;
         newBridge->strength = strength;
         newBridge->scheduler = (enum scheduler_method) scheduler;
-        newBridge->yield = 0;
+        newBridge->yield = 1;
         newBridge->countAliens = 0;
         newBridge->holdup = 0;
         newBridge->crossTime = length * 40 * 0.025;

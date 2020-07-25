@@ -129,7 +129,6 @@ void next_move(ALIEN *alien)//)
             // Avenida -> Cola
             else if(alienRoute->current == alienRoute->avenue1){
                 if(alienRoute->start == alfaPlanet){
-                    enqueue = 1;
                     nextPath = alienRoute->bridge->queueNorth;
                 }
                 else if(alienRoute->start == betaPlanet){
@@ -138,8 +137,7 @@ void next_move(ALIEN *alien)//)
                 nextStatus = ready;
                 tempLimit = alienRoute->bridge->queueSize;
                 tempPos = 0;
-                
-                // LLAMAR A CALENDARIZADOR AQUI ORDENE LA COLA
+                enqueue = 1;
             }
 
             // Cola -> Puente
@@ -155,9 +153,10 @@ void next_move(ALIEN *alien)//)
             // Cola -> Puente
             else if(alienRoute->current == alienRoute->bridge->queueSouth){
                 nextPath = alienRoute->bridge->pass;
-                tempLimit = -1;
                 tempPos = alienRoute->bridge->length-1;
-
+                tempLimit = -1;
+                dequeue = 1;
+                enqueue = 0;
             }
             // Puente -> salida
             else if(alienRoute->current == alienRoute->bridge->pass){
@@ -243,10 +242,16 @@ void next_move(ALIEN *alien)//)
             nextPath[tempPos].blocked = 1;
             nextPath[tempPos].alienID = alien->id;
             alien->status = nextStatus;
-            PATH *queuePath = alienRoute->bridge->queueNorth;
+
             PATH *past = alienRoute->current;
+            PATH *queuePath;
             int pastPos = alienRoute->pos;
-            int sorted = 0;
+            if(alienRoute->start == alfaPlanet){
+                queuePath = alienRoute->bridge->queueNorth;
+            }
+            else if(alienRoute->start == betaPlanet){
+                queuePath = alienRoute->bridge->queueSouth;
+            }
             
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
@@ -269,9 +274,17 @@ void next_move(ALIEN *alien)//)
             // }
 
             // printf("PUENTE: %s enqueue: %d dequeue: %d\n", bridgeName, enqueue, dequeue);
-            if( enqueue && !dequeue )
+            int sorted = 0;
+            if( enqueue )
             {
-                NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->northHead;
+                NODE_ALIEN *head;
+                if(alienRoute->start == alfaPlanet){
+                    head = (NODE_ALIEN*) alienRoute->bridge->northHead;
+                }
+                else if(alienRoute->start == betaPlanet){
+                    head = (NODE_ALIEN*) alienRoute->bridge->southHead;
+                }
+                
                 if(head == NULL){
                     head = malloc(sizeof(NODE_ALIEN));
                     head->data = alien;
@@ -284,21 +297,28 @@ void next_move(ALIEN *alien)//)
                     set_sorted_path(head, queuePath, alienRoute->bridge->queueSize);
                     sorted = 1;             
                 }
-               
-                // printf("PUENTE: %s\n", bridgeName);
-                // print_list2(head, 0);
-                alienRoute->bridge->northHead = (void *) head; 
+                if(alienRoute->start == alfaPlanet){
+                    alienRoute->bridge->northHead = (void *) head; 
+                }
+                else if(alienRoute->start == betaPlanet){
+                    alienRoute->bridge->southHead = (void *) head; 
+                }
+                
             }
             else if ( dequeue )
             {
-                NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->northHead;
-                REMOVE_ALIEN(&head, alien->id);
-                // print_list2(head, 0);
-                alienRoute->bridge->northHead = (void *) head; 
+                if(alienRoute->start == alfaPlanet){
+                    NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->northHead;
+                    REMOVE_ALIEN(&head, alien->id);
+                    alienRoute->bridge->northHead = (void *) head; 
 
-
+                }
+                else if(alienRoute->start == betaPlanet){
+                    NODE_ALIEN *head = (NODE_ALIEN*) alienRoute->bridge->southHead;
+                    REMOVE_ALIEN(&head, alien->id);
+                    alienRoute->bridge->southHead = (void *) head; 
+                }   
             }
-            // printf("DELETING ALIEN iD:%d FROm: %s ",alien->id, bridgeName);
             past[pastPos].blocked = 0;
             past[pastPos].alienID = -1;         
     
@@ -360,24 +380,31 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
             {
                 result = 1;
             }
-            
-
+        }
+        else if(nextPATH == myBridge->queueSouth )
+        {
+            if(get_length( myBridge->southHead ) == myBridge->queueSize)
+            {
+                result = 0;
+            }
+            else
+            {
+                result = 1;
+            }
         }
         else if(nextPATH == myBridge->pass && alienMoving->way->current != myBridge->pass)
         {      
             int nextholdup = alienMoving->weight + myBridge->holdup;
             if( nextholdup <= myBridge->strength){
-                if(myBridge->yield && alienMoving->way->start == alfaPlanet){
-                    
+                if(myBridge->yield && alienMoving->way->start == alfaPlanet)
+                {    
                     myBridge->holdup = nextholdup;
-                    result = 1;
-                    
+                    result = 1;   
                 }
                 else if (!myBridge->yield && alienMoving->way->start == betaPlanet)
                 {
                     myBridge->holdup = nextholdup;
                     result = 1;
-                    // printf("Puente: %d Coutner BetA: %d\n", myBridge->position, myBridge->countAliens);   
                 }
                 else
                 {
@@ -397,9 +424,6 @@ int can_move( ALIEN *alienMoving, PATH *nextPATH, int pos)
                 myBridge->countAliens++;
                 if(myBridge->countAliens >= 3)
                 {
-                    if(debug){
-                        printf("CAMBIO DE LA VIA \n");
-                    }  
                     myBridge->countAliens = 0;
                     myBridge->yield = !myBridge->yield;
                 }

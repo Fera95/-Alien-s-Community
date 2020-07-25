@@ -104,7 +104,7 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
       else if(deadWay->start == betaPlanet)
       {
         if(deadWay->current == deadWay->bridge->queueSouth){
-          REMOVE_ALIEN(deadWay->bridge->southHead, deadAlien->id);
+          REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->southHead), deadAlien->id);
         }
       }
       deadWay->finished = 1;
