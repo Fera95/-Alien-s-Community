@@ -640,6 +640,36 @@ void *wait_generation(void *arg)
     }
 }
 
+
+void show_data_bridge( GUI_CONTEXT *ctx,  BRIDGE *printBridge, char* nombre, int pos_x, int pos_y ){
+    char strBridgeStatus[140];
+    sprintf(strBridgeStatus, "%s BRIDGE",nombre);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t YIELD: %d",printBridge->yield);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t HOLDUP: %d",printBridge->holdup);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t STRENGTH: %d",printBridge->strength);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t LENGTH: %d",printBridge->length);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t CROSSING: %d",get_length(printBridge->crossing));
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t NORTH QUEUE: %d",get_length(printBridge->northHead));
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t SOUTH QUEUE: %d",get_length(printBridge->southHead));
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+
+}
+
+
 int loop_gui(GUI_CONTEXT *ctx)
 {
     al_start_timer(ctx->timer);
@@ -712,9 +742,14 @@ int loop_gui(GUI_CONTEXT *ctx)
             char str[30];
             sprintf(str, " x: %d, y: %d", ctx->x, ctx->y);
             al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1100, 20, 0, str);
+
+            show_data_bridge(ctx, ctx->eastBridge, "EAST", 1000, 320);
+            show_data_bridge(ctx, ctx->midBridge, "MID", 1000, 410);
+            show_data_bridge(ctx, ctx->westBridge, "WEST", 1000, 500);
+
             if (ctx->alienSelected != NULL)
             {
-
+            
                 ALIEN *temp = ctx->alienSelected;
                 char strAlienStatus[140];
                 sprintf(strAlienStatus, "id: %d, type: %d", temp->id, (int)temp->type);
@@ -806,8 +841,6 @@ int loop_gui(GUI_CONTEXT *ctx)
                     t2 = lista2[cuenta2];
                     lpthread_create(&t2, NULL, moveAlien, (void *)myAlien);
                     ADD_ALIEN(&(ctx->head), myAlien);
-                    // printf("NEW ALIEN ID: %d\n",myAlien->id);
-                    // printf("Cuenta2 %d",cuenta2);
                     cuenta2++;
                 }
             }
@@ -815,6 +848,8 @@ int loop_gui(GUI_CONTEXT *ctx)
     }
     finalize_gui(ctx);
 }
+
+
 
 void drawmap(PATH **map, GUI_CONTEXT *ctx)
 {
