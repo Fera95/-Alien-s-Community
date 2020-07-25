@@ -14,6 +14,7 @@
 #include "route.h"
 #include "alien.h"
 #include "path.h"
+#include "cpu.h"
 
 
 /**

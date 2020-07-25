@@ -648,6 +648,20 @@ int loop_gui(GUI_CONTEXT *ctx)
     al_start_timer(timer);
     lpthread_t t;
     lpthread_create(&t, NULL, wait_generation, (void *)ctx);
+
+    planning(&(ctx->eastBridge));
+    cpu(&(ctx->eastBridge),0);
+    cpu(&(ctx->eastBridge),1);
+
+    planning(&(ctx->midBridge));
+    cpu(&(ctx->midBridge),0);
+    cpu(&(ctx->midBridge),1);
+    
+    planning(&(ctx->westBridge));
+    cpu(&(ctx->westBridge),0);
+    cpu(&(ctx->westBridge),1);
+    
+
     int flag = 0;
     while (1)
     {
@@ -1032,7 +1046,7 @@ void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head)
 
 void applySemaphoreState(GUI_CONTEXT *ctx)
 {
-    if (ctx->eastBridge->yield == 0)
+    if (ctx->eastBridge->yield != northYield)
     {
         al_draw_bitmap(ctx->close, 235, 115, 0);
         al_draw_bitmap(ctx->open, 235, 471, 0);
@@ -1043,7 +1057,7 @@ void applySemaphoreState(GUI_CONTEXT *ctx)
         al_draw_bitmap(ctx->close, 235, 471, 0);
     }
 
-    if (ctx->midBridge->yield == 0)
+    if (ctx->midBridge->yield != northYield)
     {
         al_draw_bitmap(ctx->close, 392, 115, 0);
         al_draw_bitmap(ctx->open, 392, 471, 0);
@@ -1054,7 +1068,7 @@ void applySemaphoreState(GUI_CONTEXT *ctx)
         al_draw_bitmap(ctx->close, 392, 471, 0);
     }
 
-    if (ctx->westBridge->yield == 0)
+    if (ctx->westBridge->yield != northYield)
     {
         al_draw_bitmap(ctx->close, 592, 115, 0);
         al_draw_bitmap(ctx->open, 592, 471, 0);
