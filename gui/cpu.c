@@ -10,7 +10,7 @@ void *cpu_north_ready_queue(void * arg)
         {       
             lpthread_mutex_lock(&(*bridge)->yield_semaphore);
             NODE_ALIEN * temp = head;
-            if((*bridge)->yield == northYield)
+            if((*bridge)->yield == northYield ) //&& !(*bridge)->waiting)
             {
                 // printf("PUENTE %d YIELD: %d\n", (*bridge)->position, (*bridge)->yield);
                 if( temp!=NULL)
@@ -19,7 +19,6 @@ void *cpu_north_ready_queue(void * arg)
                     int nextHoldup = temp->data->weight + (*bridge)->holdup;
                     if(nextHoldup <= (*bridge)->strength && (*bridge)->yield == northYield)
                     {
-                        // printf("PUENTE %d NEXT HOLD: %d YIELD: %d\n", (*bridge)->position, nextHoldup, (*bridge)->yield);
                         if (temp->data->status == ready)
                         {
                             temp->data->status = running;
@@ -45,7 +44,7 @@ void *cpu_south_ready_queue(void * arg)
         {   
             lpthread_mutex_lock(&(*bridge)->yield_semaphore); 
             NODE_ALIEN * temp = head;
-            if((*bridge)->yield == southYield)
+            if((*bridge)->yield == southYield )//&& !(*bridge)->waiting)
             {
                 if( temp!=NULL)
                 {
@@ -113,38 +112,29 @@ void cpu ( BRIDGE ** bridge, int cardinal )
  */
 void * rutineSurvive(void *arg){
     BRIDGE ** bridge = (BRIDGE**) arg;
-    (*bridge)->yield = waitYield;
+    (*bridge)->yield = northYield;
+
     while ( bridge != NULL )
     {
         lpthread_mutex_lock(&(*bridge)->yield_semaphore); 
         if(get_length((*bridge)->crossing) == 0 && (*bridge)->holdup == 0){
             if(get_length((*bridge)->northHead) > 0 && get_length((*bridge)->southHead) == 0){
-                (*bridge)->yield = northYield;
+                if((*bridge)->yield != northYield){
+                    (*bridge)->yield = northYield;
+                    // (*bridge)->waiting = 1;
+                }
             }
             else if(get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) == 0){
-                (*bridge)->yield = southYield;
-                
-            }
-            else if(get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) > 0){
-                NODE_ALIEN* northQueue = (NODE_ALIEN*) (*bridge)->northHead;
-                NODE_ALIEN* southQueue = (NODE_ALIEN*) (*bridge)->southHead;
-                
-                if( northQueue->data->weight > (*bridge)->strength )
-                {
-                    (*bridge)->yield = northYield;
-                }
-                else if (southQueue->data->weight > (*bridge)->strength)
-                {
+                if((*bridge)->yield != southYield){
                     (*bridge)->yield = southYield;
-                }
-                else
-                {
-                    (*bridge)->yield = northYield;
+                    // (*bridge)->waiting = 1;
                 }
             }
-            else
-            {
-                (*bridge)->yield = northYield;
+            else if (get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) > 0) {
+                if((*bridge)->yield != northYield){
+                    (*bridge)->yield = northYield;
+                    // (*bridge)->waiting = 1;
+                }
             }
         }
         lpthread_mutex_unlock(&(*bridge)->yield_semaphore); 
