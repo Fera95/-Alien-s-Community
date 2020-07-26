@@ -57,14 +57,16 @@ typedef struct BRIDGE
     int strength;
     int queueSize;
     int scheduler;
-    int planner_north_count;
-    int planner_south_count;
-    int planner_time;
+    double planner_time_north;
+    double planner_time_south;
+    int planner_count;
     enum algorithm planner;
     // VARIABLES
     enum bridgePosition position;
     double crossTime;
+    double tempTime;
     int countAliens;
+    int tempCount;
     int holdup;
     enum yield_option yield;      // 1 SOUTH 0 NORTH
     int waiting;
@@ -90,9 +92,9 @@ typedef struct
     int queueSize;
     int scheduler;
     int planner;
-    int planner_time;
-    int planner_north_count;
-    int planner_south_count;
+    double planner_time_north;
+    double planner_time_south;
+    int planner_count;
 } config_bridge;
 
 typedef struct ROUTE 

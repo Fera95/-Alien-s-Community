@@ -94,29 +94,40 @@ void KILL_ALIEN(struct ALIEN *deadAlien)
   if(deadAlien != NULL)
   {
     ROUTE *deadWay = deadAlien->way;
-    if(deadWay->current != deadWay->bridge->pass )
-    {
-      if(deadWay->start == alfaPlanet){
-        if(deadWay->current == deadWay->bridge->queueNorth){
-          REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->northHead), deadAlien->id);
+  
+    if(deadWay->current == deadWay->bridge->pass){
+      NODE_ALIEN *headCross = (NODE_ALIEN*)(deadWay->bridge->crossing);
+      printf("KILLING INSIDE BRIDGE ALIEN ID:%d\n", deadAlien->id);
+      ALIEN *temp =get_by_id(headCross,deadAlien->id);
+      if(temp != NULL){
+        REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->crossing), temp->id);
+        deadWay->bridge->holdup -= temp->weight;
+        if(deadWay->bridge->waiting){
+          if(get_length(deadWay->bridge->crossing)<=0){
+              deadWay->bridge->waiting=0;
+          }
         }
-      }
-      else if(deadWay->start == betaPlanet)
-      {
-        if(deadWay->current == deadWay->bridge->queueSouth){
-          REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->southHead), deadAlien->id);
-        }
-      }
-      deadWay->finished = 1;
-      if(deadWay->current[deadWay->pos].alienID == deadAlien->id)
-      {
-          deadWay->current[deadWay->pos].blocked = 0;
-          deadWay->current[deadWay->pos].alienID = 1;
       }
     }
-    else
+    else if(deadWay->start == alfaPlanet){
+      if(deadWay->current == deadWay->bridge->queueNorth){
+        printf("KILLING INSIDE QUEUE ALFA\n");
+        REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->northHead), deadAlien->id);
+      }
+    }
+    else if(deadWay->start == betaPlanet)
     {
-      printf("ERROR :THE ALIEN ID: %d CAN NOT BE KILLED DURING HIS TIME IN THE PROCESSOR\n", deadAlien->id);
+      if(deadWay->current == deadWay->bridge->queueSouth){
+        printf("KILLING INSIDE QUEUE BETA\n");
+        REMOVE_ALIEN((NODE_ALIEN**)&(deadWay->bridge->southHead), deadAlien->id);
+      }
+    }
+
+    deadWay->finished = 1;
+    if(deadWay->current[deadWay->pos].alienID == deadAlien->id)
+    {
+        deadWay->current[deadWay->pos].blocked = 0;
+        deadWay->current[deadWay->pos].alienID = 1;
     }
   }
 }
@@ -413,12 +424,15 @@ void swap(NODE_ALIEN *head, int index1, int index2) {
 }
 
 ALIEN *get_by_id(NODE_ALIEN *head, int id) {
-  int length = get_length(head);
-  NODE_ALIEN * current = head;
+  if (head != NULL)
+  {
+    int length = get_length(head);
+    NODE_ALIEN * current = head;
 
-  for(int i = 0; i < length; ++i){
-    if(current->data->id == id) return current->data;
-    current = current->next;
+    for(int i = 0; i < length; ++i){
+      if(current->data->id == id) return current->data;
+      current = current->next;
+    }
   }
   return NULL;
 }

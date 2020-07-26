@@ -664,7 +664,16 @@ void show_data_bridge( GUI_CONTEXT *ctx,  BRIDGE *printBridge, char* nombre, int
     sprintf(strBridgeStatus, "\t STRENGTH: %d",printBridge->strength);
     al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
     pos_y+=10;
-    sprintf(strBridgeStatus, "\t LENGTH: %d",printBridge->length);
+    sprintf(strBridgeStatus, "\t PLANNER: %d",printBridge->planner);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t COUNT SPEC: %d",printBridge->planner_count);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t TIME SPEC NORTH: %f",printBridge->planner_time_north);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
+    sprintf(strBridgeStatus, "\t TIME SPEC SOUTH: %f",printBridge->planner_time_south);
     al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
     pos_y+=10;
     sprintf(strBridgeStatus, "\t CROSSING: %d",get_length(printBridge->crossing));
@@ -676,6 +685,41 @@ void show_data_bridge( GUI_CONTEXT *ctx,  BRIDGE *printBridge, char* nombre, int
     sprintf(strBridgeStatus, "\t SOUTH QUEUE: %d",get_length(printBridge->southHead));
     al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
 
+}
+
+void show_tempCount(GUI_CONTEXT *ctx, BRIDGE * bridge){
+    int pos_x, pos_y;
+    if(bridge->position == east){
+        pos_x = 195;
+        pos_y = 315;
+    }
+    else if(bridge->position == mid){
+        pos_x = 345;
+        pos_y = 315;
+    }
+    else if(bridge->position == west){
+        pos_x = 535;
+        pos_y = 315;
+    }
+    char strBridgeStatus[140];
+    sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=15;
+    if(bridge->planner == Count){
+        sprintf(strBridgeStatus, "COUNT: %d",bridge->tempCount);
+        al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+        pos_y+=10;
+    }
+    else if (bridge->planner == Semaphore)
+    {
+        
+        sprintf(strBridgeStatus, "TIME: %.2f",bridge->tempTime);
+        al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+        pos_y+=15;
+    }   
+    if(bridge->waiting){
+        al_draw_filled_circle( pos_x+5,pos_y, 4, al_map_rgb(255, 255, 0) );
+    }
 }
 
 
@@ -690,16 +734,17 @@ int loop_gui(GUI_CONTEXT *ctx)
     lpthread_create(&t, NULL, wait_generation, (void *)ctx);
 
     planning(&(ctx->eastBridge));
-    cpu(&(ctx->eastBridge), 0);
-    cpu(&(ctx->eastBridge), 1);
+    // cpu(&(ctx->eastBridge),0);
+    // cpu(&(ctx->eastBridge),1);
 
     planning(&(ctx->midBridge));
-    cpu(&(ctx->midBridge), 0);
-    cpu(&(ctx->midBridge), 1);
-
+    // cpu(&(ctx->midBridge),0);
+    // cpu(&(ctx->midBridge),1);
+    
     planning(&(ctx->westBridge));
-    cpu(&(ctx->westBridge), 0);
-    cpu(&(ctx->westBridge), 1);
+    // cpu(&(ctx->westBridge),0);
+    // cpu(&(ctx->westBridge),1);
+    
 
     int flag = 0;
     while (1)
@@ -752,9 +797,9 @@ int loop_gui(GUI_CONTEXT *ctx)
             sprintf(str, " x: %d, y: %d", ctx->x, ctx->y);
             al_draw_text(ctx->font, al_map_rgb(255, 255, 255), 1100, 20, 0, str);
 
-            show_data_bridge(ctx, ctx->eastBridge, "EAST", 1000, 320);
-            show_data_bridge(ctx, ctx->midBridge, "MID", 1000, 410);
-            show_data_bridge(ctx, ctx->westBridge, "WEST", 1000, 500);
+            show_data_bridge(ctx, ctx->eastBridge, "EAST", 1000, 220);
+            show_data_bridge(ctx, ctx->midBridge, "MID", 1000, 350);
+            show_data_bridge(ctx, ctx->westBridge, "WEST", 1000, 480);
 
             if (ctx->alienSelected != NULL)
             {
@@ -784,6 +829,9 @@ int loop_gui(GUI_CONTEXT *ctx)
             {
                 al_draw_bitmap(ctx->invaderImage, ctx->invader->x, ctx->invader->y, flag);
             }
+            show_tempCount(ctx, ctx->eastBridge);
+            show_tempCount(ctx, ctx->midBridge);
+            show_tempCount(ctx, ctx->westBridge);
             NODE_ALIEN *tempNode = ctx->head;
             while (tempNode != NULL)
             {
