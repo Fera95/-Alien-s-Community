@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "limits": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

@@ -14,6 +14,7 @@
 #include "route.h"
 #include "alien.h"
 #include "path.h"
+#include "cpu.h"
 
 
 /**
@@ -45,6 +46,7 @@ typedef struct GUI_CONTEXT
     ALLEGRO_BITMAP *betaCommunity;
     ALLEGRO_BITMAP *betaImage;
     ALLEGRO_BITMAP *alfaImage;
+    ALLEGRO_BITMAP *invaderImage;
     ALLEGRO_BITMAP *normalImage;
     // Menu Images
     ALLEGRO_BITMAP *alfaSelected;
@@ -60,6 +62,9 @@ typedef struct GUI_CONTEXT
     ALLEGRO_BITMAP *ip;
     ALLEGRO_BITMAP *sideAlfa;
     ALLEGRO_BITMAP *sideBeta;
+    ALLEGRO_BITMAP *open;
+    ALLEGRO_BITMAP *close;
+
 
     PATH **map;
     BRIDGE *eastBridge;
@@ -81,6 +86,8 @@ typedef struct GUI_CONTEXT
     enum origin sideSelected;   // side selected 0 alfa, 1 is beta   
     ALIEN *alienSelected;       // selected alien
     NODE_ALIEN *head;           //head the first node
+
+    INVADER *invader;
 } GUI_CONTEXT;
 
 int init_gui(GUI_CONTEXT *ctx);
@@ -95,6 +102,9 @@ void create_map(GUI_CONTEXT *ctx);
 void handleMenu(GUI_CONTEXT *ctx);
 void drawMenu(GUI_CONTEXT *ctx);
 void clickedAlien(GUI_CONTEXT *ctx, NODE_ALIEN *head);
+void applySemaphoreState(GUI_CONTEXT *ctx);
+INVADER * createInvader(GUI_CONTEXT *ctx);
+void dismissInvader(GUI_CONTEXT *ctx);
+void moveInvader(GUI_CONTEXT *ctx);
 ALIEN *generateAlien(GUI_CONTEXT *ctx);
-
 #endif

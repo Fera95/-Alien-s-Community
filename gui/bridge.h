@@ -13,6 +13,7 @@
 
 void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePosition position );
 void print_bridge(BRIDGE * bridge2print);
+// void put_at_tail(BRIDGE * bridge2print, int cardinal);
 config_bridge load_bridge(enum bridgePosition pos);
 
 #endif

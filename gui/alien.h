@@ -48,22 +48,7 @@ int get_length(NODE_ALIEN * head);
 //removes alien by id
 ALIEN *remove_by_id(NODE_ALIEN *head, int id);
 
-
-
-/**
- * SORT OPTIONS
- */ 
-void sort_list(NODE_ALIEN **head, int option);
-
 //swaps the content of two nodes one by one
 void swap_one_by_one(struct NODE_ALIEN *a, struct NODE_ALIEN *b);
-
-//orders list by priority 
-void order_list_by_priority(NODE_ALIEN *head);
-
-//gets a loterry winner
-NODE_ALIEN * order_list_by_lotery(NODE_ALIEN *head);
-
-
 
 #endif

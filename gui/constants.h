@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include "LPTHREAD/lpthread_mutex_posix.h"
 // PATH
 #define EXIT_COUNT 11
 #define ENTRY_COUNT 11
@@ -33,8 +33,10 @@ enum bridgePosition{east, mid, west} ;
 enum origin { alfaPlanet, betaPlanet };
 enum direction{left, right, up, down};
 enum alienType { alfa, beta, normal };
-// enum state {kill, };
-
+enum state {new, ready, running, waiting, terminated, killed};
+enum scheduler_method {RoundRobin, Priority, Lottery, FIFO, ShortestFirst};
+enum algorithm {Count, Semaphore, Survive };
+enum yield_option {northYield, southYield, waitYield};
 
 typedef struct PATH
 {
@@ -50,25 +52,30 @@ typedef struct PATH
 
 typedef struct BRIDGE
 {
+    // CONFIG
     int length;
     int strength;
     int queueSize;
     int scheduler;
-    int planner;
-    int planner_north_count;
-    int planner_south_count;
-    int planner_time;
-    // CONFIG
+    double planner_time_north;
+    double planner_time_south;
+    int planner_count;
+    enum algorithm planner;
+    // VARIABLES
     enum bridgePosition position;
     double crossTime;
+    double tempTime;
     int countAliens;
-    int blocked;
-    int full;
-    int yield; // 1 SOUTH 0 NORTH
-    // double quatum;
-    
+    int tempCount;
+    int holdup;
+    enum yield_option yield;      // 1 SOUTH 0 NORTH
+    int waiting;
+    lpthread_mutex yield_semaphore;
+
+    // ALIEN LISTS
     void *northHead;
     void *southHead;
+    void *crossing;
 
     PATH *queueNorth;
     PATH *queueSouth;
@@ -76,8 +83,7 @@ typedef struct BRIDGE
     PATH *exitSouth;
     PATH *pass;
     
-}
-BRIDGE;
+} BRIDGE;
 
 typedef struct 
 {
@@ -86,9 +92,9 @@ typedef struct
     int queueSize;
     int scheduler;
     int planner;
-    int planner_time;
-    int planner_north_count;
-    int planner_south_count;
+    double planner_time_north;
+    double planner_time_south;
+    int planner_count;
 } config_bridge;
 
 typedef struct ROUTE 
@@ -115,7 +121,6 @@ typedef struct ROUTE
 /**
  * ALIEN
  */ 
-
 typedef struct alien_config
 {
     int base_speed;
@@ -131,13 +136,14 @@ typedef struct alien_config
 typedef struct ALIEN
 {
     int selected;           // FLAG TO SELECT ALIEN
-    int deleted;            // FLAG TO FREE MEMORY
+    enum state status;      // FLAG TO FREE MEMORY
     int id;                 // IDENTIFER
     int tickets;            // LOTTERY ALGORITHM
     int alienPriority;      // PRIORITY ALGORITHM
     int weight;             // ALIEN WEIGHT TO PASS THE BRIDGE
     float x, y;             // COORDS IN SPACE
     float dx, dy;           // SPEED
+    float quatum;           // Quatum
     enum alienType type;    // TYPE OF ALIEN
     ROUTE * way;            // ROUTE THE ALIEN IS GOING TO TAKE
     
@@ -157,6 +163,7 @@ typedef struct INVADER
     float x, y;     // COORDENADAS
     float dx, dy;   // SPEED
     ROUTE * way;    // HIGHWAY    
+    int hidden; // 1 is hidden 0 is shown
 } INVADER;
 
 
