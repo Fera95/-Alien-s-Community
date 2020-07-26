@@ -442,28 +442,35 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             else if (alienMoving->status == ready && !myBridge->waiting) {
                 if( (alienMoving->way->start == alfaPlanet && myBridge->yield == northYield) || (alienMoving->way->start == betaPlanet && myBridge->yield == southYield ))
                 {
-                    if (myBridge->planner == Count){
-                        int nextCount = myBridge->tempCount + 1;
-                        if(nextCount <= myBridge->planner_count){
+                    int nextHoldup = alienMoving->weight + myBridge->holdup;
+                    if(nextHoldup <= myBridge->strength){
+
+                        
+                        if (myBridge->planner == Count){
+                            int nextCount = myBridge->tempCount + 1;
+                            if(nextCount <= myBridge->planner_count){
+                                result = 1;
+                            }
+                            else {
+                                result = 0;
+                            }
+                        }
+                        else if (myBridge->planner == Semaphore)
+                        {
+                            // double myTimeCross = myBridge->crossTime / alienMoving->dy;
+                            if(0 < myBridge->tempTime){
+                                result = 1;
+                            }
+                            else {
+                                result = 0;
+                            }
+                        }
+                        else if (myBridge->planner == Survive){
                             result = 1;
                         }
-                        else {
-                            result = 0;
-                        }
                     }
-                    else if (myBridge->planner == Semaphore)
-                    {
-                        // double myTimeCross = myBridge->crossTime / alienMoving->dy;
-                        if(0 < myBridge->tempTime){
-                            result = 1;
-                        }
-                        else {
-                            result = 0;
-                        }
-                    }
-                    else if (myBridge->planner == Survive)
-                    {
-                        result = 1;
+                    else {
+                        result = 0;
                     }                    
                 }
                 else {

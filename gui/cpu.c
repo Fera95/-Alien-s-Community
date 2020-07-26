@@ -119,7 +119,6 @@ void cpu ( BRIDGE ** bridge, int cardinal )
 }
 
 
-
 /**
  * 
  */
@@ -129,26 +128,31 @@ void * rutineSurvive(void *arg){
     while ( bridge != NULL )
     {
         if(get_length((*bridge)->crossing) == 0 && (*bridge)->holdup == 0){
+            int change_yield = 0;
             if(get_length((*bridge)->northHead) > 0 && get_length((*bridge)->southHead) == 0){
                 if((*bridge)->yield != northYield){
                     (*bridge)->yield = northYield;
-                    (*bridge)->waiting = 1;
+                    change_yield = 1;
                 }
             }
             else if(get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) == 0){
                 if((*bridge)->yield != southYield){
                     (*bridge)->yield = southYield;
-                    (*bridge)->waiting = 1;
+                    change_yield= 1;
                 }
             }
             else if (get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) > 0) {
                 if((*bridge)->yield != northYield){
                     (*bridge)->yield = northYield;
+                    change_yield = 1;
+                }
+            }
+            if(change_yield){
+                if(get_length((*bridge)->crossing) > 0){
                     (*bridge)->waiting = 1;
                 }
             }
         }
-        usleep(12500);
     }
 }
 
@@ -253,11 +257,12 @@ void *rutineSemaphore(void *arg)
         usleep(12500);
     }
 }
+
 void planning ( BRIDGE **bridge)
 {
     enum algorithm plan = (*bridge)->planner;
     lpthread_t t02;
-    lpthread_create(&t02, NULL, rutineSemaphore, (void *)bridge);
+    lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
     // lpthread_create(&t02, NULL, rutineCount, (void *)bridge);
 
     // switch (plan)
