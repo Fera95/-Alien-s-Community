@@ -44,10 +44,16 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->position = position;
         newBridge->strength = strength;
         newBridge->scheduler = (enum scheduler_method) scheduler;
-        newBridge->yield = northYield;
         newBridge->countAliens = 0;
         newBridge->holdup = 0;
         newBridge->crossTime = length * 40 * 0.025;
+        newBridge->yield = northYield;
+        lpthread_mutex_init(&(newBridge->yield_semaphore)); 
+        // if(newBridge->yield_semaphore == NULL){
+        //     printf("SEMAPHORE ERROR: BRIDGE %d COULD NOT INITIALIZE THE YIELD SEMAPHORE\n", position);
+        //     *ctxBridge = NULL;
+        //     return;
+        // }
 
         newBridge->queueNorth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->queueSouth = malloc(newBridge->queueSize*sizeof(PATH));

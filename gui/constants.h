@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include "LPTHREAD/lpthread_mutex_posix.h"
 // PATH
 #define EXIT_COUNT 11
 #define ENTRY_COUNT 11
@@ -67,7 +67,8 @@ typedef struct BRIDGE
     int countAliens;
     int holdup;
     enum yield_option yield;      // 1 SOUTH 0 NORTH
-    
+    lpthread_mutex yield_semaphore;
+
     // ALIEN LISTS
     void *northHead;
     void *southHead;
@@ -132,7 +133,7 @@ typedef struct alien_config
 typedef struct ALIEN
 {
     int selected;           // FLAG TO SELECT ALIEN
-    enum state status;            // FLAG TO FREE MEMORY
+    enum state status;      // FLAG TO FREE MEMORY
     int id;                 // IDENTIFER
     int tickets;            // LOTTERY ALGORITHM
     int alienPriority;      // PRIORITY ALGORITHM

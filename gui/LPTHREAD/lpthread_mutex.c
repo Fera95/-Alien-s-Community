@@ -57,7 +57,6 @@ lpthread_mutex_unlock_slowpath(lpthread_mutex *mutex,
 }
 
 void lpthread_mutex_lock(lpthread_mutex *mutex) {
- sleep(1);
     if (mutex->i[2] == 1){
      
        printf("Lock: Mutex no existente: Violación de segmento (`core' generado) \n");
@@ -70,7 +69,6 @@ void lpthread_mutex_lock(lpthread_mutex *mutex) {
 }
 
 void lpthread_mutex_unlock(lpthread_mutex *mutex) {
-  sleep(1);
       if (mutex->i[2] == 1){
         
        printf("Unlock: Mutex no existente: Violación de segmento (`core' generado)  \n");
@@ -87,7 +85,6 @@ void lpthread_mutex_unlock(lpthread_mutex *mutex) {
 }
 
 ebool lpthread_mutex_trylock(lpthread_mutex *mutex) {
-    sleep(1);
     if (mutex->i[2] == 1){
         
        printf("Trylock: Mutex no existente: Violación de segmento (`core' generado)  \n");
