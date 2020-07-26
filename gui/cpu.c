@@ -170,6 +170,7 @@ void *rutineCount(void * arg)
                 (*bridge)->waiting = 1;
             }
         }
+        usleep(12500);
     }  
 }
 
