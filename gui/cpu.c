@@ -262,21 +262,18 @@ void planning ( BRIDGE **bridge)
 {
     enum algorithm plan = (*bridge)->planner;
     lpthread_t t02;
-    lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
-    // lpthread_create(&t02, NULL, rutineCount, (void *)bridge);
-
-    // switch (plan)
-    // {
-    // case Count:
-    //     rutineCount((void *)bridge);
-    //     break;
-    // case Semaphore:
-    //     rutineSemaphore((void *)bridge);
-    //     break;
-    // case Survive:
-    //     lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
-    //     break;
-    // default:
-    //     break;
-    // }
+    switch (plan)
+    {
+    case Count:
+        lpthread_create(&t02, NULL, rutineCount, (void *)bridge);
+        break;
+    case Semaphore:
+        lpthread_create(&t02, NULL, rutineSemaphore, (void *)bridge);
+        break;
+    case Survive:
+        lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
+        break;
+    default:
+        break;
+    }
 }
