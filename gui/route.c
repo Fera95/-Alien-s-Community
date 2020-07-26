@@ -327,6 +327,9 @@ void next_move(ALIEN *alien) //)
                 ADD_ALIEN(&crossList, alien);
                 alienRoute->bridge->crossing = (void*) crossList;
                 (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup + alien->weight;
+                if (alienRoute->bridge->planner == Count){
+                    (alienRoute->bridge->tempCount)++;
+                }
             }
             else if (crossed)
             {
@@ -335,10 +338,11 @@ void next_move(ALIEN *alien) //)
                 (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup - alien->weight;
                 alienRoute->bridge->crossing = (void *)crossList;
                 (alienRoute->bridge->countAliens)++;
-                if(get_length(crossList) == 0){
-                    alienRoute->bridge->waiting = 0;
+                if (alienRoute->bridge->planner == Count){
+                    if(get_length(crossList) == 0){
+                        alienRoute->bridge->waiting = 0;
+                    }
                 }
-                
             }
             NODE_ALIEN *first;
             if (alienRoute->start == alfaPlanet)
@@ -451,8 +455,7 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             }
         }
         else if (nextPATH == myBridge->pass){
-            if (alienMoving->status == running)
-            {
+            if (alienMoving->status == running){
                 result = 1;
             }
             else
