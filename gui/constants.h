@@ -67,6 +67,7 @@ typedef struct BRIDGE
     int countAliens;
     int holdup;
     enum yield_option yield;      // 1 SOUTH 0 NORTH
+    int waiting;
     lpthread_mutex yield_semaphore;
 
     // ALIEN LISTS

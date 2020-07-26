@@ -335,6 +335,10 @@ void next_move(ALIEN *alien) //)
                 (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup - alien->weight;
                 alienRoute->bridge->crossing = (void *)crossList;
                 (alienRoute->bridge->countAliens)++;
+                if(get_length(crossList) == 0){
+                    alienRoute->bridge->waiting = 0;
+                }
+                
             }
             NODE_ALIEN *first;
             if (alienRoute->start == alfaPlanet)

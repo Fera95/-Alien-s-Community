@@ -48,12 +48,9 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->holdup = 0;
         newBridge->crossTime = length * 40 * 0.025;
         newBridge->yield = northYield;
+        newBridge->waiting = 1;
         lpthread_mutex_init(&(newBridge->yield_semaphore)); 
-        // if(newBridge->yield_semaphore == NULL){
-        //     printf("SEMAPHORE ERROR: BRIDGE %d COULD NOT INITIALIZE THE YIELD SEMAPHORE\n", position);
-        //     *ctxBridge = NULL;
-        //     return;
-        // }
+        
 
         newBridge->queueNorth = malloc(newBridge->queueSize*sizeof(PATH));
         newBridge->queueSouth = malloc(newBridge->queueSize*sizeof(PATH));
