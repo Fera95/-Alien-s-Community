@@ -251,7 +251,6 @@ void next_move(ALIEN *alien) //)
 
         if (available)
         {
-
             nextPath[tempPos].blocked = 1;
             nextPath[tempPos].alienID = alien->id;
 
@@ -303,15 +302,10 @@ void next_move(ALIEN *alien) //)
                 set_sorted_path(head, queuePath, alienRoute->bridge->queueSize);
                 if (alienRoute->start == alfaPlanet)
                 {
-                    // printf("ID BRIDGE %d LIST NORTH\n", alienRoute->bridge->position);
-                    // print_list2(head, 0);
-
                     alienRoute->bridge->northHead = (void *)head;
                 }
                 else if (alienRoute->start == betaPlanet)
                 {
-                    // printf("ID BRIDGE %d LIST SOUTH\n", alienRoute->bridge->position);
-                    // print_list2(head, 0);
                     alienRoute->bridge->southHead = (void *)head;
                 }
             }
@@ -331,13 +325,14 @@ void next_move(ALIEN *alien) //)
                 }
                 NODE_ALIEN *crossList = (NODE_ALIEN *)alienRoute->bridge->crossing;
                 ADD_ALIEN(&crossList, alien);
-
-                
+                alienRoute->bridge->crossing = (void*) crossList;
+                (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup + alien->weight;
             }
             else if (crossed)
             {
                 NODE_ALIEN *crossList = (NODE_ALIEN *)alienRoute->bridge->crossing;
                 REMOVE_ALIEN(&crossList, alien->id);
+                (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup - alien->weight;
                 alienRoute->bridge->crossing = (void *)crossList;
                 (alienRoute->bridge->countAliens)++;
             }
@@ -451,9 +446,8 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
                 result = 1;
             }
         }
-        else if (nextPATH == myBridge->pass)
-        {
-            if (alienMoving->status == running )
+        else if (nextPATH == myBridge->pass){
+            if (alienMoving->status == running)
             {
                 result = 1;
             }

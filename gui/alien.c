@@ -84,7 +84,7 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     newAlien->status = new;
     newAlien->tickets = 20;
     newAlien->alienPriority = (rand()%10) + 1;
-    newAlien->weight = 1;//(rand()%5)+1;
+    newAlien->weight = 1;
     newAlien->quatum = 1;
     return newAlien;
 }
