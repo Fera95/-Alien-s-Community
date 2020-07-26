@@ -340,10 +340,8 @@ void next_move(ALIEN *alien) //)
                 (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup - alien->weight;
                 alienRoute->bridge->crossing = (void *)crossList;
                 (alienRoute->bridge->countAliens)++;
-                if (alienRoute->bridge->planner == Count){
-                    if(get_length(crossList) == 0){
-                        alienRoute->bridge->waiting = 0;
-                    }
+                if(alien->status == terminated && get_length(crossList) == 0){
+                    alienRoute->bridge->waiting = 0;
                 }
             }
             NODE_ALIEN *first;
@@ -438,22 +436,35 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             }
         }
         else if (nextPATH == myBridge->pass){
-            BRIDGE *tempBridge = alienMoving->way->bridge;
-            if (alienMoving->status == running){
+            if (alienMoving->status == running ){
                 result = 1;
             }
-            else if (alienMoving->status == ready && !tempBridge->waiting) {
-                if( (alienMoving->way->start == alfaPlanet && tempBridge->yield == northYield) || (alienMoving->way->start == betaPlanet && tempBridge->yield == southYield ))
+            else if (alienMoving->status == ready && !myBridge->waiting) {
+                if( (alienMoving->way->start == alfaPlanet && myBridge->yield == northYield) || (alienMoving->way->start == betaPlanet && myBridge->yield == southYield ))
                 {
-                    if (tempBridge->planner == Count){
-                        int nextCount = tempBridge->tempCount + 1;
-                        if(nextCount <= tempBridge->planner_count){
+                    if (myBridge->planner == Count){
+                        int nextCount = myBridge->tempCount + 1;
+                        if(nextCount <= myBridge->planner_count){
                             result = 1;
                         }
                         else {
                             result = 0;
                         }
                     }
+                    else if (myBridge->planner == Semaphore)
+                    {
+                        // double myTimeCross = myBridge->crossTime / alienMoving->dy;
+                        if(0 < myBridge->tempTime){
+                            result = 1;
+                        }
+                        else {
+                            result = 0;
+                        }
+                    }
+                    else if (myBridge->planner == Survive)
+                    {
+                        result = 1;
+                    }                    
                 }
                 else {
                     result = 0;

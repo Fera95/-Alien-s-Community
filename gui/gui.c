@@ -693,15 +693,24 @@ void show_tempCount(GUI_CONTEXT *ctx, BRIDGE * bridge){
         pos_y = 315;
     }
     char strBridgeStatus[140];
+    sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
     if(bridge->planner == Count){
         sprintf(strBridgeStatus, "COUNT: %d",bridge->tempCount);
         al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
         pos_y+=10;
     }
-       
-    sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
-    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
-    
+    else if (bridge->planner == Semaphore)
+    {
+        
+        sprintf(strBridgeStatus, "TIME: %.2f",bridge->tempTime);
+        al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+        pos_y+=15;
+        if(bridge->waiting){
+            al_draw_filled_circle( pos_x+5,pos_y, 4, al_map_rgb(255, 255, 0) );
+        }
+    }   
 }
 
 

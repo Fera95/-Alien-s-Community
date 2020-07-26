@@ -126,33 +126,31 @@ void cpu ( BRIDGE ** bridge, int cardinal )
 void * rutineSurvive(void *arg){
     BRIDGE ** bridge = (BRIDGE**) arg;
     (*bridge)->yield = northYield;
-
     while ( bridge != NULL )
     {
         if(get_length((*bridge)->crossing) == 0 && (*bridge)->holdup == 0){
             if(get_length((*bridge)->northHead) > 0 && get_length((*bridge)->southHead) == 0){
                 if((*bridge)->yield != northYield){
                     (*bridge)->yield = northYield;
-                    // (*bridge)->waiting = 1;
+                    (*bridge)->waiting = 1;
                 }
             }
             else if(get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) == 0){
                 if((*bridge)->yield != southYield){
                     (*bridge)->yield = southYield;
-                    // (*bridge)->waiting = 1;
+                    (*bridge)->waiting = 1;
                 }
             }
             else if (get_length((*bridge)->southHead) > 0 && get_length((*bridge)->northHead) > 0) {
                 if((*bridge)->yield != northYield){
                     (*bridge)->yield = northYield;
-                    // (*bridge)->waiting = 1;
+                    (*bridge)->waiting = 1;
                 }
             }
         }
+        usleep(12500);
     }
 }
-
-
 
 void *rutineCount(void * arg)
 { 
@@ -216,15 +214,51 @@ void *rutineCount(void * arg)
     }  
 }
 
-void rutineSemaphore(void *bridge){
-
+void *rutineSemaphore(void *arg)
+{
+    BRIDGE ** bridge = (BRIDGE**) arg; 
+    while ((*bridge)!=NULL)
+    {
+        int change_yield = 0;
+        double northTime = (*bridge)->planner_time_north;
+        double southTime = (*bridge)->planner_time_south;
+        (*bridge)->tempTime = 0;
+        if((*bridge)->yield == northYield){
+            (*bridge)->tempTime = northTime;
+        }
+        else if((*bridge)->yield == southYield){
+            (*bridge)->tempTime = southTime;
+        }
+        while (1){
+            if(!(*bridge)->waiting ){
+                (*bridge)->tempTime-=0.125;
+                if((*bridge)->tempTime < 0){
+                    break;
+                }
+                usleep(125000);
+            }
+        }
+        if(get_length((*bridge)->crossing) > 0){
+            (*bridge)->waiting = 1;
+        }
+        while ((*bridge)->waiting){
+            usleep(125000);
+        }
+        if((*bridge)->yield == northYield){
+            (*bridge)->yield = southYield;
+        }
+        else if((*bridge)->yield == southYield){
+            (*bridge)->yield = northYield;
+        }
+        usleep(12500);
+    }
 }
 void planning ( BRIDGE **bridge)
 {
     enum algorithm plan = (*bridge)->planner;
     lpthread_t t02;
-    // lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
-    lpthread_create(&t02, NULL, rutineCount, (void *)bridge);
+    lpthread_create(&t02, NULL, rutineSemaphore, (void *)bridge);
+    // lpthread_create(&t02, NULL, rutineCount, (void *)bridge);
 
     // switch (plan)
     // {
