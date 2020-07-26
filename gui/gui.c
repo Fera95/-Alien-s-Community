@@ -963,11 +963,15 @@ void handleMenu(GUI_CONTEXT *ctx)
         ctx->invader->way->start = myOrigin;
         if (ctx->invader->way->start == alfaPlanet)
         {
-            ctx->invader->y = 21;
+            ctx->invader->x = 83;
+            ctx->invader->y = 61;
+            ctx->invader->way->dirx = right;
         }
         else
         {
+            ctx->invader->x = 276;
             ctx->invader->y = 585;
+            ctx->invader->way->dirx = left;
         }
         ctx->invader->hidden = !ctx->invader->hidden;
     }
@@ -1160,26 +1164,27 @@ void *canInvaderMove(void *args)
 
             if (ctx->invader->x > 700)
             {
-                ctx->invader->y = 61;
+                ctx->invader->y = 21;
                 ctx->invader->way->dirx = left;
             }
             else if (ctx->invader->x < 82)
             {
-                ctx->invader->y = 21;
+                ctx->invader->y = 61;
                 ctx->invader->way->dirx = right;
             }
         }
         else
         {
+            
 
             if (ctx->invader->x > 900)
             {
-                ctx->invader->y = 625;
+                ctx->invader->y = 585;
                 ctx->invader->way->dirx = left;
             }
             else if (ctx->invader->x < 275)
             {
-                ctx->invader->y = 585;
+                ctx->invader->y = 625;
                 ctx->invader->way->dirx = right;
             }
         }
@@ -1215,32 +1220,32 @@ void *canInvaderMove(void *args)
                             KILL_ALIEN(ctx->alienSelected);
                             ctx->invader->hidden = 1;
                         }
-                        else // rebase
-                        {
-                            if (ctx->invader->way->start == alfaPlanet)
-                            {
+                        // else // rebase
+                        // {
+                        //     if (ctx->invader->way->start == alfaPlanet)
+                        //     {
 
-                                if (ctx->invader->y == 21)
-                                {
-                                    ctx->invader->y = 61;
-                                }
-                                else
-                                {
-                                    ctx->invader->y = 21;
-                                }
-                            }
-                            else // beta planet
-                            {
-                                if (ctx->invader->y == 625)
-                                {
-                                    ctx->invader->y = 585;
-                                }
-                                else
-                                {
-                                    ctx->invader->y = 625;
-                                }
-                            }
-                        }
+                        //         if (ctx->invader->y == 21)
+                        //         {
+                        //             ctx->invader->y = 61;
+                        //         }
+                        //         else
+                        //         {
+                        //             ctx->invader->y = 21;
+                        //         }
+                        //     }
+                        //     else // beta planet
+                        //     {
+                        //         if (ctx->invader->y == 625)
+                        //         {
+                        //             ctx->invader->y = 585;
+                        //         }
+                        //         else
+                        //         {
+                        //             ctx->invader->y = 625;
+                        //         }
+                        //     }
+                        // }
 
                         break;
                     }
@@ -1256,8 +1261,3 @@ void moveInvader(GUI_CONTEXT *ctx)
     lpthread_t t;
     lpthread_create(&t, NULL, canInvaderMove, (void *)(ctx));
 }
-
-/**
- * 
- *  
- */
