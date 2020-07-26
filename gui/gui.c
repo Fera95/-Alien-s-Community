@@ -689,18 +689,9 @@ void show_data_bridge( GUI_CONTEXT *ctx,  BRIDGE *printBridge, char* nombre, int
 
 void show_tempCount(GUI_CONTEXT *ctx, BRIDGE * bridge){
     int pos_x, pos_y;
-    if(bridge->position == east){
-        pos_x = 195;
-        pos_y = 315;
-    }
-    else if(bridge->position == mid){
-        pos_x = 345;
-        pos_y = 315;
-    }
-    else if(bridge->position == west){
-        pos_x = 535;
-        pos_y = 315;
-    }
+    pos_x = bridge->exitSouth[0].x + 45;
+    pos_y = bridge->exitSouth[0].y + 45;
+
     char strBridgeStatus[140];
     sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
     al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
@@ -734,17 +725,8 @@ int loop_gui(GUI_CONTEXT *ctx)
     lpthread_create(&t, NULL, wait_generation, (void *)ctx);
 
     planning(&(ctx->eastBridge));
-    // cpu(&(ctx->eastBridge),0);
-    // cpu(&(ctx->eastBridge),1);
-
     planning(&(ctx->midBridge));
-    // cpu(&(ctx->midBridge),0);
-    // cpu(&(ctx->midBridge),1);
-    
     planning(&(ctx->westBridge));
-    // cpu(&(ctx->westBridge),0);
-    // cpu(&(ctx->westBridge),1);
-    
 
     int flag = 0;
     while (1)
