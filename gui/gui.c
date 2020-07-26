@@ -688,29 +688,52 @@ void show_data_bridge( GUI_CONTEXT *ctx,  BRIDGE *printBridge, char* nombre, int
 }
 
 void show_tempCount(GUI_CONTEXT *ctx, BRIDGE * bridge){
-    int pos_x, pos_y;
-    pos_x = bridge->exitSouth[0].x + 45;
-    pos_y = bridge->exitSouth[0].y + 45;
-
-    char strBridgeStatus[140];
+    int pos_x, pos_y, temp_posx, temp_posy;
+    pos_y = bridge->pass[0].y + 40 * ((bridge->length) / 2);
+    pos_x = bridge->pass[0].x + 50;
+    temp_posy = pos_y;
+    temp_posx = pos_x;
+    char strBridgeStatus[20];
+    int bg_len, bg_height;
     sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
-    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    bg_len = al_get_text_width(ctx->font, strBridgeStatus);
+    bg_height = al_get_font_line_height(ctx->font);
+    temp_posx = pos_x +bg_len;
+    
+    al_draw_filled_rectangle(pos_x-2, pos_y-2, pos_x + 2 + bg_len, pos_y + 2 + bg_height, al_map_rgb(255, 255, 255));
+    al_draw_text(ctx->font, al_map_rgb(183, 0, 255), pos_x, pos_y, 0, strBridgeStatus);
     pos_y+=15;
+    
     if(bridge->planner == Count){
         sprintf(strBridgeStatus, "COUNT: %d",bridge->tempCount);
-        al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
-        pos_y+=10;
+        
+        bg_len = al_get_text_width(ctx->font, strBridgeStatus);
+        bg_height = al_get_font_line_height(ctx->font);
+        temp_posx = pos_x +bg_len > temp_posx ? pos_x +bg_len : temp_posx;
+
+        al_draw_filled_rectangle(pos_x-2, pos_y-2, pos_x + 2 + bg_len, pos_y + 2 + bg_height, al_map_rgb(255, 255, 255));
+        al_draw_text(ctx->font, al_map_rgb(183, 0, 255), pos_x, pos_y, 0, strBridgeStatus);
+
+        pos_y+=15;
     }
     else if (bridge->planner == Semaphore)
     {
-        
         sprintf(strBridgeStatus, "TIME: %.2f",bridge->tempTime);
-        al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+        
+        bg_len = al_get_text_width(ctx->font, strBridgeStatus);
+        bg_height = al_get_font_line_height(ctx->font);
+        temp_posx = pos_x +bg_len > temp_posx ? pos_x +bg_len : temp_posx;
+        
+        al_draw_filled_rectangle(pos_x-2, pos_y-2, pos_x + 2 + bg_len, pos_y + 2 + bg_height, al_map_rgb(255, 255, 255));
+        al_draw_text(ctx->font, al_map_rgb(183, 0, 255), pos_x, pos_y, 0, strBridgeStatus);
         pos_y+=15;
     }   
+
     if(bridge->waiting){
-        al_draw_filled_circle( pos_x+5,pos_y, 4, al_map_rgb(255, 255, 0) );
+        al_draw_filled_circle( pos_x+40,pos_y+5, 4, al_map_rgb(255, 255, 0) );
+        pos_y+=10;
     }
+    al_draw_rectangle(pos_x-2, temp_posy-6, temp_posx + 2, pos_y, al_map_rgb(183, 0, 255), 1);
 }
 
 
