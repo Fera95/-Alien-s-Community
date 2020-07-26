@@ -46,13 +46,26 @@ void *cpu_south_ready_queue(void * arg)
             NODE_ALIEN * temp = head;
             if((*bridge)->yield == southYield )//&& !(*bridge)->waiting)
             {
-                if( temp!=NULL)
-                {
+                if( temp!=NULL){
                     int nextHoldup = temp->data->weight + (*bridge)->holdup;
                     if(nextHoldup <= (*bridge)->strength && (*bridge)->yield == southYield){
-                        if (temp->data->status == ready)
-                        {
-                            temp->data->status = running;
+                        if (temp->data->status == ready){
+                            if((*bridge)->planner == Count){
+                                int nextCout = (*bridge)->tempCount + 1;
+                                if (nextCout <= (*bridge)->planner_count){
+                                    if(!(*bridge)->waiting){
+                                        temp->data->status = running;
+                                    }
+                                }
+                                else
+                                {
+                                    printf("count al limite\n");
+                                }
+                                
+                            }
+                            else{
+                                temp->data->status = running;
+                            }
                         }
                     }
                 }
@@ -116,7 +129,6 @@ void * rutineSurvive(void *arg){
 
     while ( bridge != NULL )
     {
-        lpthread_mutex_lock(&(*bridge)->yield_semaphore); 
         if(get_length((*bridge)->crossing) == 0 && (*bridge)->holdup == 0){
             if(get_length((*bridge)->northHead) > 0 && get_length((*bridge)->southHead) == 0){
                 if((*bridge)->yield != northYield){
@@ -137,13 +149,73 @@ void * rutineSurvive(void *arg){
                 }
             }
         }
-        lpthread_mutex_unlock(&(*bridge)->yield_semaphore); 
     }
 }
 
-void rutineCount(void *bridge){
 
+
+void *rutineCount(void * arg)
+{ 
+    BRIDGE ** bridge = (BRIDGE**) arg;  
+    while ((*bridge)!=NULL)
+    {
+        int change_yield = 0;
+        NODE_ALIEN *queueNorth = (NODE_ALIEN *) (*bridge)->northHead;
+        NODE_ALIEN *queueSouth = (NODE_ALIEN *) (*bridge)->southHead;
+        if((*bridge)->tempCount >= (*bridge)->planner_count)
+        {
+            (*bridge)->tempCount = 0;
+            if((*bridge)->yield == northYield){
+                (*bridge)->yield = southYield;
+                change_yield = 1;
+            }
+            else if((*bridge)->yield == southYield){
+                (*bridge)->yield = northYield;
+                change_yield = 1;
+            }
+        }
+        else
+        {
+            int lenNorth = get_length(queueNorth);
+            int lenSouth = get_length(queueSouth);
+            if (lenNorth == 0 && lenSouth != 0){
+                if((*bridge)->yield != southYield){
+                    change_yield = 1;
+                    (*bridge)->yield = southYield;
+                }
+            }
+            else if (lenSouth == 0 && lenNorth != 0){
+                if((*bridge)->yield != northYield){
+                    change_yield = 1;
+                    (*bridge)->yield = northYield;
+                }
+            }
+            else {
+                if( lenNorth < (*bridge)->planner_count && lenSouth < (*bridge)->planner_count){
+                    if(lenNorth < lenSouth) {
+                        if((*bridge)->yield != southYield){
+                            change_yield = 1;
+                            (*bridge)->yield = southYield;
+                        }
+                    }
+                    else if(lenNorth > lenSouth) {
+                        if((*bridge)->yield != northYield){
+                            change_yield = 1;
+                            (*bridge)->yield = northYield;
+                        }
+                    }
+                }
+            }
+        }
+        if(change_yield){
+            if(get_length((*bridge)->crossing) != 0){
+                (*bridge)->waiting = 1;
+            }
+        }
+        usleep(12500);
+    }  
 }
+
 void rutineSemaphore(void *bridge){
 
 }
@@ -151,7 +223,8 @@ void planning ( BRIDGE **bridge)
 {
     enum algorithm plan = (*bridge)->planner;
     lpthread_t t02;
-    lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
+    // lpthread_create(&t02, NULL, rutineSurvive, (void *)bridge);
+    lpthread_create(&t02, NULL, rutineCount, (void *)bridge);
 
     // switch (plan)
     // {
