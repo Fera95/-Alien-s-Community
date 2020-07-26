@@ -693,6 +693,9 @@ void show_tempCount(GUI_CONTEXT *ctx, BRIDGE * bridge){
         pos_y = 315;
     }
     char strBridgeStatus[140];
+    sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
+    al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+    pos_y+=10;
     if(bridge->planner == Count){
         sprintf(strBridgeStatus, "COUNT: %d",bridge->tempCount);
         al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
@@ -702,6 +705,16 @@ void show_tempCount(GUI_CONTEXT *ctx, BRIDGE * bridge){
     sprintf(strBridgeStatus, "TOTAL: %d",bridge->countAliens);
     al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
     
+    if (bridge->planner == Semaphore)
+    {
+        
+        sprintf(strBridgeStatus, "TIME: %.2f",bridge->tempTime);
+        al_draw_text(ctx->font, al_map_rgb(255, 255, 255), pos_x, pos_y, 0, strBridgeStatus);
+        pos_y+=15;
+        if(bridge->waiting){
+            al_draw_filled_circle( pos_x+5,pos_y, 4, al_map_rgb(255, 255, 0) );
+        }
+    }   
 }
 
 
@@ -715,16 +728,16 @@ int loop_gui(GUI_CONTEXT *ctx)
     lpthread_create(&t, NULL, wait_generation, (void *)ctx);
 
     planning(&(ctx->eastBridge));
-    cpu(&(ctx->eastBridge),0);
-    cpu(&(ctx->eastBridge),1);
+    // cpu(&(ctx->eastBridge),0);
+    // cpu(&(ctx->eastBridge),1);
 
     planning(&(ctx->midBridge));
-    cpu(&(ctx->midBridge),0);
-    cpu(&(ctx->midBridge),1);
+    // cpu(&(ctx->midBridge),0);
+    // cpu(&(ctx->midBridge),1);
     
     planning(&(ctx->westBridge));
-    cpu(&(ctx->westBridge),0);
-    cpu(&(ctx->westBridge),1);
+    // cpu(&(ctx->westBridge),0);
+    // cpu(&(ctx->westBridge),1);
     
 
     int flag = 0;

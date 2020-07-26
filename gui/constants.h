@@ -64,6 +64,7 @@ typedef struct BRIDGE
     // VARIABLES
     enum bridgePosition position;
     double crossTime;
+    double tempTime;
     int countAliens;
     int tempCount;
     int holdup;

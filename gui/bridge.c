@@ -28,7 +28,7 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
     {
         printf("ERROR: Bridge %d scheduler not allowed, please enter a value between 0 and 4\n",position);   
     }
-    else if (northTime < 0 || southTime < 0)
+    else if (northTime < 1 || southTime < 1)
     {
         printf("ERROR: Bridge %d time spect not allowed, please enter a value grader than 0\n",position);   
     }
@@ -72,6 +72,9 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->yield = northYield;
         newBridge->waiting = 0;
         newBridge->tempCount = 0;
+        newBridge->tempTime = 0;
+        newBridge->planner_time_north = northTime;
+        newBridge->planner_time_south = southTime;
         lpthread_mutex_init(&(newBridge->yield_semaphore)); 
         
 

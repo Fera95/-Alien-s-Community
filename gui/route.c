@@ -86,8 +86,7 @@ void next_move(ALIEN *alien) //)
         }
     }
 
-    if (change_pos)
-    {
+    if (change_pos){
         enum state nextStatus = -1;
         PATH *nextPath = alienRoute->current;
         int tempPos = alienRoute->pos;
@@ -148,14 +147,17 @@ void next_move(ALIEN *alien) //)
             // Cola -> Puente
             else if (alienRoute->current == alienRoute->bridge->queueNorth)
             {
+                nextStatus = running;
                 nextPath = alienRoute->bridge->pass;
                 tempLimit = alienRoute->bridge->length;
                 tempPos = 0;
                 dequeue = 1;
+
             }
             // Cola -> Puente
             else if (alienRoute->current == alienRoute->bridge->queueSouth)
             {
+                nextStatus = running;
                 nextPath = alienRoute->bridge->pass;
                 tempPos = alienRoute->bridge->length - 1;
                 tempLimit = -1;
@@ -338,10 +340,8 @@ void next_move(ALIEN *alien) //)
                 (alienRoute->bridge)->holdup = (alienRoute->bridge)->holdup - alien->weight;
                 alienRoute->bridge->crossing = (void *)crossList;
                 (alienRoute->bridge->countAliens)++;
-                if (alienRoute->bridge->planner == Count){
-                    if(get_length(crossList) == 0){
-                        alienRoute->bridge->waiting = 0;
-                    }
+                if(alien->status == terminated && get_length(crossList) == 0){
+                    alienRoute->bridge->waiting = 0;
                 }
             }
             NODE_ALIEN *first;
@@ -394,24 +394,6 @@ void next_move(ALIEN *alien) //)
         }
     }
 }
-/** PRINT DE PUENTE CON NOMBRE
-    // char* bridgeName;
-            // switch (alienRoute->bridge->position)
-            // {
-            // case 0:
-            //     bridgeName = "east";
-            //     break;
-            // case 1:
-            //     bridgeName = "mid";
-            //     break;
-            // case 2:
-            //     bridgeName = "west";
-            //     break;
-            
-            // default:
-            //     break;
-            // }
-*/
 int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
 {
     int result = 0;
@@ -431,7 +413,6 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
     else
     {
         BRIDGE *myBridge = alienMoving->way->bridge;
-        bool debug = 0;
         if (nextPATH == myBridge->queueNorth)
         {
             if (get_length(myBridge->northHead) == myBridge->queueSize)
@@ -455,8 +436,39 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             }
         }
         else if (nextPATH == myBridge->pass){
-            if (alienMoving->status == running){
+            if (alienMoving->status == running ){
                 result = 1;
+            }
+            else if (alienMoving->status == ready && !myBridge->waiting) {
+                if( (alienMoving->way->start == alfaPlanet && myBridge->yield == northYield) || (alienMoving->way->start == betaPlanet && myBridge->yield == southYield ))
+                {
+                    if (myBridge->planner == Count){
+                        int nextCount = myBridge->tempCount + 1;
+                        if(nextCount <= myBridge->planner_count){
+                            result = 1;
+                        }
+                        else {
+                            result = 0;
+                        }
+                    }
+                    else if (myBridge->planner == Semaphore)
+                    {
+                        // double myTimeCross = myBridge->crossTime / alienMoving->dy;
+                        if(0 < myBridge->tempTime){
+                            result = 1;
+                        }
+                        else {
+                            result = 0;
+                        }
+                    }
+                    else if (myBridge->planner == Survive)
+                    {
+                        result = 1;
+                    }                    
+                }
+                else {
+                    result = 0;
+                }                
             }
             else
             {
