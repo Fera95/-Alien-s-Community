@@ -139,8 +139,11 @@ typedef struct ALIEN
     enum state status;      // FLAG TO FREE MEMORY
     int id;                 // IDENTIFER
     int tickets;            // LOTTERY ALGORITHM
+    int RR_pos;             // ROUND ROBIN ALGORITHM
+    PATH* RR_path;          // ROUND ROBIN ALGORITHM
     int alienPriority;      // PRIORITY ALGORITHM
     int weight;             // ALIEN WEIGHT TO PASS THE BRIDGE
+    int sleep;
     float x, y;             // COORDS IN SPACE
     float dx, dy;           // SPEED
     float quatum;           // Quatum

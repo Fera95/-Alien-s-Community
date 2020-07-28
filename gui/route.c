@@ -38,6 +38,79 @@ ROUTE *create_route(BRIDGE **bridge, PATH **map, enum origin start)
     return newRoute;
 }
 
+
+void set_waiting(ALIEN * alien){
+    float *next_x = &alien->x;
+    float *next_y = &alien->y;
+    (alien->RR_path) = alien->way->current;
+    alien->RR_pos = alien->way->pos;
+    alien->status = waiting;
+    PATH* pastPath = alien->way->current;
+    int pastPos = alien->way->pos;
+    
+    alien->sleep = 1;
+
+    NODE_ALIEN * queue;
+    PATH * queuePath;
+    alien->way->pos = 0;
+
+    if(alien->way->start ==  alfaPlanet){
+        *next_x= alien->way->bridge->queueNorth[0].x - 40;
+        *next_y= alien->way->bridge->queueNorth[0].y;
+        queue = (NODE_ALIEN* ) alien->way->bridge->northHead;
+        alien->way->current = alien->way->bridge->queueNorth;
+        queuePath = alien->way->bridge->queueNorth;
+    
+    }
+    else if(alien->way->start ==  betaPlanet){
+        *next_x= alien->way->bridge->queueSouth[0].x + 40;
+        *next_y= alien->way->bridge->queueSouth[0].y;
+        queue = (NODE_ALIEN* )alien->way->bridge->southHead;
+        queuePath = alien->way->bridge->queueSouth;
+
+
+
+    }
+    NODE_ALIEN * cross = (NODE_ALIEN* )alien->way->bridge->crossing;
+    ADD_ALIEN(&queue, alien);
+    if(alien->way->start ==  alfaPlanet){
+        alien->way->bridge->northHead = (void* )queue;
+    }
+    else if (alien->way->start ==  betaPlanet) {
+            alien->way->bridge->southHead = (void* )queue;
+    }
+    
+
+    REMOVE_ALIEN (&cross, alien->id);
+    alien->way->bridge->holdup = alien->way->bridge->holdup - (alien->weight);
+    alien->way->bridge->crossing= (void* )cross;
+    if(get_length(cross)==0){
+        alien->way->bridge->waiting = 0;
+    }
+    pastPath[pastPos].blocked=0;
+    pastPath[pastPos].alienID=-1;
+    
+    for (int i = 0; i < alien->way->bridge->queueSize; i++)
+    {
+        if(!queuePath[i].blocked){
+            queuePath[i].blocked = 1;
+            queuePath[i].alienID = alien->id;
+            alien->way->current = queuePath;
+            alien->way->pos = i;
+            alien->way->limit = alien->way->bridge->queueSize;
+            alien->x = queuePath[i].x;
+            alien->y = queuePath[i].y;
+            alien->sleep = 0;
+            break;
+        }            
+    }
+    
+}
+
+int check_RoundRobin(ALIEN *alienMoving, PATH *nextPATH, int pos) {
+
+}
+
 void next_move(ALIEN *alien) //)
 {
     float *next_x = &alien->x;
@@ -47,8 +120,31 @@ void next_move(ALIEN *alien) //)
     float dy = alien->dy;
     int change_pos = 1;
     float tempx, tempy;
-
-    if (alienRoute->diry == down)
+    int move = 1;
+    if(alien->way->bridge->scheduler == RoundRobin){
+        // printf("%p\n",(void *)alien->way->bridge, );
+        if(alien->status == running && alien->way->bridge->waiting){
+            change_pos = 0;
+            set_waiting(alien);
+        }
+        else if (alien->status == waiting) {
+            if(alien->sleep){
+                change_pos = 0;
+                move=0;
+            }
+            else{
+                move = 1;
+            }
+            // else {
+            //     NODE_ALIEN * queue = (NODE_ALIEN*) alien->way->bridge->northHead;
+            //     // if(get_at(queue))
+            // }
+            
+        }
+        
+    }
+    
+    if (alienRoute->diry == down && move)
     {
         tempy = *next_y + dy;
         if (tempy < alienRoute->current[alienRoute->pos].y)
@@ -57,7 +153,8 @@ void next_move(ALIEN *alien) //)
             change_pos = 0;
         }
     }
-    if (alienRoute->diry == up)
+    
+    if (alienRoute->diry == up && move)
     {
         tempy = *next_y - dy;
         if (tempy > alienRoute->current[alienRoute->pos].y)
@@ -67,7 +164,7 @@ void next_move(ALIEN *alien) //)
         }
     }
 
-    if (alienRoute->dirx == left)
+    if (alienRoute->dirx == left && move)
     {
         tempx = *next_x - dx;
         if (tempx > alienRoute->current[alienRoute->pos].x)
@@ -76,7 +173,8 @@ void next_move(ALIEN *alien) //)
             change_pos = 0;
         }
     }
-    if (alienRoute->dirx == right)
+    
+    if (alienRoute->dirx == right && move)
     {
         tempx = *next_x + dx;
         if (tempx < alienRoute->current[alienRoute->pos].x)
@@ -138,7 +236,7 @@ void next_move(ALIEN *alien) //)
                 {
                     nextPath = alienRoute->bridge->queueSouth;
                 }
-                // nextStatus = ready;
+                nextStatus = ready;
                 tempLimit = alienRoute->bridge->queueSize;
                 tempPos = 0;
                 enqueue = 1;
@@ -148,18 +246,32 @@ void next_move(ALIEN *alien) //)
             else if (alienRoute->current == alienRoute->bridge->queueNorth)
             {
                 nextStatus = running;
-                nextPath = alienRoute->bridge->pass;
+                if(alien->status == waiting) {
+                    printf("SET TO ROUND ROBIN\n");
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = alien->RR_pos;
+                }
+                else if (alien->status == ready) {
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = 0;
+                }
+                
                 tempLimit = alienRoute->bridge->length;
-                tempPos = 0;
                 dequeue = 1;
 
             }
             // Cola -> Puente
             else if (alienRoute->current == alienRoute->bridge->queueSouth)
             {
-                nextStatus = running;
-                nextPath = alienRoute->bridge->pass;
-                tempPos = alienRoute->bridge->length - 1;
+                if(alien->status == waiting) {
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = alien->RR_pos;
+                }
+                else if (alien->status == ready) {
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = alienRoute->bridge->length - 1;
+                }
+                nextStatus = running;                
                 tempLimit = -1;
                 dequeue = 1;
             }
@@ -245,10 +357,14 @@ void next_move(ALIEN *alien) //)
             {
                 alienRoute->finished = 1;
             }
+            else if (alien->status == waiting)
+            {
+                printf("ESTOY DE PRIMERO HIJUEPUTAS %d\n",alien->id);
+            }
+            
         }
 
         int available = can_move(alien, nextPath, tempPos);
-
         // LLAMAR AL SEMAFORO DEL PUENTE
 
         if (available)
@@ -256,10 +372,6 @@ void next_move(ALIEN *alien) //)
             nextPath[tempPos].blocked = 1;
             nextPath[tempPos].alienID = alien->id;
 
-            if (nextStatus != -1)
-            {
-                alien->status = nextStatus;
-            }
 
             PATH *past = alienRoute->current;
             PATH *queuePath;
@@ -276,6 +388,16 @@ void next_move(ALIEN *alien) //)
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
             alienRoute->pos = tempPos;
+
+            if(alien->status == waiting){
+                alien->x = nextPath[tempPos].x;
+                alien->y = nextPath[tempPos].y;
+            }
+            if (nextStatus != -1)
+            {
+                alien->status = nextStatus;
+            }
+
             int sorted = 0;
             if (enqueue)
             {
@@ -344,22 +466,8 @@ void next_move(ALIEN *alien) //)
                     alienRoute->bridge->waiting = 0;
                 }
             }
-            NODE_ALIEN *first;
-            if (alienRoute->start == alfaPlanet)
-            {
-                first = ((NODE_ALIEN *)alienRoute->bridge->northHead);
-            }
-            else if (alienRoute->start == betaPlanet)
-            {
-                first = ((NODE_ALIEN *)alienRoute->bridge->southHead);
-            }
-            if(first != NULL){
-                if (alien->id == first->data->id)
-                {
-                    alien->status = ready;
-                }
-            }
 
+          
             past[pastPos].blocked = 0;
             past[pastPos].alienID = -1;
 
@@ -394,8 +502,10 @@ void next_move(ALIEN *alien) //)
         }
     }
 }
+
 int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
 {
+    
     int result = 0;
     if (alienMoving->way->finished)
     {
@@ -415,7 +525,7 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
         BRIDGE *myBridge = alienMoving->way->bridge;
         if (nextPATH == myBridge->queueNorth)
         {
-            if (get_length(myBridge->northHead) == myBridge->queueSize)
+            if (get_length(myBridge->northHead) >= myBridge->queueSize)
             {
                 result = 0;
             }
@@ -426,7 +536,7 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
         }
         else if (nextPATH == myBridge->queueSouth)
         {
-            if (get_length(myBridge->southHead) == myBridge->queueSize)
+            if (get_length(myBridge->southHead) >= myBridge->queueSize)
             {
                 result = 0;
             }
@@ -439,13 +549,13 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             if (alienMoving->status == running ){
                 result = 1;
             }
-            else if (alienMoving->status == ready && !myBridge->waiting) {
+            else if ((alienMoving->status == ready || alienMoving->status == waiting) && !myBridge->waiting) {
+
                 if( (alienMoving->way->start == alfaPlanet && myBridge->yield == northYield) || (alienMoving->way->start == betaPlanet && myBridge->yield == southYield ))
                 {
                     int nextHoldup = alienMoving->weight + myBridge->holdup;
                     if(nextHoldup <= myBridge->strength){
 
-                        
                         if (myBridge->planner == Count){
                             int nextCount = myBridge->tempCount + 1;
                             if(nextCount <= myBridge->planner_count){
@@ -479,6 +589,7 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             }
             else
             {
+
                 result = 0;
             }
         }
