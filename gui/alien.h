@@ -11,7 +11,7 @@
 alien_config load_alien();
 
 
-ALIEN * create_alien (int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed);
+ALIEN * create_alien (int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed, double rto_time);
 
 void KILL_ALIEN(struct ALIEN *deadAlien);
 void ADD_ALIEN (struct NODE_ALIEN **head, struct ALIEN *newData);

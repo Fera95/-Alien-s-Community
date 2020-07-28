@@ -158,8 +158,22 @@ void next_move(ALIEN *alien) //)
     int change_pos = 1;
     float tempx, tempy;
     int move = 1;
-    if(alien->way->bridge->scheduler == RoundRobin || alien->way->bridge->scheduler == ShortestFirst){
-        // printf("%p\n",(void *)alien->way->bridge, );
+
+
+    if(alien->type == beta && alien->status == running){
+        double next_rtoLeft =alien->rto_left - 0.025;
+        if(next_rtoLeft <= 0){
+            move = 0;
+            change_pos = 0;
+            alien->selected = 1;
+            alien->stopbyRto = 1;
+            printf("STOPPED BY RTO SPEC\n");
+        }
+        else {
+            alien->rto_left = next_rtoLeft;
+        }
+    }
+    else if(alien->way->bridge->scheduler == RoundRobin || alien->way->bridge->scheduler == ShortestFirst){
         if(alien->status == running && alien->way->bridge->waiting){
             change_pos = 0;
             set_waiting(alien);
@@ -589,20 +603,20 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
         int len = alienMoving->way->bridge->queueSize-1;
         NODE_ALIEN * headN = (NODE_ALIEN *) alienMoving->way->bridge->northHead;
         NODE_ALIEN * headS = (NODE_ALIEN *) alienMoving->way->bridge->southHead;
-        printf("\nPATH LEN %d   N: %d\n",len, alienMoving->way->bridge->queueNorth[len].alienID);
-        if(headN!=NULL){
-        printf("ID HEAD     N: %d\n",headN->data->id);
-        }
-        else {
-        printf("PATH LEN-1  N: NULL\n");
-        }
-        printf("\nPATH LEN %d   S: %d\n",len, alienMoving->way->bridge->queueNorth[len].alienID);
-        if(headS!=NULL){
-        printf("ID HEAD     S: %d\n",headS->data->id);
-        }
-        else {
-        printf("PATH LEN-1  S: NULL\n");
-        }
+        // printf("\nPATH LEN %d   N: %d\n",len, alienMoving->way->bridge->queueNorth[len].alienID);
+        // if(headN!=NULL){
+        // printf("ID HEAD     N: %d\n",headN->data->id);
+        // }
+        // else {
+        // printf("PATH LEN-1  N: NULL\n");
+        // }
+        // printf("\nPATH LEN %d   S: %d\n",len, alienMoving->way->bridge->queueNorth[len].alienID);
+        // if(headS!=NULL){
+        // printf("ID HEAD     S: %d\n",headS->data->id);
+        // }
+        // else {
+        // printf("PATH LEN-1  S: NULL\n");
+        // }
         
     }
     int result = 0;

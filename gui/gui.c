@@ -109,6 +109,11 @@ int init_gui(GUI_CONTEXT *ctx)
         ERROR_LOADING = 1;
         printf("ERROR: INVALID MEDIUM TIME FOR CREATION\n");
     }
+    if (ctx->config.rto_time < 1)
+    {
+        ERROR_LOADING = 1;
+        printf("ERROR: INVALID REAL TIME \n");
+    }
     else
     {
         ctx->generate = 0;
@@ -561,7 +566,10 @@ ALIEN *generateAlien(GUI_CONTEXT *ctx)
             initPosX = COMMUNITY_BETA_POSX;
             initPosY = COMMUNITY_BETA_POSY;
         }
-        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, ctx->config.base_speed); //
+        newAlien = create_alien(countIDs, type, &tempRoute, initPosX, initPosY, ctx->config.base_speed, ctx->config.rto_time); //
+        if(newAlien->type == beta){
+            newAlien->rto_left = ctx->config.rto_time;
+        }
         countIDs++;
     }
 
@@ -618,7 +626,7 @@ ALIEN *generateManualAlien(GUI_CONTEXT *ctx, enum origin start, enum alienType a
             initPosY = COMMUNITY_BETA_POSY;
         }
         // printf("Creando (MANUAL) nuevo alien %d\n",countIDs);
-        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, ctx->config.base_speed);
+        newAlien = create_alien(countIDs, alien_t, &tempRoute, initPosX, initPosY, ctx->config.base_speed, ctx->config.rto_time);
         countIDs++;
     }
 
@@ -757,6 +765,48 @@ int loop_gui(GUI_CONTEXT *ctx)
             break;
 
         case ALLEGRO_EVENT_KEY_DOWN:
+            if (ctx->event.keyboard.keycode != ALLEGRO_KEY_LEFT) {
+                NODE_ALIEN* temp = (NODE_ALIEN*) ctx->westBridge->crossing;
+                while(temp != NULL){
+                    if(temp->data->type == beta && temp->data->stopbyRto ){
+                        temp->data->rto_left = 1000;
+                        temp->data->selected = 0;
+
+                        break;
+
+                    }
+                    temp = temp->next;
+
+                }
+
+            }
+            if (ctx->event.keyboard.keycode != ALLEGRO_KEY_RIGHT) {
+                NODE_ALIEN* temp = (NODE_ALIEN*) ctx->eastBridge->crossing;
+                while(temp != NULL){
+                    if(temp->data->type == beta && temp->data->stopbyRto ){
+                        temp->data->rto_left = 1000;
+                        temp->data->selected = 0;
+                        break;
+                    }
+                    temp = temp->next;
+                }
+
+            }
+            if (ctx->event.keyboard.keycode != ALLEGRO_KEY_UP) {
+                NODE_ALIEN* temp = (NODE_ALIEN*) ctx->midBridge->crossing;
+                while(temp != NULL){
+                    if(temp->data->type == beta && temp->data->stopbyRto ){
+                        temp->data->rto_left = 1000;
+                        temp->data->selected = 0;
+
+                        break;
+                    }
+                    temp = temp->next;
+
+                }
+            }
+            break;
+
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
             ctx->done = true;
             break;
@@ -978,7 +1028,9 @@ void *moveAlien(void *args)
         if (myAlien != NULL)
         {
             onRoad = !myAlien->way->finished;
-            next_move(myAlien);
+            if(!myAlien->pause){
+                next_move(myAlien);
+            }
             usleep(25000);
         }
         else
