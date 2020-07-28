@@ -63,8 +63,8 @@ typedef struct BRIDGE
     enum algorithm planner;
     // VARIABLES
     enum bridgePosition position;
-    double crossTime;
     double tempTime;
+    double crossTime;
     int countAliens;
     int tempCount;
     int holdup;
@@ -72,6 +72,8 @@ typedef struct BRIDGE
     int waiting;
     lpthread_mutex yield_semaphore;
 
+    int IdsNorth[5];
+    int IdsSouth[5];
     // ALIEN LISTS
     void *northHead;
     void *southHead;
@@ -139,8 +141,12 @@ typedef struct ALIEN
     enum state status;      // FLAG TO FREE MEMORY
     int id;                 // IDENTIFER
     int tickets;            // LOTTERY ALGORITHM
+    int RR_pos;             // ROUND ROBIN ALGORITHM
+    PATH* RR_path;          // ROUND ROBIN ALGORITHM
+    int leftPixels;         // Shortest First 
     int alienPriority;      // PRIORITY ALGORITHM
     int weight;             // ALIEN WEIGHT TO PASS THE BRIDGE
+    int sleep;
     float x, y;             // COORDS IN SPACE
     float dx, dy;           // SPEED
     float quatum;           // Quatum

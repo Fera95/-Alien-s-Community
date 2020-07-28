@@ -1,5 +1,38 @@
 #include "scheduler.h"
 
+
+void order_list_by_speedest(NODE_ALIEN *head)
+{
+    int swapped, i; 
+    struct NODE_ALIEN *ptr1; 
+    struct NODE_ALIEN *lptr = NULL; 
+  
+    /* Se verifica si la lista no es nula */
+    if (head == NULL) 
+        return; 
+    do
+    { 
+        swapped = 0; 
+        ptr1 = head; 
+  
+        while (ptr1->next != lptr) 
+        { 
+            if (ptr1->data->leftPixels == ptr1->next->data->leftPixels){    
+                if (ptr1->data->dy < ptr1->next->data->dy) 
+                {  
+                    swap_one_by_one(ptr1, ptr1->next); 
+                    swapped = 1; 
+                }
+            }
+            ptr1 = ptr1->next; 
+        } 
+        lptr = ptr1; 
+    } 
+    while (swapped); 
+}
+
+
+
 /**
  * LIST SORT OPERATIONS
  * SCHEDULER
@@ -147,8 +180,8 @@ return result;
 void order_list_by_shortest(NODE_ALIEN *head)
 {
     int swapped, i; 
-  struct NODE_ALIEN *ptr1; 
-  struct NODE_ALIEN *lptr = NULL; 
+    struct NODE_ALIEN *ptr1; 
+    struct NODE_ALIEN *lptr = NULL; 
   
     /* Se verifica si la lista no es nula */
     if (head == NULL) 
@@ -160,17 +193,20 @@ void order_list_by_shortest(NODE_ALIEN *head)
   
         while (ptr1->next != lptr) 
         { 
-            //se ordena por propiedad 
-            if (ptr1->data->dy < ptr1->next->data->dy) 
+
+            if (ptr1->data->leftPixels > ptr1->next->data->leftPixels) 
             {  
                 swap_one_by_one(ptr1, ptr1->next); 
                 swapped = 1; 
-            } 
+            }
+             
             ptr1 = ptr1->next; 
         } 
         lptr = ptr1; 
     } 
     while (swapped); 
+    order_list_by_speedest(head);
+    
 }
 
 void order_list_by_rr(NODE_ALIEN *head){}

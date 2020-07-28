@@ -38,6 +38,116 @@ ROUTE *create_route(BRIDGE **bridge, PATH **map, enum origin start)
     return newRoute;
 }
 
+
+void set_waiting(ALIEN * alien){
+    float *next_x = &alien->x;
+    float *next_y = &alien->y;
+
+    alien->RR_pos = alien->way->pos;
+    alien->status = waiting;
+    PATH* pastPath = alien->way->current;
+    int pastPos = alien->way->pos;
+
+
+    
+    if(alien->way->start ==  alfaPlanet){
+        alien->leftPixels -= 40*(alien->way->pos);        
+    }
+    else {
+        alien->leftPixels -= 40*(alien->way->bridge->length - alien->way->pos) *alien->dy;
+    }
+
+    alien->sleep = 1;
+
+    NODE_ALIEN * queue;
+    PATH * queuePath;
+    alien->way->pos = 0;
+
+    if(alien->way->start ==  alfaPlanet){
+        *next_x = alien->way->bridge->queueNorth[0].x;
+        *next_x -= 40;
+        *next_y = alien->way->bridge->queueNorth[0].y;
+        queue = (NODE_ALIEN* ) alien->way->bridge->northHead;
+        alien->way->current = alien->way->bridge->queueNorth;
+        queuePath = alien->way->bridge->queueNorth;
+    
+    }
+    else if(alien->way->start ==  betaPlanet){
+        *next_x = alien->way->bridge->queueSouth[0].x + 40;
+        *next_y = alien->way->bridge->queueSouth[0].y;
+        queue = (NODE_ALIEN* )alien->way->bridge->southHead;
+        queuePath = alien->way->bridge->queueSouth;
+
+
+
+    }
+    NODE_ALIEN * cross = (NODE_ALIEN* )alien->way->bridge->crossing;
+    ADD_ALIEN(&queue, alien);
+    int cardinal;
+    if(alien->way->start ==  alfaPlanet){
+        alien->way->bridge->northHead = (void* )queue;
+        cardinal=1;
+    }
+    else if (alien->way->start ==  betaPlanet) {
+        alien->way->bridge->southHead = (void* )queue;
+        cardinal=0;
+    }
+    
+
+    REMOVE_ALIEN (&cross, alien->id);
+    alien->way->bridge->holdup = alien->way->bridge->holdup - (alien->weight);
+    alien->way->bridge->crossing= (void* )cross;
+    if(get_length(cross)==0){
+        alien->way->bridge->waiting = 0;
+    }
+    
+    int len =alien->way->bridge->queueSize-1;
+    for (int i = len; i >= 0 ; i--)
+    {
+        if(!queuePath[i].blocked ){
+            queuePath[i].blocked = 1;
+            queuePath[i].alienID = alien->id;
+            if(cardinal){
+                alien->way->bridge->IdsNorth[i]=alien->id;
+            }
+            else
+            {
+                alien->way->bridge->IdsSouth[i]=alien->id;
+                
+            }
+            
+            alien->way->current = queuePath;
+            alien->way->pos = i;
+            alien->way->limit = alien->way->bridge->queueSize;
+            alien->x = queuePath[i].x;
+            alien->y = queuePath[i].y;
+            alien->sleep = 0;
+            break;
+        }    
+    }
+
+    if(pastPath[pastPos].alienID == alien->id){
+        pastPath[pastPos].blocked = 0;
+        pastPath[pastPos].alienID = -1;
+    }
+    if(alien->way->bridge->scheduler == ShortestFirst){
+        if(cardinal){
+            printf("SHORTEST FIRST %d, POS %d\n", cardinal, alien->way->bridge->position);
+            print_list2((NODE_ALIEN*) (alien->way->bridge->northHead),0);
+            schedule_list((NODE_ALIEN**) ( &(alien->way->bridge->northHead)),alien->way->bridge->scheduler);
+        }
+        else{
+            printf("SHORTEST FIRST %d, POS %d\n", cardinal, alien->way->bridge->position);
+            print_list2((NODE_ALIEN*) (alien->way->bridge->northHead),0);
+            schedule_list((NODE_ALIEN**) ( &(alien->way->bridge->northHead)),alien->way->bridge->scheduler);
+        }
+    }     
+}
+
+int check_RoundRobin(ALIEN *alienMoving, PATH *nextPATH, int pos) {
+
+}
+
 void next_move(ALIEN *alien) //)
 {
     float *next_x = &alien->x;
@@ -47,8 +157,25 @@ void next_move(ALIEN *alien) //)
     float dy = alien->dy;
     int change_pos = 1;
     float tempx, tempy;
+    int move = 1;
+    if(alien->way->bridge->scheduler == RoundRobin || alien->way->bridge->scheduler == ShortestFirst){
+        // printf("%p\n",(void *)alien->way->bridge, );
+        if(alien->status == running && alien->way->bridge->waiting){
+            change_pos = 0;
+            set_waiting(alien);
+        }
+        else if (alien->status == waiting) {
+            if(alien->sleep){
+                change_pos = 0;
+                move=0;
+            }
+            else{
+                move = 1;
+            }
+        }
+    }
 
-    if (alienRoute->diry == down)
+    if (alienRoute->diry == down && move)
     {
         tempy = *next_y + dy;
         if (tempy < alienRoute->current[alienRoute->pos].y)
@@ -57,7 +184,8 @@ void next_move(ALIEN *alien) //)
             change_pos = 0;
         }
     }
-    if (alienRoute->diry == up)
+    
+    if (alienRoute->diry == up && move)
     {
         tempy = *next_y - dy;
         if (tempy > alienRoute->current[alienRoute->pos].y)
@@ -67,7 +195,7 @@ void next_move(ALIEN *alien) //)
         }
     }
 
-    if (alienRoute->dirx == left)
+    if (alienRoute->dirx == left && move)
     {
         tempx = *next_x - dx;
         if (tempx > alienRoute->current[alienRoute->pos].x)
@@ -76,7 +204,8 @@ void next_move(ALIEN *alien) //)
             change_pos = 0;
         }
     }
-    if (alienRoute->dirx == right)
+    
+    if (alienRoute->dirx == right && move)
     {
         tempx = *next_x + dx;
         if (tempx < alienRoute->current[alienRoute->pos].x)
@@ -138,7 +267,7 @@ void next_move(ALIEN *alien) //)
                 {
                     nextPath = alienRoute->bridge->queueSouth;
                 }
-                // nextStatus = ready;
+                nextStatus = ready;
                 tempLimit = alienRoute->bridge->queueSize;
                 tempPos = 0;
                 enqueue = 1;
@@ -148,18 +277,32 @@ void next_move(ALIEN *alien) //)
             else if (alienRoute->current == alienRoute->bridge->queueNorth)
             {
                 nextStatus = running;
-                nextPath = alienRoute->bridge->pass;
+                if(alien->status == waiting) {
+                    // printf("SET TO ROUND ROBIN\n");
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = alien->RR_pos;
+                }
+                else if (alien->status == ready) {
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = 0;
+                }
+                
                 tempLimit = alienRoute->bridge->length;
-                tempPos = 0;
                 dequeue = 1;
 
             }
             // Cola -> Puente
             else if (alienRoute->current == alienRoute->bridge->queueSouth)
             {
-                nextStatus = running;
-                nextPath = alienRoute->bridge->pass;
-                tempPos = alienRoute->bridge->length - 1;
+                if(alien->status == waiting) {
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = alien->RR_pos;
+                }
+                else if (alien->status == ready) {
+                    nextPath = alienRoute->bridge->pass;
+                    tempPos = alienRoute->bridge->length - 1;
+                }
+                nextStatus = running;                
                 tempLimit = -1;
                 dequeue = 1;
             }
@@ -245,10 +388,14 @@ void next_move(ALIEN *alien) //)
             {
                 alienRoute->finished = 1;
             }
+            else if (alien->status == waiting)
+            {
+                
+            }
+            
         }
 
         int available = can_move(alien, nextPath, tempPos);
-
         // LLAMAR AL SEMAFORO DEL PUENTE
 
         if (available)
@@ -256,14 +403,11 @@ void next_move(ALIEN *alien) //)
             nextPath[tempPos].blocked = 1;
             nextPath[tempPos].alienID = alien->id;
 
-            if (nextStatus != -1)
-            {
-                alien->status = nextStatus;
-            }
 
             PATH *past = alienRoute->current;
             PATH *queuePath;
             int pastPos = alienRoute->pos;
+
             if (alienRoute->start == alfaPlanet)
             {
                 queuePath = alienRoute->bridge->queueNorth;
@@ -276,9 +420,20 @@ void next_move(ALIEN *alien) //)
             alienRoute->current = nextPath;
             alienRoute->limit = tempLimit;
             alienRoute->pos = tempPos;
+
+            if(alien->status == waiting){
+                alien->x = nextPath[tempPos].x;
+                alien->y = nextPath[tempPos].y;
+            }
+            if (nextStatus != -1)
+            {
+                alien->status = nextStatus;
+            }
+
             int sorted = 0;
             if (enqueue)
             {
+
                 NODE_ALIEN *head;
                 if (alienRoute->start == alfaPlanet)
                 {
@@ -318,12 +473,22 @@ void next_move(ALIEN *alien) //)
                     NODE_ALIEN *head = (NODE_ALIEN *)alienRoute->bridge->northHead;
                     REMOVE_ALIEN(&head, alien->id);
                     alienRoute->bridge->northHead = (void *)head;
+                    int size = alienRoute->bridge->queueSize;
+                    if(get_length(head) > size ){
+                        ALIEN* sleepy = get_at(head, size);
+                        sleepy->sleep=0;
+                    }
                 }
                 else if (alienRoute->start == betaPlanet)
                 {
                     NODE_ALIEN *head = (NODE_ALIEN *)alienRoute->bridge->southHead;
                     REMOVE_ALIEN(&head, alien->id);
                     alienRoute->bridge->southHead = (void *)head;
+                    int size = alienRoute->bridge->queueSize;
+                    if(get_length(head) > size ){
+                        ALIEN* sleepy = get_at(head, size);
+                        sleepy->sleep=0;
+                    }
                 }
                 NODE_ALIEN *crossList = (NODE_ALIEN *)alienRoute->bridge->crossing;
                 ADD_ALIEN(&crossList, alien);
@@ -344,25 +509,46 @@ void next_move(ALIEN *alien) //)
                     alienRoute->bridge->waiting = 0;
                 }
             }
-            NODE_ALIEN *first;
-            if (alienRoute->start == alfaPlanet)
-            {
-                first = ((NODE_ALIEN *)alienRoute->bridge->northHead);
-            }
-            else if (alienRoute->start == betaPlanet)
-            {
-                first = ((NODE_ALIEN *)alienRoute->bridge->southHead);
-            }
-            if(first != NULL){
-                if (alien->id == first->data->id)
-                {
-                    alien->status = ready;
-                }
-            }
 
+          
             past[pastPos].blocked = 0;
             past[pastPos].alienID = -1;
+            
+            NODE_ALIEN * queue;
+            int cardinal = 0;
+            if(alien->way->start == alfaPlanet){
+                cardinal=1;
+                queue = (NODE_ALIEN*) alien->way->bridge->northHead;
+            }
+            else
+            {
+                queue = (NODE_ALIEN*) alien->way->bridge->southHead;
 
+            }
+            
+            
+            // int len =  alien->way->bridge->queueSize;
+            // for (int i = 0; i < len; i++)
+            // {
+            //     if(cardinal){
+            //         int pathID =  alien->way->bridge->queueNorth[i].alienID;
+            //         ALIEN* temp = get_at(queue, i);
+            //         if (temp!=NULL )
+            //         {
+            //             if(temp->id != pathID){
+            //                 alien->way->bridge->queueNorth[i].blocked=0;
+            //                 alien->way->bridge->queueNorth[i].alienID=-1;
+            //             }
+            //         }
+            //         else
+            //         {
+            //             alien->way->bridge->queueNorth[i].blocked=0;
+            //             alien->way->bridge->queueNorth[i].alienID=-1;
+            //         }
+            //     }
+            // }
+            
+            
             /**
              * Direction of speed
             */
@@ -394,8 +580,31 @@ void next_move(ALIEN *alien) //)
         }
     }
 }
+
 int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
 {
+
+
+    if(alienMoving->way->bridge->position == mid){
+        int len = alienMoving->way->bridge->queueSize-1;
+        NODE_ALIEN * headN = (NODE_ALIEN *) alienMoving->way->bridge->northHead;
+        NODE_ALIEN * headS = (NODE_ALIEN *) alienMoving->way->bridge->southHead;
+        printf("\nPATH LEN %d   N: %d\n",len, alienMoving->way->bridge->queueNorth[len].alienID);
+        if(headN!=NULL){
+        printf("ID HEAD     N: %d\n",headN->data->id);
+        }
+        else {
+        printf("PATH LEN-1  N: NULL\n");
+        }
+        printf("\nPATH LEN %d   S: %d\n",len, alienMoving->way->bridge->queueNorth[len].alienID);
+        if(headS!=NULL){
+        printf("ID HEAD     S: %d\n",headS->data->id);
+        }
+        else {
+        printf("PATH LEN-1  S: NULL\n");
+        }
+        
+    }
     int result = 0;
     if (alienMoving->way->finished)
     {
@@ -415,10 +624,22 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
         BRIDGE *myBridge = alienMoving->way->bridge;
         if (nextPATH == myBridge->queueNorth)
         {
-            if (get_length(myBridge->northHead) == myBridge->queueSize)
+            if (get_length(myBridge->northHead) >= myBridge->queueSize)
             {
                 result = 0;
             }
+            else if (myBridge->scheduler == RoundRobin || myBridge->scheduler == ShortestFirst) {
+                int lenCola = get_length(myBridge->northHead);
+                int lenPuente  = get_length(myBridge->crossing);                
+                if ( lenCola+lenPuente >= myBridge->queueSize){
+                    result = 0;
+                }
+                else
+                {
+                    result = 1;
+                }
+            }
+            
             else
             {
                 result = 1;
@@ -426,9 +647,27 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
         }
         else if (nextPATH == myBridge->queueSouth)
         {
-            if (get_length(myBridge->southHead) == myBridge->queueSize)
+            if (get_length(myBridge->southHead) >= myBridge->queueSize)
             {
                 result = 0;
+            }
+            else if (myBridge->scheduler == RoundRobin || myBridge->scheduler == ShortestFirst) {
+                if( alienMoving->status == new ){
+                    int lenCola = get_length(myBridge->southHead);
+                    int lenPuente  = get_length(myBridge->crossing);                
+                    if ( lenCola+lenPuente >= myBridge->queueSize){
+                        result = 0;
+                    }
+                    else
+                    {
+                        result = 1;
+                    }
+                }
+                else
+                {
+                    result =1;
+                }
+                
             }
             else
             {
@@ -439,13 +678,13 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             if (alienMoving->status == running ){
                 result = 1;
             }
-            else if (alienMoving->status == ready && !myBridge->waiting) {
+            else if ((alienMoving->status == ready || alienMoving->status == waiting) && !myBridge->waiting) {
+
                 if( (alienMoving->way->start == alfaPlanet && myBridge->yield == northYield) || (alienMoving->way->start == betaPlanet && myBridge->yield == southYield ))
                 {
                     int nextHoldup = alienMoving->weight + myBridge->holdup;
                     if(nextHoldup <= myBridge->strength){
 
-                        
                         if (myBridge->planner == Count){
                             int nextCount = myBridge->tempCount + 1;
                             if(nextCount <= myBridge->planner_count){
@@ -479,6 +718,7 @@ int can_move(ALIEN *alienMoving, PATH *nextPATH, int pos)
             }
             else
             {
+
                 result = 0;
             }
         }
@@ -512,6 +752,7 @@ void set_sorted_path(NODE_ALIEN *sorted_list, PATH *queuePATH, int sizequeue)
                 temp->data->y = queuePATH[index].y;
                 temp->data->way->pos = index;
                 temp = temp->next;
+                // tempRoute->bridge->IdsNorth[index]./
             }
         }
         else

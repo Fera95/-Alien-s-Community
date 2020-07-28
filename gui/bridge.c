@@ -73,6 +73,12 @@ void create_bridge (BRIDGE **ctxBridge, config_bridge bridgeConf,  enum bridgePo
         newBridge->waiting = 0;
         newBridge->tempCount = 0;
         newBridge->tempTime = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            newBridge->IdsNorth[i] = -1;
+            newBridge->IdsSouth[i] = -1;
+        }
+        
         newBridge->planner_time_north = northTime;
         newBridge->planner_time_south = southTime;
         lpthread_mutex_init(&(newBridge->yield_semaphore)); 
