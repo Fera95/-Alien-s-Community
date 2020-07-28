@@ -72,6 +72,8 @@ typedef struct BRIDGE
     int waiting;
     lpthread_mutex yield_semaphore;
 
+    int IdsNorth[5];
+    int IdsSouth[5];
     // ALIEN LISTS
     void *northHead;
     void *southHead;
