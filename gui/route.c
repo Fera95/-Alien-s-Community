@@ -47,7 +47,16 @@ void set_waiting(ALIEN * alien){
     alien->status = waiting;
     PATH* pastPath = alien->way->current;
     int pastPos = alien->way->pos;
+
+
     
+    if(alien->way->start ==  alfaPlanet){
+        alien->leftPixels -= 40*(alien->way->pos);        
+    }
+    else {
+        alien->leftPixels -= 40*(alien->way->bridge->length - alien->way->pos) *alien->dy;
+    }
+
     alien->sleep = 1;
 
     NODE_ALIEN * queue;
@@ -91,6 +100,7 @@ void set_waiting(ALIEN * alien){
     if(get_length(cross)==0){
         alien->way->bridge->waiting = 0;
     }
+    
     int len =alien->way->bridge->queueSize-1;
     for (int i = len; i >= 0 ; i--)
     {
@@ -119,7 +129,19 @@ void set_waiting(ALIEN * alien){
     if(pastPath[pastPos].alienID == alien->id){
         pastPath[pastPos].blocked = 0;
         pastPath[pastPos].alienID = -1;
-    }       
+    }
+    if(alien->way->bridge->scheduler == ShortestFirst){
+        if(cardinal){
+            printf("SHORTEST FIRST %d, POS %d\n", cardinal, alien->way->bridge->position);
+            print_list2((NODE_ALIEN*) (alien->way->bridge->northHead),0);
+            schedule_list((NODE_ALIEN**) ( &(alien->way->bridge->northHead)),alien->way->bridge->scheduler);
+        }
+        else{
+            printf("SHORTEST FIRST %d, POS %d\n", cardinal, alien->way->bridge->position);
+            print_list2((NODE_ALIEN*) (alien->way->bridge->northHead),0);
+            schedule_list((NODE_ALIEN**) ( &(alien->way->bridge->northHead)),alien->way->bridge->scheduler);
+        }
+    }     
 }
 
 int check_RoundRobin(ALIEN *alienMoving, PATH *nextPATH, int pos) {
@@ -136,7 +158,7 @@ void next_move(ALIEN *alien) //)
     int change_pos = 1;
     float tempx, tempy;
     int move = 1;
-    if(alien->way->bridge->scheduler == RoundRobin){
+    if(alien->way->bridge->scheduler == RoundRobin || alien->way->bridge->scheduler == ShortestFirst){
         // printf("%p\n",(void *)alien->way->bridge, );
         if(alien->status == running && alien->way->bridge->waiting){
             change_pos = 0;
@@ -150,15 +172,9 @@ void next_move(ALIEN *alien) //)
             else{
                 move = 1;
             }
-            // else {
-            //     NODE_ALIEN * queue = (NODE_ALIEN*) alien->way->bridge->northHead;
-            //     // if(get_at(queue))
-            // }
-            
         }
-        
     }
-    
+
     if (alienRoute->diry == down && move)
     {
         tempy = *next_y + dy;
@@ -417,6 +433,7 @@ void next_move(ALIEN *alien) //)
             int sorted = 0;
             if (enqueue)
             {
+
                 NODE_ALIEN *head;
                 if (alienRoute->start == alfaPlanet)
                 {
