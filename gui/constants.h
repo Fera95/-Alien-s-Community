@@ -145,6 +145,8 @@ typedef struct ALIEN
     PATH* RR_path;          // ROUND ROBIN ALGORITHM
     int leftPixels;         // Shortest First 
     int alienPriority;      // PRIORITY ALGORITHM
+    double rto_left;        // RTO Algorithm
+    int stopbyRto;          // RTO Flag
     int weight;             // ALIEN WEIGHT TO PASS THE BRIDGE
     int sleep;
     float x, y;             // COORDS IN SPACE
@@ -152,7 +154,8 @@ typedef struct ALIEN
     float quatum;           // Quatum
     enum alienType type;    // TYPE OF ALIEN
     ROUTE * way;            // ROUTE THE ALIEN IS GOING TO TAKE
-    
+    int pause;
+
 } ALIEN;
 
 typedef struct NODE_ALIEN

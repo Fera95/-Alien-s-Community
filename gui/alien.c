@@ -25,7 +25,7 @@ alien_config load_alien()
                 conf.medium_time_creation = atoi(current);
             }
             else if(!strcmp(prev,"rto_time")){
-                conf.rto_time = atoi(current);
+                conf.rto_time = atof(current);
             }            
 			else if(!strcmp(prev,"normal_percent")){
                 conf.normal_percent = atoi(current);
@@ -46,7 +46,7 @@ alien_config load_alien()
 /**
  * CREATE
  */
-ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed)
+ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, float firstY, float baseSpeed, double rto_time)
 {
 
     // printf("Creating ALIEN\n");
@@ -88,6 +88,9 @@ ALIEN * create_alien(int ID, enum alienType type, ROUTE ** myWay, float firstX, 
     newAlien->quatum = 1;
     newAlien->sleep = 0;
     newAlien->leftPixels = 40*(newAlien->way->bridge->length);
+    newAlien->pause = 0;
+    newAlien->rto_left = rto_time;
+    newAlien->stopbyRto = 0;
     return newAlien;
 }
 
